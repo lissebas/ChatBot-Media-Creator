@@ -1,0 +1,22 @@
+# ChatBot Creator — editor visual + simulador de flujos conversacionales (tipo Botpress).
+#
+#   docker compose up          → construye y arranca; abre http://localhost:5174
+#   docker compose up --build  → fuerza reconstrucción tras cambiar dependencias
+#   docker compose down        → detiene y limpia el contenedor
+#
+# node_modules vive en un volumen nombrado (dentro de Docker), NO en tu Mac.
+# Host 5174 (el 5173 lo usa otro proyecto tuyo); dentro del contenedor Vite usa 5173.
+services:
+  studio:
+    build: .
+    container_name: chatbot-creator
+    ports:
+      - "5174:5173"
+    volumes:
+      - .:/app
+      - studio_node_modules:/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  studio_node_modules:

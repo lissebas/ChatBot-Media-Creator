@@ -1,0 +1,61 @@
+# ChatBot Creator
+
+Plataforma **propia** (tipo Botpress, no Botpress) para **diseñar y simular** flujos
+conversacionales: un lienzo de nodos/tarjetas conectados por flechas, que puedes
+**crear, mover, conectar, editar y borrar**, y un **simulador de chat** que ejecuta el
+flujo que diseñaste.
+
+Stack: **React + React Flow** (Vite). **Todo corre en Docker** — no se instala nada
+(Node, npm, dependencias) en tu Mac.
+
+> Nace del chatbot **Willy** (WGT Seguros): su flujo viene cargado como ejemplo semilla
+> (`src/flow/willyFlow.js`), pero la plataforma es genérica y sirve para cualquier bot.
+
+## Cómo correrlo (localhost)
+
+Necesitas solo **Docker**.
+
+```bash
+docker compose up --build      # la 1ª vez (instala deps dentro del contenedor)
+# luego abre  http://localhost:5174
+```
+
+Para apagarlo: `Ctrl+C`, y opcionalmente `docker compose down`.
+Siguientes veces basta `docker compose up` (sin `--build`).
+Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
+
+## Qué puedes hacer
+
+**Editor**
+- **Arrastrar** un tipo de nodo desde la paleta izquierda al lienzo → crea un paso.
+- **Conectar** pasos: arrastra desde el punto inferior de un nodo al superior de otro.
+- **Editar** un paso o conexión: selecciónalo → panel derecho (título, texto,
+  color/grupo, etiqueta de la conexión).
+- **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
+- **Auto-organizar** (layout jerárquico automático), **Ajustar**, minimapa + zoom.
+- **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.
+
+**Simulador** (botón **▶ Probar**)
+- Ejecuta el flujo como un chat: escribe o toca opciones y el bot avanza por el grafo.
+- El **nodo activo se resalta** (pulso verde) en el lienzo y la vista se centra en él.
+- Reglas: nodo sin salidas = fin; 1 salida sin etiqueta = espera texto libre;
+  1 con etiqueta o varias = opciones (botones), con match por texto sin tildes.
+
+## Estructura
+
+| Archivo | Qué es |
+|---|---|
+| `docker-compose.yml`, `Dockerfile` | Entorno Docker (Node vive aquí, no en tu Mac). |
+| `src/App.jsx` | App principal: lienzo, drag&drop, edición, guardar/cargar, simulador. |
+| `src/components/FlowNode.jsx` | La tarjeta de nodo (look tipo Botpress). |
+| `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
+| `src/components/Simulator.jsx` | Panel de chat que ejecuta el flujo. |
+| `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
+| `src/flow/willyFlow.js` | Flujo **semilla** de ejemplo (mapa del bot Willy). |
+| `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |
+
+## Roadmap
+
+- ✅ **Fase 1** — Editor visual de flujos.
+- ✅ **Fase 2** — Runtime + simulador de chat.
+- ⏳ **Fase 3** — Conectar el runtime a un canal real (WhatsApp).

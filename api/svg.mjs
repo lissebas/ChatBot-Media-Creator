@@ -84,6 +84,24 @@ export function anclas(nodo) {
   return { entrada: { x: x + width / 2, y }, salidas: mapa };
 }
 
+/**
+ * Recorta un punto al área que se está dibujando, con holgura.
+ *
+ * En un flujo alto, una conexión puede salir de la región y volver miles de
+ * píxeles más abajo. Esa geometría no se ve —queda fuera del recorte— pero el
+ * rasterizador la procesa igual, y con distancias grandes **aborta** (`unreachable`
+ * en el wasm de resvg). Recortando los extremos, el trazo dentro de la vista es
+ * idéntico y lo de fuera deja de existir.
+ */
+function recortarPunto(p, region) {
+  const holgura = 400;
+  const limitar = (v, min, max) => Math.max(min, Math.min(max, v));
+  return {
+    x: limitar(p.x, region.x - holgura, region.x + region.w + holgura),
+    y: limitar(p.y, region.y - holgura, region.y + region.h + holgura),
+  };
+}
+
 /** Trazado en escalones con esquinas redondeadas, como el `smoothstep` del editor. */
 function ruta(a, b) {
   const r = 14;
@@ -205,8 +223,9 @@ export function svgDeRegion({ nodes, edges }, { region, zoom = 1, seleccion = nu
     if (!a || !b || (!visible(a) && !visible(b))) continue;
     const origen = anclas(a).salidas[e.sourceHandle || "next"] || anclas(a).salidas.next;
     if (!origen) continue;
+    const trazo = ruta(recortarPunto(origen, region), recortarPunto(anclas(b).entrada, region));
     partes.push(
-      `<path d="${ruta(origen, anclas(b).entrada)}" fill="none" stroke="${TEMA.arista}"` +
+      `<path d="${trazo}" fill="none" stroke="${TEMA.arista}"` +
         ` stroke-width="1.6" marker-end="url(#flecha)"/>`,
     );
   }

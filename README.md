@@ -34,8 +34,10 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
   renombrar, duplicar y borrar (con confirmación propia, no la del navegador).
 - Sección **Próximamente** con lo que viene: publicar en la Cloud API, webhooks
   entrantes, variables y contexto, analítica, plantillas de Meta e historial.
-- Todo se guarda en el navegador (localStorage); el flujo que tuvieras del
-  modelo anterior se migra solo la primera vez.
+- Todo se guarda en el navegador (localStorage) con **un documento por flujo**:
+  la portada solo lee un índice de metadatos (~0,2 KB) y el autoguardado escribe
+  únicamente el flujo abierto, no los demás. Lo que tuvieras guardado antes se
+  migra solo la primera vez.
 
 **Editor** — lienzo oscuro con retícula de puntos, tarjetas suaves y cápsulas de
 Inicio/Fin, al estilo de los constructores de flujos modernos.
@@ -175,7 +177,7 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/App.jsx` | Portada + editor: lienzo, drag&drop, edición, guardar/cargar, simulador. |
 | `src/components/Home.jsx` | Portada: tus flujos y lo que viene. |
 | `src/components/Modal.jsx` | Diálogos de la app (confirmar, renombrar). |
-| `src/flow/workspace.js` | Los flujos guardados en el navegador. |
+| `src/flow/workspace.js` | Índice + documentos de los flujos en el navegador. |
 | `src/flow/flowJson.js` | **Catálogo de componentes de Flows**: campos, límites y Flow JSON. |
 | `src/components/FlowDesigner.jsx` | Diseñador de pantallas de la tarjeta Flow. |
 | `src/components/FlowScreen.jsx` | Vista previa de una pantalla de Flow. |

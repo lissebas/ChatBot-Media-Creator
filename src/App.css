@@ -202,8 +202,7 @@
   position: absolute; top: 12px; left: 12px; z-index: 6;
   width: 32px; height: 32px;
   display: grid; place-items: center;
-  background: rgba(26, 26, 30, .82);
-  backdrop-filter: blur(8px);
+  background: #1c1c21;
   border: 1px solid var(--border);
   border-radius: 9px;
   cursor: pointer;
@@ -231,7 +230,10 @@
   border-radius: 14px;
   padding: 12px 14px 14px;
   box-shadow: var(--shadow);
-  transition: border-color .13s ease, box-shadow .13s ease, transform .08s ease;
+  /* Solo se anima el borde: animar la sombra de 100 nodos a la vez se nota
+     al arrastrar. `contain` aísla el repintado de cada tarjeta. */
+  transition: border-color .13s ease;
+  contain: layout style paint;
 }
 .fnode:hover { border-color: var(--border-hi); }
 .fnode__head { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
@@ -288,7 +290,8 @@
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: var(--shadow);
-  transition: border-color .13s ease, box-shadow .13s ease;
+  transition: border-color .13s ease;
+  contain: layout style paint;
 }
 .pill:hover { border-color: var(--border-hi); }
 .pill--solid {
@@ -393,8 +396,7 @@
   position: absolute; right: 14px; bottom: 14px; z-index: 6;
   display: flex; flex-direction: column; align-items: center;
   padding: 5px;
-  background: rgba(26, 26, 30, .82);
-  backdrop-filter: blur(8px);
+  background: #1c1c21;
   border: 1px solid var(--border);
   border-radius: 11px;
   box-shadow: var(--shadow);
@@ -416,10 +418,10 @@
 /* Especificidad doble: React Flow posiciona el minimapa con `.panel.bottom.right`. */
 .react-flow__panel.react-flow__minimap {
   margin: 0;
+  contain: strict;
   bottom: 14px; left: 14px; right: auto; top: auto;
   width: 168px; height: 108px;
-  background: rgba(20, 20, 24, .8) !important;
-  backdrop-filter: blur(8px);
+  background: #141418 !important;
   border: 1px solid var(--border);
   border-radius: 11px;
   overflow: hidden;

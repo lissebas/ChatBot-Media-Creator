@@ -1,0 +1,8731 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "card",
+      "position": {
+        "x": 430,
+        "y": 79.5
+      },
+      "data": {
+        "card": "start",
+        "title": "Inicio",
+        "props": {}
+      }
+    },
+    {
+      "id": "saludo",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 275
+      },
+      "data": {
+        "card": "buttons",
+        "title": "Saludo · ¿casos asignados?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "ver_asignados",
+              "title": "Mis casos asignados"
+            },
+            {
+              "id": "nuevo_caso",
+              "title": "Nuevo caso"
+            }
+          ],
+          "body": "👋 Hola *abogado*. Tienes *N* caso(s) asignado(s).\n\n¿Qué deseas hacer?"
+        }
+      }
+    },
+    {
+      "id": "casos_asignados",
+      "type": "card",
+      "position": {
+        "x": 205,
+        "y": 788
+      },
+      "data": {
+        "card": "list",
+        "title": "Casos asignados",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Casos por llenar",
+              "rows": [
+                {
+                  "id": "caso:GYS-EJEMPLO1",
+                  "title": "PXP236",
+                  "description": "ABOGADO IN SITU · MAPFRE"
+                },
+                {
+                  "id": "caso:GYS-EJEMPLO2",
+                  "title": "KIH609",
+                  "description": "TELEFONICA · SOLIDARIA"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "Tus casos asignados — elige cuál completar:",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "caso_precargado",
+      "type": "card",
+      "position": {
+        "x": 205,
+        "y": 1066
+      },
+      "data": {
+        "card": "text",
+        "title": "Caso asignado (pre-cargado)",
+        "props": {
+          "body": "📋 *Caso asignado*\n\n• Placa: *PXP236*\n• N° asistencia: *123456*\n• Servicio: *ABOGADO IN SITU*\n• Aseguradora: *MAPFRE*\n\nYa tengo esos datos ✅ — completemos lo que falta 👇"
+        }
+      }
+    },
+    {
+      "id": "intro_1",
+      "type": "card",
+      "position": {
+        "x": 535,
+        "y": 553
+      },
+      "data": {
+        "card": "text",
+        "title": "Presentación",
+        "props": {
+          "body": "👋 Hola *abogado*.\n\nSoy *Amaranta*, el asistente de G&S Legal.\nVoy a guiarte para registrar el informe de asistencia jurídica paso a paso.\n\n⏱ *Tiempo estimado: 5 a 10 minutos.*"
+        }
+      }
+    },
+    {
+      "id": "intro_2",
+      "type": "card",
+      "position": {
+        "x": 535,
+        "y": 809.5
+      },
+      "data": {
+        "card": "text",
+        "title": "Checklist + comandos",
+        "props": {
+          "body": "📋 *Antes de comenzar, ten a la mano:*\n\n• Número de asistencia y datos de la póliza\n• Datos completos del conductor asegurado\n• Datos del tercero (si aplica)\n• Fotos de los documentos: cédula, licencias\n• Fotos del vehículo (frente, laterales, trasera)\n• Hoja de asistencia firmada\n• Selfie en el lugar del siniestro\n\n📝 *Comandos útiles:*\n• Escribe *corregir* para volver al campo anterior\n• Escribe *reiniciar* para empezar de nuevo\n\nCuando estés listo, responde *listo* ✅",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "arranque",
+      "type": "card",
+      "position": {
+        "x": 535,
+        "y": 1083
+      },
+      "data": {
+        "card": "text",
+        "title": "Arranque",
+        "props": {
+          "body": "¡Perfecto! Empecemos. 🚀"
+        }
+      }
+    },
+    {
+      "id": "aseguradora",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 1301
+      },
+      "data": {
+        "card": "list",
+        "title": "Aseguradora",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Aseguradoras",
+              "rows": [
+                {
+                  "id": "MAPFRE",
+                  "title": "MAPFRE"
+                },
+                {
+                  "id": "SOLIDARIA",
+                  "title": "SOLIDARIA"
+                },
+                {
+                  "id": "ZURICH",
+                  "title": "ZURICH"
+                },
+                {
+                  "id": "HDI",
+                  "title": "HDI"
+                },
+                {
+                  "id": "BOLIVAR",
+                  "title": "BOLIVAR"
+                },
+                {
+                  "id": "ASISYA",
+                  "title": "ASISYA"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es la *aseguradora*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "no_asistencia",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 1682
+      },
+      "data": {
+        "card": "text",
+        "title": "N° de asistencia",
+        "props": {
+          "body": "¿Cuál es el *número de asistencia*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "placa",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 1883
+      },
+      "data": {
+        "card": "text",
+        "title": "Placa del asegurado",
+        "props": {
+          "body": "¿Cuál es la *placa del vehículo asegurado*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "tipo_servicio",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 2101
+      },
+      "data": {
+        "card": "list",
+        "title": "Tipo de servicio",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Tipo de servicio",
+              "rows": [
+                {
+                  "id": "TELEFONICA",
+                  "title": "TELEFONICA"
+                },
+                {
+                  "id": "ABOGADO IN SITU",
+                  "title": "ABOGADO IN SITU"
+                },
+                {
+                  "id": "AUDIENCIA DE CONCILIACION",
+                  "title": "AUDIENCIA DE CONCILIACIO"
+                },
+                {
+                  "id": "PRELIMINAR",
+                  "title": "PRELIMINAR"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *tipo de servicio*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "departamento",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 2422
+      },
+      "data": {
+        "card": "text",
+        "title": "Departamento",
+        "props": {
+          "body": "¿En qué *departamento* ocurrió el siniestro?\n_(Ej: CUNDINAMARCA, ANTIOQUIA, VALLE DEL CAUCA, SANTANDER, ATLÁNTICO...)_",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ciudad",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 2657
+      },
+      "data": {
+        "card": "text",
+        "title": "Ciudad o municipio",
+        "props": {
+          "body": "¿En qué *ciudad o municipio*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "fecha_siniestro",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 2858
+      },
+      "data": {
+        "card": "buttons",
+        "title": "Fecha del siniestro",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "hoy",
+              "title": "📅 Hoy"
+            },
+            {
+              "id": "ayer",
+              "title": "📅 Ayer"
+            },
+            {
+              "id": "otra_fecha",
+              "title": "✏️ Otra fecha"
+            }
+          ],
+          "body": "¿Cuál fue la *fecha del siniestro*?"
+        }
+      }
+    },
+    {
+      "id": "fecha_manual",
+      "type": "card",
+      "position": {
+        "x": 457.5,
+        "y": 3149
+      },
+      "data": {
+        "card": "text",
+        "title": "Fecha escrita a mano",
+        "props": {
+          "body": "✏️ Escribe la *fecha del siniestro* en formato DD/MM/AAAA\n_(Ej: 03/07/2026)_",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "hora_siniestro",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 3384
+      },
+      "data": {
+        "card": "text",
+        "title": "Hora del siniestro",
+        "props": {
+          "body": "¿A qué *hora* ocurrió? (HH:MM, 24h)",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "nombre_conductor",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 3585
+      },
+      "data": {
+        "card": "text",
+        "title": "Nombre del conductor",
+        "props": {
+          "body": "¿Cuál es el *nombre completo del conductor*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "cc_conductor",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 3803
+      },
+      "data": {
+        "card": "text",
+        "title": "Cédula del conductor",
+        "props": {
+          "body": "¿Cuál es la *cédula del conductor*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "tel_conductor",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 4004
+      },
+      "data": {
+        "card": "text",
+        "title": "Teléfono del conductor",
+        "props": {
+          "body": "¿Cuál es el *teléfono del conductor*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "mismo_conductor",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 4222
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Titular = conductor?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿El *titular de la póliza* es el *mismo conductor*?"
+        }
+      }
+    },
+    {
+      "id": "nombre_asegurado",
+      "type": "card",
+      "position": {
+        "x": 457.5,
+        "y": 4500
+      },
+      "data": {
+        "card": "text",
+        "title": "Nombre del asegurado",
+        "props": {
+          "body": "¿Cuál es el *nombre del titular de la póliza* (asegurado)?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "cc_asegurado",
+      "type": "card",
+      "position": {
+        "x": 457.5,
+        "y": 4718
+      },
+      "data": {
+        "card": "text",
+        "title": "Cédula del asegurado",
+        "props": {
+          "body": "¿Cuál es la *cédula del asegurado*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "hay_tercero",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 4919
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Hay tercero?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿Hay *tercero* involucrado en el siniestro?"
+        }
+      }
+    },
+    {
+      "id": "placa_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 5197
+      },
+      "data": {
+        "card": "text",
+        "title": "Placa del tercero",
+        "props": {
+          "body": "¿Cuál es la *placa del vehículo del tercero*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "nombre_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 5415
+      },
+      "data": {
+        "card": "text",
+        "title": "Nombre del tercero",
+        "props": {
+          "body": "¿Cuál es el *nombre del tercero*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "cc_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 5616
+      },
+      "data": {
+        "card": "text",
+        "title": "Cédula del tercero",
+        "props": {
+          "body": "¿Cuál es la *cédula del tercero*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "tel_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 5817
+      },
+      "data": {
+        "card": "text",
+        "title": "Teléfono del tercero",
+        "props": {
+          "body": "¿Cuál es el *teléfono del tercero*?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "aseg_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 6018
+      },
+      "data": {
+        "card": "list",
+        "title": "Aseguradora del tercero (1/2)",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Aseguradoras",
+              "rows": [
+                {
+                  "id": "ALLIANZ",
+                  "title": "ALLIANZ"
+                },
+                {
+                  "id": "SBS",
+                  "title": "SBS"
+                },
+                {
+                  "id": "SURA",
+                  "title": "SURA"
+                },
+                {
+                  "id": "SEGUROS DEL ESTADO",
+                  "title": "SEGUROS DEL ESTADO"
+                },
+                {
+                  "id": "PREVISORA",
+                  "title": "PREVISORA"
+                },
+                {
+                  "id": "LIBERTY",
+                  "title": "LIBERTY"
+                },
+                {
+                  "id": "SHUBB",
+                  "title": "SHUBB"
+                },
+                {
+                  "id": "MAPFRE",
+                  "title": "MAPFRE"
+                },
+                {
+                  "id": "BOLIVAR",
+                  "title": "BOLIVAR"
+                },
+                {
+                  "id": "OTRO",
+                  "title": "OTRO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es la *aseguradora del tercero*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "aseg_tercero_2",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 6536
+      },
+      "data": {
+        "card": "list",
+        "title": "Aseguradora del tercero (2/2)",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Más aseguradoras",
+              "rows": [
+                {
+                  "id": "AXA COLPATRIA",
+                  "title": "AXA COLPATRIA"
+                },
+                {
+                  "id": "EQUIDAD",
+                  "title": "EQUIDAD"
+                },
+                {
+                  "id": "SOLIDARIA",
+                  "title": "SOLIDARIA"
+                },
+                {
+                  "id": "ZURICH",
+                  "title": "ZURICH"
+                },
+                {
+                  "id": "HDI",
+                  "title": "HDI"
+                },
+                {
+                  "id": "QUALITAS",
+                  "title": "QUALITAS"
+                },
+                {
+                  "id": "NO SUMINISTRA",
+                  "title": "NO SUMINISTRA"
+                },
+                {
+                  "id": "ASISYA",
+                  "title": "ASISYA"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es la *aseguradora del tercero*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "foto_cedula_tercero",
+      "type": "card",
+      "position": {
+        "x": 282.5,
+        "y": 6994
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Cédula del tercero",
+        "props": {
+          "body": "📷 Foto de la *cédula del tercero*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "relato",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 7212
+      },
+      "data": {
+        "card": "text",
+        "title": "Relato del siniestro",
+        "props": {
+          "body": "Escriba el *relato del siniestro* (tal como lo narró el conductor):",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "preconcepto",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 7430
+      },
+      "data": {
+        "card": "list",
+        "title": "Preconcepto",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Preconcepto",
+              "rows": [
+                {
+                  "id": "REC TERCERO",
+                  "title": "REC TERCERO"
+                },
+                {
+                  "id": "REC ASEGURADO",
+                  "title": "REC ASEGURADO"
+                },
+                {
+                  "id": "REC POR DETERMINAR",
+                  "title": "REC POR DETERMINAR"
+                },
+                {
+                  "id": "REC COMPARTIDA",
+                  "title": "REC COMPARTIDA"
+                },
+                {
+                  "id": "TERCERO EN FUGA",
+                  "title": "TERCERO EN FUGA"
+                },
+                {
+                  "id": "HURTO",
+                  "title": "HURTO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *preconcepto de responsabilidad*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "tipo_acuerdo",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 7828
+      },
+      "data": {
+        "card": "list",
+        "title": "Tipo de acuerdo",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Tipo de acuerdo",
+              "rows": [
+                {
+                  "id": "VERBAL",
+                  "title": "VERBAL"
+                },
+                {
+                  "id": "LEY 2251",
+                  "title": "LEY 2251"
+                },
+                {
+                  "id": "NINGUN ACUERDO",
+                  "title": "NINGUN ACUERDO"
+                },
+                {
+                  "id": "CARTA DE INVITACION",
+                  "title": "CARTA DE INVITACION"
+                },
+                {
+                  "id": "CONTRATO DE TRANSACCION",
+                  "title": "CONTRATO DE TRANSACCION"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *tipo de acuerdo*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "posibilidad_recobro",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 8179
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Posibilidad de recobro?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿Hay *posibilidad de recobro*?"
+        }
+      }
+    },
+    {
+      "id": "concepto_responsabilidad",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 8440
+      },
+      "data": {
+        "card": "text",
+        "title": "Concepto de responsabilidad",
+        "props": {
+          "body": "Indique el *concepto de responsabilidad* según su criterio jurídico:",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "informe_transito",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 8658
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Informe de tránsito?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿Hay *informe de tránsito* (comparendo/Policía)?"
+        }
+      }
+    },
+    {
+      "id": "observaciones",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 8936
+      },
+      "data": {
+        "card": "text",
+        "title": "Observaciones",
+        "props": {
+          "body": "¿Alguna *observación adicional*? (lesiones, testigos, vía...)\nSi no hay, responda _ninguna_.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "resultado_servicio",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 9171
+      },
+      "data": {
+        "card": "list",
+        "title": "Resultado del servicio",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Resultado",
+              "rows": [
+                {
+                  "id": "SITIO",
+                  "title": "SITIO"
+                },
+                {
+                  "id": "DESISTIMIENTO DE LESIONES",
+                  "title": "DESIST. LESIONES"
+                },
+                {
+                  "id": "PRELIMINAR LESIONES (LIBERACION)",
+                  "title": "PRELIM. LESIONES"
+                },
+                {
+                  "id": "PRELIMINAR HOMICIDIO (LIBERACION)",
+                  "title": "PRELIM. HOMICIDIO"
+                },
+                {
+                  "id": "ORIENTACION TELEFONICA",
+                  "title": "ORIENTACION TELEFONICA"
+                },
+                {
+                  "id": "AUDIENCIA DE CONCILIACION",
+                  "title": "AUDIENCIA CONCIL."
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál fue el *resultado del servicio*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "tipo_autorizacion",
+      "type": "card",
+      "position": {
+        "x": 40,
+        "y": 14890
+      },
+      "data": {
+        "card": "buttons",
+        "title": "Tipo de autorización",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "ACOMPAÑAMIENTO",
+              "title": "ACOMPAÑAMIENTO"
+            },
+            {
+              "id": "CONVOCAR",
+              "title": "CONVOCAR"
+            }
+          ],
+          "body": "¿Cuál es el *tipo de autorización* para la audiencia?"
+        }
+      }
+    },
+    {
+      "id": "des_rol",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 9569
+      },
+      "data": {
+        "card": "list",
+        "title": "Rol en el accidente",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Rol en el accidente",
+              "rows": [
+                {
+                  "id": "CONDUCTOR ASEGURADO",
+                  "title": "CONDUCTOR ASEGURADO"
+                },
+                {
+                  "id": "CONDUCTOR TERCERO",
+                  "title": "CONDUCTOR TERCERO"
+                },
+                {
+                  "id": "PEATÓN",
+                  "title": "PEATÓN"
+                },
+                {
+                  "id": "PASAJERO",
+                  "title": "PASAJERO"
+                },
+                {
+                  "id": "OTRO",
+                  "title": "OTRO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *rol en el accidente*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "des_num_lesionados",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 9920
+      },
+      "data": {
+        "card": "text",
+        "title": "N° de lesionados",
+        "props": {
+          "body": "¿Cuántos *lesionados* hay?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_les_nombre",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 10121
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — nombre",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Nombre completo?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_les_cc",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 10339
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — cédula",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Cédula?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_les_tel",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 10540
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — teléfono",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Teléfono?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_doc_les",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 10741
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Doc. del lesionado",
+        "props": {
+          "body": "📷 *Doc. lesionado 1/N* — Documento de identidad.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_embarazada",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 10976
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Embarazada?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿El/la lesionado(a) está *embarazada*?"
+        }
+      }
+    },
+    {
+      "id": "des_obedece",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 11254
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Obedece órdenes?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿El/la lesionado(a) *obedece órdenes*?"
+        }
+      }
+    },
+    {
+      "id": "des_orientado",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 11568.5
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Está orientado(a)?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "si",
+              "title": "✅ SÍ"
+            },
+            {
+              "id": "no",
+              "title": "❌ NO"
+            }
+          ],
+          "body": "¿El/la lesionado(a) *está orientado(a)*?"
+        }
+      }
+    },
+    {
+      "id": "des_tipo_lesion",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 11883
+      },
+      "data": {
+        "card": "list",
+        "title": "Tipo de lesión",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Tipo de lesión",
+              "rows": [
+                {
+                  "id": "LEVE",
+                  "title": "LEVE"
+                },
+                {
+                  "id": "MODERADA",
+                  "title": "MODERADA"
+                },
+                {
+                  "id": "GRAVE",
+                  "title": "GRAVE"
+                },
+                {
+                  "id": "GRAVÍSIMA",
+                  "title": "GRAVÍSIMA"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *tipo de lesión*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "des_descripcion",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 12212.5
+      },
+      "data": {
+        "card": "text",
+        "title": "Descripción de lesiones",
+        "props": {
+          "body": "Describa las *lesiones* en detalle:",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_tipo_acuerdo",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 12422
+      },
+      "data": {
+        "card": "list",
+        "title": "Tipo de acuerdo (lesiones)",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Tipo de acuerdo",
+              "rows": [
+                {
+                  "id": "VERBAL",
+                  "title": "VERBAL"
+                },
+                {
+                  "id": "LEY 2251",
+                  "title": "LEY 2251"
+                },
+                {
+                  "id": "NINGUN ACUERDO",
+                  "title": "NINGUN ACUERDO"
+                },
+                {
+                  "id": "CARTA DE INVITACION",
+                  "title": "CARTA DE INVITACION"
+                },
+                {
+                  "id": "CONTRATO DE TRANSACCION",
+                  "title": "CONTRATO DE TRANSACCION"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *tipo de acuerdo*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "des_quien_paga",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 12773
+      },
+      "data": {
+        "card": "list",
+        "title": "¿Quién paga?",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "¿Quién realiza el pago?",
+              "rows": [
+                {
+                  "id": "ASEGURADORA",
+                  "title": "ASEGURADORA"
+                },
+                {
+                  "id": "ASEGURADO",
+                  "title": "ASEGURADO"
+                },
+                {
+                  "id": "TERCERO",
+                  "title": "TERCERO"
+                },
+                {
+                  "id": "SIN PAGO",
+                  "title": "SIN PAGO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Quién *realiza el pago*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "des_valor",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 13102.5
+      },
+      "data": {
+        "card": "text",
+        "title": "Valor del acuerdo",
+        "props": {
+          "body": "¿Cuál es el *valor del acuerdo*?\n_(Si es sin pago escriba 0)_",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_sarlaft",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 13389
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 SARLAFT",
+        "props": {
+          "body": "📷 *Docs indemnización 1/4* — SARLAFT.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_cert_bancaria",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 13725
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Certificación bancaria",
+        "props": {
+          "body": "📷 *Docs indemnización 2/4* — Certificación bancaria.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_contrato",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 14018
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Contrato",
+        "props": {
+          "body": "📷 *Docs indemnización 3/4* — Contrato.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_formato_1",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 14236
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Desistimiento 1/3",
+        "props": {
+          "body": "📷 *Formato desistimiento 1/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_formato_2",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 14454
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Desistimiento 2/3",
+        "props": {
+          "body": "📷 *Formato desistimiento 2/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_formato_3",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 14672
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Desistimiento 3/3",
+        "props": {
+          "body": "📷 *Formato desistimiento 3/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "des_firma",
+      "type": "card",
+      "position": {
+        "x": 370,
+        "y": 14920
+      },
+      "data": {
+        "card": "text",
+        "title": "✍️ Firma",
+        "props": {
+          "body": "✍️ *Firma* del asegurado o conductor — envíe foto de la firma.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_rol",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 11532
+      },
+      "data": {
+        "card": "list",
+        "title": "Rol en el accidente",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Rol en el accidente",
+              "rows": [
+                {
+                  "id": "CONDUCTOR ASEGURADO",
+                  "title": "CONDUCTOR ASEGURADO"
+                },
+                {
+                  "id": "CONDUCTOR TERCERO",
+                  "title": "CONDUCTOR TERCERO"
+                },
+                {
+                  "id": "PEATÓN",
+                  "title": "PEATÓN"
+                },
+                {
+                  "id": "PASAJERO",
+                  "title": "PASAJERO"
+                },
+                {
+                  "id": "OTRO",
+                  "title": "OTRO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *rol en el accidente*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "pl_num_lesionados",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 11943
+      },
+      "data": {
+        "card": "text",
+        "title": "N° de lesionados",
+        "props": {
+          "body": "¿Cuántos *lesionados* hay?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_les_nombre",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 12204
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — nombre",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Nombre completo?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_les_cc",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 12497
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — cédula",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Cédula?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_les_tel",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 12833
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Lesionado — teléfono",
+        "props": {
+          "body": "👤 *Lesionado 1/N* — ¿Teléfono?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_doc_les",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 13094
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Doc. del lesionado",
+        "props": {
+          "body": "📷 *Doc. lesionado 1/N* — Documento de identidad.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_severidad",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 13329
+      },
+      "data": {
+        "card": "list",
+        "title": "Severidad de lesiones",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Severidad",
+              "rows": [
+                {
+                  "id": "LEVE",
+                  "title": "LEVE"
+                },
+                {
+                  "id": "MODERADA",
+                  "title": "MODERADA"
+                },
+                {
+                  "id": "GRAVE",
+                  "title": "GRAVE"
+                },
+                {
+                  "id": "GRAVÍSIMA",
+                  "title": "GRAVÍSIMA"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es la *severidad de las lesiones*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "pl_tipo_liberacion",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 13667
+      },
+      "data": {
+        "card": "list",
+        "title": "Tipo de liberación",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Tipo de liberación",
+              "rows": [
+                {
+                  "id": "DESIST. AUTENTICADO",
+                  "title": "DESIST. AUTENTICADO"
+                },
+                {
+                  "id": "ORDEN JUDICIAL",
+                  "title": "ORDEN JUDICIAL"
+                },
+                {
+                  "id": "LIBERTAD CONDICIONAL",
+                  "title": "LIBERTAD CONDICIONAL"
+                },
+                {
+                  "id": "HABEAS CORPUS",
+                  "title": "HABEAS CORPUS"
+                },
+                {
+                  "id": "OTRO",
+                  "title": "OTRO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *tipo de liberación*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "pl_ipat_1",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 14018
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 IPAT 1/3",
+        "props": {
+          "body": "📷 *IPAT 1/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_ipat_2",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 14236
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 IPAT 2/3",
+        "props": {
+          "body": "📷 *IPAT 2/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_ipat_3",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 14454
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 IPAT 3/3",
+        "props": {
+          "body": "📷 *IPAT 3/3*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_no_concilio",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 14672
+      },
+      "data": {
+        "card": "text",
+        "title": "¿Por qué no se concilió?",
+        "props": {
+          "body": "¿Por qué *no se concilió en sitio*? Describa brevemente:",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "pl_otros",
+      "type": "card",
+      "position": {
+        "x": 700,
+        "y": 14911.5
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Otros documentos",
+        "props": {
+          "body": "📷 *Otros documentos* (desistimiento autenticado + factura grúa/patios si aplica).\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_rol",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 12422
+      },
+      "data": {
+        "card": "list",
+        "title": "Rol en el accidente",
+        "props": {
+          "button": "Ver opciones",
+          "sections": [
+            {
+              "title": "Rol en el accidente",
+              "rows": [
+                {
+                  "id": "CONDUCTOR ASEGURADO",
+                  "title": "CONDUCTOR ASEGURADO"
+                },
+                {
+                  "id": "CONDUCTOR TERCERO",
+                  "title": "CONDUCTOR TERCERO"
+                },
+                {
+                  "id": "PEATÓN",
+                  "title": "PEATÓN"
+                },
+                {
+                  "id": "PASAJERO",
+                  "title": "PASAJERO"
+                },
+                {
+                  "id": "OTRO",
+                  "title": "OTRO"
+                }
+              ]
+            }
+          ],
+          "header_text": "G&S Legal",
+          "body": "¿Cuál es el *rol en el accidente*?",
+          "footer": "Seleccione una opción"
+        }
+      }
+    },
+    {
+      "id": "ph_num_fallecidos",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 12833
+      },
+      "data": {
+        "card": "text",
+        "title": "N° de fallecidos",
+        "props": {
+          "body": "¿Cuántos *fallecidos* hay?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_fall_nombre",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 13102.5
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Fallecido — nombre",
+        "props": {
+          "body": "👤 *Fallecido 1/N* — ¿Nombre completo?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_fall_cc",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 13397.5
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Fallecido — cédula",
+        "props": {
+          "body": "👤 *Fallecido 1/N* — ¿Cédula?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_fall_tel",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 13733.5
+      },
+      "data": {
+        "card": "text",
+        "title": "👤 Fallecido — teléfono familiar",
+        "props": {
+          "body": "👤 *Fallecido 1/N* — ¿Teléfono de familiar?",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_doc_1",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 14018
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Doc. fallecido 1",
+        "props": {
+          "body": "📷 *Doc. fallecido 1*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_doc_2",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 14236
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Doc. fallecido 2",
+        "props": {
+          "body": "📷 *Doc. fallecido 2*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_ipat_1",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 14454
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 IPAT 1/2",
+        "props": {
+          "body": "📷 *IPAT 1/2*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_ipat_2",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 14672
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 IPAT 2/2",
+        "props": {
+          "body": "📷 *IPAT 2/2*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "ph_firma",
+      "type": "card",
+      "position": {
+        "x": 1030,
+        "y": 14920
+      },
+      "data": {
+        "card": "text",
+        "title": "✍️ Firma",
+        "props": {
+          "body": "✍️ *Firma* del asegurado o conductor — envíe foto de la firma.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_cedula_cond",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 15168
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Cédula del conductor",
+        "props": {
+          "body": "📷 *Docs asegurado 1/3* — Foto de la *cédula del conductor*.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_lic_conduccion",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 15386
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Licencia de conducción",
+        "props": {
+          "body": "📷 *Docs asegurado 2/3* — Foto de la *licencia de conducción*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_lic_transito",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 15621
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Licencia de tránsito",
+        "props": {
+          "body": "📷 *Docs asegurado 3/3* — Foto de la *licencia de tránsito*.\nEscriba _omitir_ si no tiene.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_frente",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 15856
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Frente",
+        "props": {
+          "body": "📷 *Posición final 1/4* — Foto FRENTE del vehículo asegurado.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_lat_izq",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 16074
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Lateral izquierda",
+        "props": {
+          "body": "📷 *Posición final 2/4* — Foto LATERAL IZQUIERDA.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_lat_der",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 16292
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Lateral derecha",
+        "props": {
+          "body": "📷 *Posición final 3/4* — Foto LATERAL DERECHA.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_trasera",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 16510
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Trasera",
+        "props": {
+          "body": "📷 *Posición final 4/4* — Foto TRASERA.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_hoja_asistencia",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 16728
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Hoja de asistencia",
+        "props": {
+          "body": "📷 *Evidencias 1/3* — Foto de la *hoja de asistencia* firmada.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_selfi",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 16946
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Selfie del abogado",
+        "props": {
+          "body": "📷 *Evidencias 2/3* — *Selfie* del abogado en el lugar del siniestro.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "foto_pantallazo",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 17164
+      },
+      "data": {
+        "card": "text",
+        "title": "📷 Pantallazo de llamada",
+        "props": {
+          "body": "📷 *Evidencias 3/3* — *Pantallazo de llamada*.\n_(Obligatorio en casos telefónicos; escriba omitir solo si NO es telefónico.)_",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "mas_fotos",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 17399
+      },
+      "data": {
+        "card": "buttons",
+        "title": "¿Más fotos?",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "mas_fotos_si",
+              "title": "✅ Sí"
+            },
+            {
+              "id": "mas_fotos_no",
+              "title": "❌ No, continuar"
+            }
+          ],
+          "body": "📷 ¿Desea cargar más fotos antes de generar el PDF?"
+        }
+      }
+    },
+    {
+      "id": "cargar_fotos",
+      "type": "card",
+      "position": {
+        "x": 147.5,
+        "y": 17677
+      },
+      "data": {
+        "card": "text",
+        "title": "Carga libre de fotos",
+        "props": {
+          "body": "📷 Envía *todas* las fotos que necesites (una por una o en álbum).\n\nCuando termines de cargar las fotos, escribe *Listo* ✅ para generar el PDF.",
+          "wait_reply": true
+        }
+      }
+    },
+    {
+      "id": "resumen",
+      "type": "card",
+      "position": {
+        "x": 235,
+        "y": 17912
+      },
+      "data": {
+        "card": "text",
+        "title": "Resumen del informe",
+        "props": {
+          "body": "📋 *Revisa el informe antes de generar el PDF:*\n\n• Asistencia #: *123456*\n• Aseguradora: *MAPFRE*\n• Placa: *PXP236*\n• Servicio: *ABOGADO IN SITU*\n• Fecha/Hora: *03/07/2026 14:30*\n• Lugar: *BOGOTÁ, CUNDINAMARCA*\n\n👤 *Conductor*\n• NOMBRE  CC 00000000\n• Tel: 3001234567\n\n📝 *Caso*\n• Preconcepto · Acuerdo · Resultado · Tercero"
+        }
+      }
+    },
+    {
+      "id": "confirmar",
+      "type": "card",
+      "position": {
+        "x": 117.5,
+        "y": 18147
+      },
+      "data": {
+        "card": "buttons",
+        "title": "Confirmar informe",
+        "props": {
+          "header_type": "none",
+          "buttons": [
+            {
+              "id": "confirmar_pdf",
+              "title": "✅ Generar PDF"
+            },
+            {
+              "id": "corregir",
+              "title": "✏️ Corregir"
+            }
+          ],
+          "body": "¿Los datos son correctos? Confirma para generar el PDF."
+        }
+      }
+    },
+    {
+      "id": "correccion",
+      "type": "card",
+      "position": {
+        "x": 447.5,
+        "y": 18425
+      },
+      "data": {
+        "card": "text",
+        "title": "Corrección",
+        "props": {
+          "body": "↩️ Vamos a corregir el campo anterior:"
+        }
+      }
+    },
+    {
+      "id": "generando",
+      "type": "card",
+      "position": {
+        "x": 117.5,
+        "y": 18425
+      },
+      "data": {
+        "card": "text",
+        "title": "Generando PDF",
+        "props": {
+          "body": "⏳ *Generando el PDF del informe...* Un momento."
+        }
+      }
+    },
+    {
+      "id": "pdf",
+      "type": "card",
+      "position": {
+        "x": 117.5,
+        "y": 18643
+      },
+      "data": {
+        "card": "document",
+        "title": "📄 Informe en PDF",
+        "props": {
+          "link": "https://gys-legal.s4v8m0g3gj5k6.us-west-2.cs.amazonlightsail.com/api/pdf/GYS-PXP236",
+          "filename": "GYS-PXP236.pdf",
+          "caption": "📄 Asistencia #123456 · Placa PXP236 · MAPFRE"
+        }
+      }
+    },
+    {
+      "id": "final",
+      "type": "card",
+      "position": {
+        "x": 117.5,
+        "y": 18844
+      },
+      "data": {
+        "card": "text",
+        "title": "Cierre",
+        "props": {
+          "body": "✅ *¡Todo listo!*\n\nEl informe *GYS-PXP236* fue generado y enviado a la firma.\nEl sistema Amaranta procesará el caso automáticamente.\n\nEscribe *nuevo* o *asistencia* para registrar otro caso."
+        }
+      }
+    },
+    {
+      "id": "fin",
+      "type": "card",
+      "position": {
+        "x": 177.5,
+        "y": 19079
+      },
+      "data": {
+        "card": "end",
+        "title": "Fin",
+        "props": {}
+      }
+    },
+    {
+      "id": "comandos_globales",
+      "type": "card",
+      "position": {
+        "x": 640,
+        "y": 40
+      },
+      "data": {
+        "card": "text",
+        "title": "Comandos globales",
+        "props": {
+          "body": "Disponibles en cualquier paso:\n• *corregir* → vuelve al campo anterior\n• *reiniciar* / *nuevo* → empieza de cero\n• *mis casos* → lista de casos asignados\n\nLa sesión expira a las 23 h de inactividad (ventana de 24 h de Meta)."
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "start",
+      "target": "saludo",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e1",
+      "source": "saludo",
+      "target": "casos_asignados",
+      "sourceHandle": "ver_asignados",
+      "label": "Mis casos asignados",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e2",
+      "source": "saludo",
+      "target": "intro_1",
+      "sourceHandle": "nuevo_caso",
+      "label": "Nuevo caso",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e3",
+      "source": "casos_asignados",
+      "target": "caso_precargado",
+      "sourceHandle": "caso:GYS-EJEMPLO1",
+      "label": "elige un caso",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e4",
+      "source": "casos_asignados",
+      "target": "caso_precargado",
+      "sourceHandle": "caso:GYS-EJEMPLO2",
+      "label": "elige un caso",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e5",
+      "source": "caso_precargado",
+      "target": "aseguradora",
+      "sourceHandle": "next",
+      "label": "salta lo ya conocido",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#3a3a44"
+      },
+      "style": {
+        "stroke": "#3a3a44",
+        "strokeWidth": 1.6,
+        "strokeDasharray": "6 6"
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e6",
+      "source": "intro_1",
+      "target": "intro_2",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e7",
+      "source": "intro_2",
+      "target": "arranque",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e8",
+      "source": "arranque",
+      "target": "aseguradora",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e9",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "MAPFRE",
+      "label": "MAPFRE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e10",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "SOLIDARIA",
+      "label": "SOLIDARIA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e11",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "ZURICH",
+      "label": "ZURICH",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e12",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "HDI",
+      "label": "HDI",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e13",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "BOLIVAR",
+      "label": "BOLIVAR",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e14",
+      "source": "aseguradora",
+      "target": "no_asistencia",
+      "sourceHandle": "ASISYA",
+      "label": "ASISYA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e15",
+      "source": "no_asistencia",
+      "target": "placa",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e16",
+      "source": "placa",
+      "target": "tipo_servicio",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e17",
+      "source": "tipo_servicio",
+      "target": "departamento",
+      "sourceHandle": "TELEFONICA",
+      "label": "TELEFONICA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e18",
+      "source": "tipo_servicio",
+      "target": "departamento",
+      "sourceHandle": "ABOGADO IN SITU",
+      "label": "ABOGADO IN SITU",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e19",
+      "source": "tipo_servicio",
+      "target": "departamento",
+      "sourceHandle": "AUDIENCIA DE CONCILIACION",
+      "label": "AUDIENCIA DE CONC…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e20",
+      "source": "tipo_servicio",
+      "target": "departamento",
+      "sourceHandle": "PRELIMINAR",
+      "label": "PRELIMINAR",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e21",
+      "source": "departamento",
+      "target": "ciudad",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e22",
+      "source": "ciudad",
+      "target": "fecha_siniestro",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e23",
+      "source": "fecha_siniestro",
+      "target": "hora_siniestro",
+      "sourceHandle": "hoy",
+      "label": "Hoy",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e24",
+      "source": "fecha_siniestro",
+      "target": "hora_siniestro",
+      "sourceHandle": "ayer",
+      "label": "Ayer",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e25",
+      "source": "fecha_siniestro",
+      "target": "fecha_manual",
+      "sourceHandle": "otra_fecha",
+      "label": "Otra fecha",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e26",
+      "source": "fecha_manual",
+      "target": "hora_siniestro",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e27",
+      "source": "hora_siniestro",
+      "target": "nombre_conductor",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e28",
+      "source": "nombre_conductor",
+      "target": "cc_conductor",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e29",
+      "source": "cc_conductor",
+      "target": "tel_conductor",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e30",
+      "source": "tel_conductor",
+      "target": "mismo_conductor",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e31",
+      "source": "mismo_conductor",
+      "target": "hay_tercero",
+      "sourceHandle": "si",
+      "label": "SÍ (mismo conductor)",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e32",
+      "source": "mismo_conductor",
+      "target": "nombre_asegurado",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e33",
+      "source": "nombre_asegurado",
+      "target": "cc_asegurado",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e34",
+      "source": "cc_asegurado",
+      "target": "hay_tercero",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e35",
+      "source": "hay_tercero",
+      "target": "placa_tercero",
+      "sourceHandle": "si",
+      "label": "SÍ, hay tercero",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e36",
+      "source": "hay_tercero",
+      "target": "relato",
+      "sourceHandle": "no",
+      "label": "Sin tercero",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e37",
+      "source": "placa_tercero",
+      "target": "nombre_tercero",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e38",
+      "source": "nombre_tercero",
+      "target": "cc_tercero",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e39",
+      "source": "cc_tercero",
+      "target": "tel_tercero",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e40",
+      "source": "tel_tercero",
+      "target": "aseg_tercero",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e41",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "ALLIANZ",
+      "label": "ALLIANZ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e42",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "SBS",
+      "label": "SBS",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e43",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "SURA",
+      "label": "SURA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e44",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "SEGUROS DEL ESTADO",
+      "label": "SEGUROS DEL ESTADO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e45",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "PREVISORA",
+      "label": "PREVISORA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e46",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "LIBERTY",
+      "label": "LIBERTY",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e47",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "SHUBB",
+      "label": "SHUBB",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e48",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "MAPFRE",
+      "label": "MAPFRE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e49",
+      "source": "aseg_tercero",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "BOLIVAR",
+      "label": "BOLIVAR",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e50",
+      "source": "aseg_tercero",
+      "target": "aseg_tercero_2",
+      "sourceHandle": "OTRO",
+      "label": "OTRO → más opciones",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e51",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "AXA COLPATRIA",
+      "label": "AXA COLPATRIA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e52",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "EQUIDAD",
+      "label": "EQUIDAD",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e53",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "SOLIDARIA",
+      "label": "SOLIDARIA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e54",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "ZURICH",
+      "label": "ZURICH",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e55",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "HDI",
+      "label": "HDI",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e56",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "QUALITAS",
+      "label": "QUALITAS",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e57",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "NO SUMINISTRA",
+      "label": "NO SUMINISTRA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e58",
+      "source": "aseg_tercero_2",
+      "target": "foto_cedula_tercero",
+      "sourceHandle": "ASISYA",
+      "label": "ASISYA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e59",
+      "source": "foto_cedula_tercero",
+      "target": "relato",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e60",
+      "source": "relato",
+      "target": "preconcepto",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e61",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "REC TERCERO",
+      "label": "REC TERCERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e62",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "REC ASEGURADO",
+      "label": "REC ASEGURADO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e63",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "REC POR DETERMINAR",
+      "label": "REC POR DETERMINAR",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e64",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "REC COMPARTIDA",
+      "label": "REC COMPARTIDA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e65",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "TERCERO EN FUGA",
+      "label": "TERCERO EN FUGA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e66",
+      "source": "preconcepto",
+      "target": "tipo_acuerdo",
+      "sourceHandle": "HURTO",
+      "label": "HURTO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e67",
+      "source": "tipo_acuerdo",
+      "target": "posibilidad_recobro",
+      "sourceHandle": "VERBAL",
+      "label": "VERBAL",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e68",
+      "source": "tipo_acuerdo",
+      "target": "posibilidad_recobro",
+      "sourceHandle": "LEY 2251",
+      "label": "LEY 2251",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e69",
+      "source": "tipo_acuerdo",
+      "target": "posibilidad_recobro",
+      "sourceHandle": "NINGUN ACUERDO",
+      "label": "NINGUN ACUERDO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e70",
+      "source": "tipo_acuerdo",
+      "target": "posibilidad_recobro",
+      "sourceHandle": "CARTA DE INVITACION",
+      "label": "CARTA DE INVITACI…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e71",
+      "source": "tipo_acuerdo",
+      "target": "posibilidad_recobro",
+      "sourceHandle": "CONTRATO DE TRANSACCION",
+      "label": "CONTRATO DE TRANS…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e72",
+      "source": "posibilidad_recobro",
+      "target": "concepto_responsabilidad",
+      "sourceHandle": "si",
+      "label": "SÍ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e73",
+      "source": "posibilidad_recobro",
+      "target": "concepto_responsabilidad",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e74",
+      "source": "concepto_responsabilidad",
+      "target": "informe_transito",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e75",
+      "source": "informe_transito",
+      "target": "observaciones",
+      "sourceHandle": "si",
+      "label": "SÍ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e76",
+      "source": "informe_transito",
+      "target": "observaciones",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e77",
+      "source": "observaciones",
+      "target": "resultado_servicio",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e78",
+      "source": "resultado_servicio",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "SITIO",
+      "label": "SITIO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e79",
+      "source": "resultado_servicio",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "ORIENTACION TELEFONICA",
+      "label": "ORIENTACIÓN TELEFÓNICA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e80",
+      "source": "resultado_servicio",
+      "target": "tipo_autorizacion",
+      "sourceHandle": "AUDIENCIA DE CONCILIACION",
+      "label": "AUDIENCIA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e81",
+      "source": "resultado_servicio",
+      "target": "des_rol",
+      "sourceHandle": "DESISTIMIENTO DE LESIONES",
+      "label": "DESISTIMIENTO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e82",
+      "source": "resultado_servicio",
+      "target": "pl_rol",
+      "sourceHandle": "PRELIMINAR LESIONES (LIBERACION)",
+      "label": "PRELIM. LESIONES",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e83",
+      "source": "resultado_servicio",
+      "target": "ph_rol",
+      "sourceHandle": "PRELIMINAR HOMICIDIO (LIBERACION)",
+      "label": "PRELIM. HOMICIDIO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e84",
+      "source": "tipo_autorizacion",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "ACOMPAÑAMIENTO",
+      "label": "ACOMPAÑAMIENTO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e85",
+      "source": "tipo_autorizacion",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "CONVOCAR",
+      "label": "CONVOCAR",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e86",
+      "source": "des_rol",
+      "target": "des_num_lesionados",
+      "sourceHandle": "CONDUCTOR ASEGURADO",
+      "label": "CONDUCTOR ASEGURA…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e87",
+      "source": "des_rol",
+      "target": "des_num_lesionados",
+      "sourceHandle": "CONDUCTOR TERCERO",
+      "label": "CONDUCTOR TERCERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e88",
+      "source": "des_rol",
+      "target": "des_num_lesionados",
+      "sourceHandle": "PEATÓN",
+      "label": "PEATÓN",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e89",
+      "source": "des_rol",
+      "target": "des_num_lesionados",
+      "sourceHandle": "PASAJERO",
+      "label": "PASAJERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e90",
+      "source": "des_rol",
+      "target": "des_num_lesionados",
+      "sourceHandle": "OTRO",
+      "label": "OTRO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e91",
+      "source": "des_num_lesionados",
+      "target": "des_les_nombre",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e92",
+      "source": "des_les_nombre",
+      "target": "des_les_cc",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e93",
+      "source": "des_les_cc",
+      "target": "des_les_tel",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e94",
+      "source": "des_les_tel",
+      "target": "des_doc_les",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e95",
+      "source": "des_doc_les",
+      "target": "des_embarazada",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e96",
+      "source": "des_embarazada",
+      "target": "des_obedece",
+      "sourceHandle": "si",
+      "label": "SÍ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e97",
+      "source": "des_embarazada",
+      "target": "des_obedece",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e98",
+      "source": "des_obedece",
+      "target": "des_orientado",
+      "sourceHandle": "si",
+      "label": "SÍ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e99",
+      "source": "des_obedece",
+      "target": "des_orientado",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e100",
+      "source": "des_orientado",
+      "target": "des_tipo_lesion",
+      "sourceHandle": "si",
+      "label": "SÍ",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e101",
+      "source": "des_orientado",
+      "target": "des_tipo_lesion",
+      "sourceHandle": "no",
+      "label": "NO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e102",
+      "source": "des_tipo_lesion",
+      "target": "des_descripcion",
+      "sourceHandle": "LEVE",
+      "label": "LEVE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e103",
+      "source": "des_tipo_lesion",
+      "target": "des_descripcion",
+      "sourceHandle": "MODERADA",
+      "label": "MODERADA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e104",
+      "source": "des_tipo_lesion",
+      "target": "des_descripcion",
+      "sourceHandle": "GRAVE",
+      "label": "GRAVE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e105",
+      "source": "des_tipo_lesion",
+      "target": "des_descripcion",
+      "sourceHandle": "GRAVÍSIMA",
+      "label": "GRAVÍSIMA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e106",
+      "source": "des_descripcion",
+      "target": "des_tipo_acuerdo",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e107",
+      "source": "des_tipo_acuerdo",
+      "target": "des_quien_paga",
+      "sourceHandle": "VERBAL",
+      "label": "VERBAL",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e108",
+      "source": "des_tipo_acuerdo",
+      "target": "des_quien_paga",
+      "sourceHandle": "LEY 2251",
+      "label": "LEY 2251",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e109",
+      "source": "des_tipo_acuerdo",
+      "target": "des_quien_paga",
+      "sourceHandle": "NINGUN ACUERDO",
+      "label": "NINGUN ACUERDO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e110",
+      "source": "des_tipo_acuerdo",
+      "target": "des_quien_paga",
+      "sourceHandle": "CARTA DE INVITACION",
+      "label": "CARTA DE INVITACI…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e111",
+      "source": "des_tipo_acuerdo",
+      "target": "des_quien_paga",
+      "sourceHandle": "CONTRATO DE TRANSACCION",
+      "label": "CONTRATO DE TRANS…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e112",
+      "source": "des_quien_paga",
+      "target": "des_valor",
+      "sourceHandle": "ASEGURADORA",
+      "label": "ASEGURADORA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e113",
+      "source": "des_quien_paga",
+      "target": "des_valor",
+      "sourceHandle": "ASEGURADO",
+      "label": "ASEGURADO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e114",
+      "source": "des_quien_paga",
+      "target": "des_valor",
+      "sourceHandle": "TERCERO",
+      "label": "TERCERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e115",
+      "source": "des_quien_paga",
+      "target": "des_valor",
+      "sourceHandle": "SIN PAGO",
+      "label": "SIN PAGO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e116",
+      "source": "des_valor",
+      "target": "des_sarlaft",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e117",
+      "source": "des_sarlaft",
+      "target": "des_cert_bancaria",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e118",
+      "source": "des_cert_bancaria",
+      "target": "des_contrato",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e119",
+      "source": "des_contrato",
+      "target": "des_formato_1",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e120",
+      "source": "des_formato_1",
+      "target": "des_formato_2",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e121",
+      "source": "des_formato_2",
+      "target": "des_formato_3",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e122",
+      "source": "des_formato_3",
+      "target": "des_firma",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e123",
+      "source": "des_firma",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e124",
+      "source": "pl_rol",
+      "target": "pl_num_lesionados",
+      "sourceHandle": "CONDUCTOR ASEGURADO",
+      "label": "CONDUCTOR ASEGURA…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e125",
+      "source": "pl_rol",
+      "target": "pl_num_lesionados",
+      "sourceHandle": "CONDUCTOR TERCERO",
+      "label": "CONDUCTOR TERCERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e126",
+      "source": "pl_rol",
+      "target": "pl_num_lesionados",
+      "sourceHandle": "PEATÓN",
+      "label": "PEATÓN",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e127",
+      "source": "pl_rol",
+      "target": "pl_num_lesionados",
+      "sourceHandle": "PASAJERO",
+      "label": "PASAJERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e128",
+      "source": "pl_rol",
+      "target": "pl_num_lesionados",
+      "sourceHandle": "OTRO",
+      "label": "OTRO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e129",
+      "source": "pl_num_lesionados",
+      "target": "pl_les_nombre",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e130",
+      "source": "pl_les_nombre",
+      "target": "pl_les_cc",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e131",
+      "source": "pl_les_cc",
+      "target": "pl_les_tel",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e132",
+      "source": "pl_les_tel",
+      "target": "pl_doc_les",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e133",
+      "source": "pl_doc_les",
+      "target": "pl_severidad",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e134",
+      "source": "pl_severidad",
+      "target": "pl_tipo_liberacion",
+      "sourceHandle": "LEVE",
+      "label": "LEVE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e135",
+      "source": "pl_severidad",
+      "target": "pl_tipo_liberacion",
+      "sourceHandle": "MODERADA",
+      "label": "MODERADA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e136",
+      "source": "pl_severidad",
+      "target": "pl_tipo_liberacion",
+      "sourceHandle": "GRAVE",
+      "label": "GRAVE",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e137",
+      "source": "pl_severidad",
+      "target": "pl_tipo_liberacion",
+      "sourceHandle": "GRAVÍSIMA",
+      "label": "GRAVÍSIMA",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e138",
+      "source": "pl_tipo_liberacion",
+      "target": "pl_ipat_1",
+      "sourceHandle": "DESIST. AUTENTICADO",
+      "label": "DESIST. AUTENTICA…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e139",
+      "source": "pl_tipo_liberacion",
+      "target": "pl_ipat_1",
+      "sourceHandle": "ORDEN JUDICIAL",
+      "label": "ORDEN JUDICIAL",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e140",
+      "source": "pl_tipo_liberacion",
+      "target": "pl_ipat_1",
+      "sourceHandle": "LIBERTAD CONDICIONAL",
+      "label": "LIBERTAD CONDICIO…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e141",
+      "source": "pl_tipo_liberacion",
+      "target": "pl_ipat_1",
+      "sourceHandle": "HABEAS CORPUS",
+      "label": "HABEAS CORPUS",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e142",
+      "source": "pl_tipo_liberacion",
+      "target": "pl_ipat_1",
+      "sourceHandle": "OTRO",
+      "label": "OTRO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e143",
+      "source": "pl_ipat_1",
+      "target": "pl_ipat_2",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e144",
+      "source": "pl_ipat_2",
+      "target": "pl_ipat_3",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e145",
+      "source": "pl_ipat_3",
+      "target": "pl_no_concilio",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e146",
+      "source": "pl_no_concilio",
+      "target": "pl_otros",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e147",
+      "source": "pl_otros",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e148",
+      "source": "ph_rol",
+      "target": "ph_num_fallecidos",
+      "sourceHandle": "CONDUCTOR ASEGURADO",
+      "label": "CONDUCTOR ASEGURA…",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e149",
+      "source": "ph_rol",
+      "target": "ph_num_fallecidos",
+      "sourceHandle": "CONDUCTOR TERCERO",
+      "label": "CONDUCTOR TERCERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e150",
+      "source": "ph_rol",
+      "target": "ph_num_fallecidos",
+      "sourceHandle": "PEATÓN",
+      "label": "PEATÓN",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e151",
+      "source": "ph_rol",
+      "target": "ph_num_fallecidos",
+      "sourceHandle": "PASAJERO",
+      "label": "PASAJERO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e152",
+      "source": "ph_rol",
+      "target": "ph_num_fallecidos",
+      "sourceHandle": "OTRO",
+      "label": "OTRO",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e153",
+      "source": "ph_num_fallecidos",
+      "target": "ph_fall_nombre",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e154",
+      "source": "ph_fall_nombre",
+      "target": "ph_fall_cc",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e155",
+      "source": "ph_fall_cc",
+      "target": "ph_fall_tel",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e156",
+      "source": "ph_fall_tel",
+      "target": "ph_doc_1",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e157",
+      "source": "ph_doc_1",
+      "target": "ph_doc_2",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e158",
+      "source": "ph_doc_2",
+      "target": "ph_ipat_1",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e159",
+      "source": "ph_ipat_1",
+      "target": "ph_ipat_2",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e160",
+      "source": "ph_ipat_2",
+      "target": "ph_firma",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e161",
+      "source": "ph_firma",
+      "target": "foto_cedula_cond",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e162",
+      "source": "foto_cedula_cond",
+      "target": "foto_lic_conduccion",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e163",
+      "source": "foto_lic_conduccion",
+      "target": "foto_lic_transito",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e164",
+      "source": "foto_lic_transito",
+      "target": "foto_frente",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e165",
+      "source": "foto_frente",
+      "target": "foto_lat_izq",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e166",
+      "source": "foto_lat_izq",
+      "target": "foto_lat_der",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e167",
+      "source": "foto_lat_der",
+      "target": "foto_trasera",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e168",
+      "source": "foto_trasera",
+      "target": "foto_hoja_asistencia",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e169",
+      "source": "foto_hoja_asistencia",
+      "target": "foto_selfi",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e170",
+      "source": "foto_selfi",
+      "target": "foto_pantallazo",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e171",
+      "source": "foto_pantallazo",
+      "target": "mas_fotos",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e172",
+      "source": "mas_fotos",
+      "target": "cargar_fotos",
+      "sourceHandle": "mas_fotos_si",
+      "label": "Sí",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e173",
+      "source": "mas_fotos",
+      "target": "resumen",
+      "sourceHandle": "mas_fotos_no",
+      "label": "No, continuar",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e174",
+      "source": "cargar_fotos",
+      "target": "resumen",
+      "sourceHandle": "next",
+      "label": "escribe «Listo»",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e175",
+      "source": "resumen",
+      "target": "confirmar",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e176",
+      "source": "confirmar",
+      "target": "generando",
+      "sourceHandle": "confirmar_pdf",
+      "label": "Generar PDF",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e177",
+      "source": "confirmar",
+      "target": "correccion",
+      "sourceHandle": "corregir",
+      "label": "Corregir",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e178",
+      "source": "correccion",
+      "target": "resumen",
+      "sourceHandle": "next",
+      "label": "vuelve al resumen",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#3a3a44"
+      },
+      "style": {
+        "stroke": "#3a3a44",
+        "strokeWidth": 1.6,
+        "strokeDasharray": "6 6"
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e179",
+      "source": "generando",
+      "target": "pdf",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e180",
+      "source": "pdf",
+      "target": "final",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    },
+    {
+      "id": "e181",
+      "source": "final",
+      "target": "fin",
+      "sourceHandle": "next",
+      "type": "smoothstep",
+      "pathOptions": {
+        "borderRadius": 18
+      },
+      "markerEnd": {
+        "type": "arrowclosed",
+        "width": 16,
+        "height": 16,
+        "color": "#54545f"
+      },
+      "style": {
+        "stroke": "#54545f",
+        "strokeWidth": 1.6
+      },
+      "labelBgPadding": [
+        7,
+        4
+      ],
+      "labelBgBorderRadius": 6,
+      "labelBgStyle": {
+        "fill": "#16161a",
+        "stroke": "#2a2a31",
+        "fillOpacity": 1
+      },
+      "labelStyle": {
+        "fontSize": 11,
+        "fill": "#a3a3ae",
+        "fontWeight": 500
+      }
+    }
+  ]
+}

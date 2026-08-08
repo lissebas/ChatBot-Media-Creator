@@ -16,7 +16,8 @@ Stack: **React + React Flow** (Vite). **Todo corre en Docker** — no se instala
 
 Producción en AWS (us-west-2), como sitio estático con login:
 **https://dev.sebasgomezrubio.com** — S3 privado + CloudFront + Cognito, sin
-backend ni base de datos. Detalles y despliegue en [`infra/`](./infra).
+backend ni base de datos. El acceso es un formulario propio dentro de la app
+(sin saltar al Hosted UI de Amazon). Detalles y despliegue en [`infra/`](./infra).
 
 ## Cómo correrlo (localhost)
 

@@ -1,57 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "@xyflow/react/dist/style.css";
 import "./index.css";
+import "./App.css";
 import App from "./App";
+import Login from "./components/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { entrar, resolverSesion } from "./auth";
+import { resolverSesion } from "./auth";
 
 const raiz = ReactDOM.createRoot(document.getElementById("root"));
 
-// Antes de dibujar nada: resolver la sesión. Sin Cognito configurado (desarrollo
-// local) esto entra directo; en AWS, redirige al Hosted UI si hace falta.
-raiz.render(<Cargando />);
+/** Decide qué se ve: el formulario de acceso o el editor. */
+function Raiz({ inicial }) {
+  const [sesion, setSesion] = useState(inicial);
+  if (!sesion) return <Login onEntrar={setSesion} />;
+  return <App sesion={sesion} />;
+}
 
+// La sesión se resuelve antes de dibujar: si hay una guardada (o se puede
+// renovar con el refresh token), se entra directo; si no, sale el formulario.
 resolverSesion()
   .then((sesion) => {
     raiz.render(
       <React.StrictMode>
         <ErrorBoundary>
-          <App sesion={sesion} />
+          <Raiz inicial={sesion} />
         </ErrorBoundary>
       </React.StrictMode>,
     );
   })
   .catch((e) => {
     console.error("[auth]", e);
-    raiz.render(<FalloLogin mensaje={String(e.message || e)} />);
+    raiz.render(
+      <React.StrictMode>
+        <ErrorBoundary>
+          <Raiz inicial={null} />
+        </ErrorBoundary>
+      </React.StrictMode>,
+    );
   });
-
-function Cargando() {
-  return (
-    <div className="crash">
-      <div className="crash__panel">
-        <div className="crash__icon">⏳</div>
-        <h1 className="crash__title">Entrando…</h1>
-        <p className="crash__text">Comprobando tu sesión.</p>
-      </div>
-    </div>
-  );
-}
-
-function FalloLogin({ mensaje }) {
-  return (
-    <div className="crash">
-      <div className="crash__panel">
-        <div className="crash__icon">🔒</div>
-        <h1 className="crash__title">No se pudo iniciar sesión</h1>
-        <p className="crash__text">{mensaje}</p>
-        <div className="crash__actions">
-          <button className="btn btn--primary" onClick={() => { sessionStorage.clear(); entrar(); }}>
-            Entrar de nuevo
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}

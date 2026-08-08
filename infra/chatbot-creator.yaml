@@ -169,7 +169,13 @@ Resources:
         - !Sub "https://${Distribucion.DomainName}/"
         - !Ref UrlLocal
         - !If [ConDominio, !Sub "https://${DominioApp}/", !Ref "AWS::NoValue"]
-      ExplicitAuthFlows: [ALLOW_USER_SRP_AUTH, ALLOW_REFRESH_TOKEN_AUTH]
+      # USER_PASSWORD_AUTH permite el formulario propio de la app (la contraseña
+      # viaja por TLS a Cognito, no la vemos ni la guardamos). SRP se queda por
+      # si algún día se usa el Hosted UI.
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
       PreventUserExistenceErrors: ENABLED
 
 Outputs:

@@ -1,7 +1,7 @@
 {
   "name": "chatbot-creator",
   "private": true,
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "module",
   "description": "ChatBot Creator — plataforma propia (tipo Botpress) para diseñar y simular flujos conversacionales",
   "author": "Johan Sebastián Gómez Rubio <gomezrubiosebas@gmail.com>",

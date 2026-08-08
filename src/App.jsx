@@ -58,6 +58,13 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
+  // El minimapa redibuja TODOS los nodos en cada movimiento de la vista: en
+  // flujos grandes arranca apagado, y la preferencia se recuerda.
+  const [mapa, setMapa] = useState(() => {
+    const guardado = localStorage.getItem("cbc-minimapa");
+    if (guardado !== null) return guardado === "1";
+    return (initial.nodes?.length || 0) <= 60;
+  });
   const [reset, setReset] = useState(false);
   const wrapperRef = useRef(null);
   const { screenToFlowPosition, fitView, setCenter, getZoom } = useReactFlow();
@@ -272,6 +279,17 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     [setNodes, setEdges, fitView],
   );
 
+  const toggleMapa = useCallback(() => {
+    setMapa((v) => {
+      localStorage.setItem("cbc-minimapa", v ? "0" : "1");
+      return !v;
+    });
+  }, []);
+
+  // Identidad estable: si esta función cambia en cada render, el minimapa se
+  // repinta aunque no haya cambiado nada.
+  const colorNodo = useCallback((n) => cardColor(n.data?.card), []);
+
   const toggleSim = useCallback(() => {
     setSimOpen((open) => {
       if (open) setActiveNodeId(null); // al detener, quita el resaltado
@@ -367,15 +385,17 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
               proOptions={{ hideAttribution: true }}
             >
               <Background gap={20} size={1.4} color="#232327" />
-              <MiniMap
-                pannable
-                zoomable
-                nodeColor={(n) => cardColor(n.data?.card)}
-                nodeStrokeWidth={0}
-                maskColor="rgba(8,8,10,0.7)"
-                bgColor="transparent"
-              />
-              <ZoomControls />
+              {mapa ? (
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor={colorNodo}
+                  nodeStrokeWidth={0}
+                  maskColor="rgba(8,8,10,0.7)"
+                  bgColor="transparent"
+                />
+              ) : null}
+              <ZoomControls mapa={mapa} onToggleMapa={toggleMapa} />
             </ReactFlow>
           </SimContext.Provider>
 

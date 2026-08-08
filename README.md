@@ -51,7 +51,10 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 - **Clic derecho** sobre un nodo → duplicar o borrar; sobre una conexión → borrar.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
 - **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
-  flotantes con porcentaje, minimapa y paleta plegable.
+  flotantes con porcentaje y paleta plegable.
+- **Minimapa conmutable** (botón ▣ en los controles): redibuja todos los nodos en
+  cada movimiento de la vista, así que en flujos de más de 60 pasos arranca
+  apagado. La preferencia se recuerda.
 - **Reiniciar** abre un diálogo con dos salidas: **vaciar el lienzo** o volver al
   **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.

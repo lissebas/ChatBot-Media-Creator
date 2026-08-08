@@ -67,17 +67,14 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
   calcula **en AWS**, no en tu equipo; si el motor no responde, se hace en local.
 - **Analizar** — revisa el flujo entero en la nube: pasos inalcanzables,
   callejones sin salida, salidas sin conectar y tarjetas que Meta rechazaría.
-- **Ajustar**, controles de zoom
-  flotantes con porcentaje y paleta plegable.
-- Dos **interruptores de rendimiento** en los controles del lienzo, ambos con la
-  preferencia recordada:
-  - **▣ Minimapa** — redibuja todos los nodos en cada movimiento de la vista;
-    arranca apagado por encima de 60 pasos.
-  - **⚡ Modo ligero** — monta **solo los nodos visibles** (en un flujo de 103
-    pasos, ~25 en vez de 103: 76 % menos DOM), dibuja las aristas sin etiqueta y,
-    al alejar el zoom, quita el texto de las tarjetas. Arranca activo por encima
-    de 60 pasos u 80 conexiones. Solo cambia el dibujo: al guardar, exportar y
-    simular está todo. Si algún día el lienzo se ve vacío, apágalo con ⚡.
+- **Controles del lienzo** (abajo a la derecha): zoom con porcentaje, **⤢
+  encuadrar todo** y **▶ ir al primer paso**, que centra la vista en el Inicio
+  del flujo (o en el disparador externo, si el flujo empieza por ahí) y lo deja
+  seleccionado. En un lienzo de miles de píxeles es la forma rápida de volver.
+- **Minimapa siempre visible** y **modo ligero siempre activo**: se monta solo lo
+  que se ve (en un flujo de 103 pasos, ~25 nodos en vez de 103: 76 % menos DOM),
+  las aristas van sin etiqueta y, al alejar el zoom, las tarjetas pierden el
+  texto. Solo cambia el dibujo: al guardar, exportar y simular está todo.
 - **Reiniciar** abre un diálogo con dos salidas: **vaciar el lienzo** o volver al
   **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.

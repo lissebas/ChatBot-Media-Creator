@@ -10,6 +10,9 @@ PROYECTO="chatbot-creator"
 STACK="$PROYECTO"
 REGION="${AWS_REGION:-us-west-2}"
 TAG="Project=ChatBotMediaCreator"
+# Dominio propio (vacío = se usa el de CloudFront). El certificado va en us-east-1.
+DOMINIO="${DOMINIO:-dev.sebasgomezrubio.com}"
+CERT="${CERT:-arn:aws:acm:us-east-1:180670195920:certificate/858c0cca-0d70-4f6e-9d0f-bbd968ffa81e}"
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Perfil personal (el que tiene la cuenta de este proyecto).
@@ -26,6 +29,8 @@ if [[ "${1:-}" != "--solo-app" ]]; then
     --stack-name "$STACK" \
     --template-file "$RAIZ/infra/chatbot-creator.yaml" \
     --tags "$TAG" \
+    --parameter-overrides "DominioApp=$DOMINIO" "CertificadoArn=$CERT" \
+    --capabilities CAPABILITY_IAM \
     --no-fail-on-empty-changeset
 fi
 

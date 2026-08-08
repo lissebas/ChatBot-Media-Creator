@@ -12,6 +12,17 @@ Parameters:
     Type: String
     Default: http://localhost:5174/
     Description: Callback extra para probar el login desde el entorno de desarrollo.
+  DominioApp:
+    Type: String
+    Default: ""
+    Description: Dominio propio (p. ej. dev.sebasgomezrubio.com). Vacío = dominio de CloudFront.
+  CertificadoArn:
+    Type: String
+    Default: ""
+    Description: Certificado de ACM en us-east-1 que cubre DominioApp.
+
+Conditions:
+  ConDominio: !Not [!Equals [!Ref DominioApp, ""]]
 
 Resources:
   # ── Sitio: bucket privado, solo accesible por CloudFront ──────────────────
@@ -67,6 +78,14 @@ Resources:
       DistributionConfig:
         Enabled: true
         Comment: !Sub "${NombreProyecto} — editor visual de flujos"
+        # Con dominio propio: el certificado debe estar en us-east-1 y cubrirlo.
+        Aliases: !If [ConDominio, [!Ref DominioApp], !Ref "AWS::NoValue"]
+        ViewerCertificate: !If
+          - ConDominio
+          - AcmCertificateArn: !Ref CertificadoArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
         DefaultRootObject: index.html
         HttpVersion: http2and3
         PriceClass: PriceClass_100
@@ -145,9 +164,11 @@ Resources:
       CallbackURLs:
         - !Sub "https://${Distribucion.DomainName}/"
         - !Ref UrlLocal
+        - !If [ConDominio, !Sub "https://${DominioApp}/", !Ref "AWS::NoValue"]
       LogoutURLs:
         - !Sub "https://${Distribucion.DomainName}/"
         - !Ref UrlLocal
+        - !If [ConDominio, !Sub "https://${DominioApp}/", !Ref "AWS::NoValue"]
       ExplicitAuthFlows: [ALLOW_USER_SRP_AUTH, ALLOW_REFRESH_TOKEN_AUTH]
       PreventUserExistenceErrors: ENABLED
 
@@ -159,8 +180,11 @@ Outputs:
     Description: Id de CloudFront (para invalidar la caché)
     Value: !Ref Distribucion
   Url:
-    Description: URL pública de la app
-    Value: !Sub "https://${Distribucion.DomainName}"
+    Description: URL pública de la app (dominio propio si está configurado)
+    Value: !If [ConDominio, !Sub "https://${DominioApp}", !Sub "https://${Distribucion.DomainName}"]
+  UrlCloudFront:
+    Description: Dominio de CloudFront (el destino del CNAME)
+    Value: !GetAtt Distribucion.DomainName
   CognitoDominio:
     Description: Dominio del Hosted UI
     Value: !Sub "https://${DominioLogin}.auth.${AWS::Region}.amazoncognito.com"

@@ -54,6 +54,14 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
   **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.
 
+**Formato de WhatsApp** — el cuerpo y el pie se renderizan de verdad, tanto en la
+vista previa como en el simulador: `*negrita*`, `_cursiva_`, `~tachado~`,
+`` ```monoespaciado``` ``, listas con `-` o `1.` y citas con `>`. Se respetan las
+reglas del chat real (un marcador con espacios alrededor no formatea, y dentro
+del monoespaciado no se aplica nada más) y las de Meta (el **encabezado** de las
+tarjetas interactivas va sin formato). En el lienzo las tarjetas muestran el
+texto limpio, sin marcadores.
+
 **Simulador** (botón **▶ Probar**) — es un **emulador de WhatsApp**, no un chat
 genérico: mismo fondo, mismas burbujas, misma hora dentro del mensaje.
 - Los **botones van pegados a la burbuja**, como en el chat real: las respuestas
@@ -146,6 +154,7 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/components/ZoomControls.jsx` | Controles flotantes de zoom / encuadre. |
 | `src/components/FieldForm.jsx` | Formulario que se dibuja solo desde la definición de la tarjeta. |
 | `src/components/WhatsAppMessage.jsx` | Render fiel de una tarjeta en WhatsApp (simulador y vista previa). |
+| `src/components/WaText.jsx` | Formato de WhatsApp (negrita, cursiva, listas, citas…). |
 | `src/components/CardPreview.jsx` | Vista previa en vivo dentro del inspector. |
 | `src/components/Simulator.jsx` | Emulador de WhatsApp que ejecuta el flujo. |
 | `src/flow/cardTypes.js` | **Catálogo de tarjetas de Meta**: campos, límites, salidas y JSON. |

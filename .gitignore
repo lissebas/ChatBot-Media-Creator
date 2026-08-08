@@ -5,3 +5,7 @@ dist
 
 # Flujos generados (se regeneran con: npm run presets)
 examples
+
+# Bundle temporal de la Lambda
+api/dist
+api/motor.zip

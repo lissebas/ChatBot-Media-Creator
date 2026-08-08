@@ -31,6 +31,29 @@ esos valores (`VITE_COGNITO_DOMINIO`, `VITE_COGNITO_CLIENTE`, `VITE_URL_APP`),
 sube los assets con caché de un año y el `index.html` sin caché, e invalida
 CloudFront.
 
+## Motor de cómputo (Lambda)
+
+El auto-organizado (dagre) y el análisis del flujo se calculan en una **Lambda**,
+no en el portátil. El navegador la invoca así:
+
+1. El `id_token` de Cognito se cambia por **credenciales temporales de AWS** en
+   un **Identity Pool** (`src/aws/sigv4.js`).
+2. Con ellas se **firma la petición con SigV4** —sin SDK, con WebCrypto— y se
+   llama a la **API `Invoke` de Lambda**.
+
+Dos caminos que **no** funcionan en esta cuenta y por qué, para no repetirlos:
+
+- **Function URL pública** (`AuthType: NONE`): devuelve 403 aunque la política de
+  recursos lo permita.
+- **Function URL con `AWS_IAM`**: acepta credenciales de root pero **rechaza las
+  credenciales temporales del Identity Pool**, con el mismo rol que IAM sí
+  autoriza (`simulate-principal-policy` dice *allowed*). La API `Invoke` acepta
+  esas mismas credenciales sin problema — de ahí la vía elegida.
+- **CloudFront + OAC hacia la Function URL**: CloudFront no llega a firmar.
+
+Sin API Gateway, por tanto sin coste fijo. El endpoint de Lambda admite CORS
+(`access-control-allow-origin: *`), así que el navegador puede llamarlo directo.
+
 ## Dominio propio
 
 La app responde en **https://dev.sebasgomezrubio.com** (CloudFront + certificado

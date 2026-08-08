@@ -34,11 +34,34 @@ if [[ "${1:-}" != "--solo-app" ]]; then
     --no-fail-on-empty-changeset
 fi
 
+# Salidas del stack (todas de una vez: alguna la usa el bloque del motor).
 BUCKET="$(salida Bucket)"
 DIST="$(salida DistribucionId)"
 URL="$(salida Url)"
 COGNITO_DOMINIO="$(salida CognitoDominio)"
 COGNITO_CLIENTE="$(salida CognitoClienteId)"
+
+# ── Motor ────────────────────────────────────────────────────────────────────
+MOTOR="$(salida MotorNombre)"
+
+echo "▸ Empaquetando la Lambda…"
+# El bundle se hace en el contenedor (esbuild); el zip, con el `zip` de macOS.
+docker run --rm -v "$RAIZ":/app -v chatbotcreator_studio_node_modules:/app/node_modules -w /app \
+  node:20-alpine ./node_modules/.bin/esbuild api/handler.mjs --bundle --platform=node \
+    --format=esm --target=node20 --outfile=api/dist/index.mjs
+(cd "$RAIZ/api/dist" && zip -q ../motor.zip index.mjs)
+aws lambda update-function-code --function-name "$MOTOR" \
+  --zip-file "fileb://$RAIZ/api/motor.zip" --query 'LastModified' --output text >/dev/null
+rm -rf "$RAIZ/api/motor.zip" "$RAIZ/api/dist"
+aws lambda wait function-updated --function-name "$MOTOR"
+
+# El pool y el cliente se inyectan aquí (en la plantilla crearían un ciclo).
+aws lambda update-function-configuration --function-name "$MOTOR" \
+  --environment "Variables={USER_POOL_ID=$(salida CognitoUserPoolId),CLIENT_ID=$(salida CognitoClienteId),ORIGENES=$URL\,http://localhost:5174}" \
+  --query 'LastModified' --output text >/dev/null
+aws lambda wait function-updated --function-name "$MOTOR"
+
+
 
 echo "▸ Compilando (Vite en Docker)…"
 docker run --rm \
@@ -46,6 +69,10 @@ docker run --rm \
   -e VITE_COGNITO_DOMINIO="$COGNITO_DOMINIO" \
   -e VITE_COGNITO_CLIENTE="$COGNITO_CLIENTE" \
   -e VITE_URL_APP="$URL/" \
+  -e VITE_REGION="$REGION" \
+  -e VITE_MOTOR_NOMBRE="$MOTOR" \
+  -e VITE_IDENTITY_POOL="$(salida IdentityPoolId)" \
+  -e VITE_USER_POOL_ID="$(salida CognitoUserPoolId)" \
   node:20-alpine ./node_modules/.bin/vite build
 
 echo "▸ Subiendo a s3://${BUCKET}…"
@@ -64,4 +91,5 @@ rm -rf "$RAIZ/dist"
 echo
 echo "✅ Listo: $URL"
 echo "   Login:  $COGNITO_DOMINIO"
+echo "   Motor:  $MOTOR (invocado por la API de Lambda con firma SigV4)"
 echo "   Usuarios nuevos:  ./infra/usuario.sh correo@ejemplo.com"

@@ -9,7 +9,7 @@
  * reserializa los demás: antes cada autoguardado hacía `JSON.stringify` de todo
  * el espacio (varios cientos de KB) en el hilo principal — eso era el tirón.
  */
-import { migrateFlow } from "./transform";
+import { migrateFlow, nodeSize } from "./transform";
 
 const IDX = "cbc-index-v1";
 const DOC = (id) => `cbc-doc-${id}`;
@@ -95,7 +95,12 @@ function migrarDesdeVersionesAnteriores() {
 export function cargarDocumento(id) {
   const doc = leerJSON(DOC(id));
   if (!doc || !Array.isArray(doc.nodes)) return { nodes: [], edges: [] };
-  return doc;
+
+  // Sin `width`/`height` React Flow no sabe qué nodos están a la vista y la
+  // virtualización no filtra NADA: se montan todos. Los documentos guardados
+  // antes de que existieran esas dimensiones se completan aquí al abrirlos.
+  const nodes = doc.nodes.map((n) => (n.width && n.height ? n : { ...nodeSize(n), ...n }));
+  return { nodes, edges: doc.edges || [] };
 }
 
 export function guardarDocumento(id, doc) {

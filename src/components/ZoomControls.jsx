@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useReactFlow, useStore } from "@xyflow/react";
 
 /**
@@ -8,12 +7,9 @@ import { useReactFlow, useStore } from "@xyflow/react";
  */
 export default function ZoomControls({ mapa, onToggleMapa, ligero, onToggleLigero }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
-  const zoom = useStore((s) => s.transform[2]);
-  const [pct, setPct] = useState(100);
-
-  useEffect(() => {
-    setPct(Math.round(zoom * 100));
-  }, [zoom]);
+  // El redondeo va DENTRO del selector: así este componente solo se vuelve a
+  // dibujar cuando cambia el porcentaje, no en cada fotograma del zoom.
+  const pct = useStore((s) => Math.round(s.transform[2] * 100));
 
   return (
     <div className="zoomctl">

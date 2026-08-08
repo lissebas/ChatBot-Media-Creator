@@ -27,6 +27,7 @@ import {
   buildInitialFlow,
   makeEdge,
   migrateFlow,
+  nodeSize,
   simplificarAristas,
   NODE_H,
   NODE_W,
@@ -45,6 +46,31 @@ import {
 import "./App.css";
 
 const nodeTypes = { card: FlowNode };
+
+/**
+ * Compara dos listas ignorando lo que no se guarda (selección, estados de
+ * arrastre). Es O(n) con comparaciones por referencia: nada de serializar.
+ */
+function mismoContenido(antes, ahora, iguales) {
+  if (!antes || antes.length !== ahora.length) return false;
+  for (let i = 0; i < ahora.length; i++) {
+    if (antes[i] !== ahora[i] && !iguales(antes[i], ahora[i])) return false;
+  }
+  return true;
+}
+
+const nodoIgual = (a, b) =>
+  a.id === b.id &&
+  a.data === b.data &&
+  a.position?.x === b.position?.x &&
+  a.position?.y === b.position?.y;
+
+const aristaIgual = (a, b) =>
+  a.id === b.id &&
+  a.source === b.source &&
+  a.target === b.target &&
+  a.sourceHandle === b.sourceHandle &&
+  a.label === b.label;
 
 /* ══════════════════════════ Editor ══════════════════════════ */
 
@@ -92,16 +118,25 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
   }, [activeNodeId]);
 
   // Autoguardado. Se salta el primer render (acabamos de cargar: no hay nada que
-  // guardar) y escribe en un hueco libre del hilo para no cortar una animación.
+  // guardar), ignora los cambios que solo mueven la SELECCIÓN —seleccionar un
+  // nodo no debe reescribir 126 KB— y escribe en un hueco libre del hilo para no
+  // cortar una animación.
   const montado = useRef(false);
+  const guardado = useRef({ nodes: null, edges: null });
   useEffect(() => {
     if (!montado.current) {
       montado.current = true;
+      guardado.current = { nodes, edges };
+      return;
+    }
+    if (mismoContenido(guardado.current.nodes, nodes, nodoIgual) &&
+        mismoContenido(guardado.current.edges, edges, aristaIgual)) {
       return;
     }
     const t = setTimeout(() => {
       const guardar = () => {
         onChange(nodes, edges);
+        guardado.current = { nodes, edges };
         setSaved("Guardado ✓");
       };
       if (typeof requestIdleCallback === "function") requestIdleCallback(guardar, { timeout: 1000 });
@@ -124,14 +159,17 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
   const addNode = useCallback(
     (cardKey, position) => {
       const id = `n_${Date.now()}`;
-      setNodes((nds) =>
-        nds.concat({
+      setNodes((nds) => {
+        const nodo = {
           id,
           type: "card",
           position,
           data: { card: cardKey, title: getCard(cardKey).nombre, props: defaultProps(cardKey) },
-        }),
-      );
+        };
+        // Con dimensiones desde el primer momento, la virtualización lo tiene en
+        // cuenta sin esperar a medirlo en el DOM.
+        return nds.concat({ ...nodo, ...nodeSize(nodo) });
+      });
       setSelNodeId(id);
       setSelEdgeId(null);
     },
@@ -216,13 +254,14 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
       setNodes((nds) => {
         const src = nds.find((n) => n.id === id);
         if (!src) return nds;
-        return nds.concat({
+        const copia = {
           ...src,
           id: `n_${Date.now()}`,
           selected: false,
           position: { x: src.position.x + 44, y: src.position.y + 44 },
           data: { ...src.data },
-        });
+        };
+        return nds.concat({ ...nodeSize(copia), ...copia });
       });
     },
     [setNodes],

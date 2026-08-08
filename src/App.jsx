@@ -354,8 +354,6 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     () => (simples ? simplificarAristas(edges) : edges),
     [edges, simples],
   );
-  // En flujos grandes, React Flow solo monta lo que se ve.
-  const virtualizar = nodes.length > 60;
 
   return (
     <div className="app">
@@ -400,7 +398,6 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
               fitView
               fitViewOptions={{ padding: 0.18 }}
               minZoom={0.15}
-              onlyRenderVisibleElements={virtualizar}
               proOptions={{ hideAttribution: true }}
             >
               <Background gap={20} size={1.4} color="#232327" />

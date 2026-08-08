@@ -1,7 +1,7 @@
 /**
- * Barra superior: título + acciones (guardar/cargar JSON, auto-organizar,
- * ajustar, reiniciar al flujo semilla). El estado de guardado se muestra a la
- * derecha.
+ * Barra superior: marca + acciones (probar, auto-organizar, ajustar,
+ * exportar/importar JSON, reiniciar al flujo semilla). El estado de guardado se
+ * muestra a la derecha.
  */
 export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, onToggleSim, simOpen, saved }) {
   return (
@@ -15,13 +15,7 @@ export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, 
       </div>
 
       <div className="toolbar__actions">
-        <button
-          className={`btn ${simOpen ? "btn--primary" : "btn--play"}`}
-          onClick={onToggleSim}
-          title="Probar el flujo en el simulador de chat"
-        >
-          {simOpen ? "■ Detener" : "▶ Probar"}
-        </button>
+        <span className="toolbar__saved">{saved}</span>
         <span className="toolbar__sep" />
         <button className="btn" onClick={onAutoLayout} title="Reorganizar los nodos automáticamente">
           Auto-organizar
@@ -40,11 +34,17 @@ export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, 
             onChange={onLoad}
           />
         </label>
-        <span className="toolbar__sep" />
         <button className="btn btn--ghost" onClick={onReset} title="Volver al flujo de ejemplo">
           Reiniciar
         </button>
-        <span className="toolbar__saved">{saved}</span>
+        <span className="toolbar__sep" />
+        <button
+          className={`btn ${simOpen ? "btn--stop" : "btn--play"}`}
+          onClick={onToggleSim}
+          title="Probar el flujo en el simulador de chat"
+        >
+          {simOpen ? "■ Detener" : "▶ Probar"}
+        </button>
       </div>
     </header>
   );

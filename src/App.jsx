@@ -3,7 +3,6 @@ import {
   ReactFlow,
   ReactFlowProvider,
   Background,
-  Controls,
   MiniMap,
   addEdge,
   useNodesState,
@@ -16,6 +15,8 @@ import Sidebar from "./components/Sidebar";
 import Inspector from "./components/Inspector";
 import Toolbar from "./components/Toolbar";
 import Simulator from "./components/Simulator";
+import ContextMenu from "./components/ContextMenu";
+import ZoomControls from "./components/ZoomControls";
 import { SimContext } from "./sim/SimContext";
 import { GRUPOS } from "./flow/seedFlow";
 import { autoLayout, buildInitialFlow, makeEdge, NODE_H, NODE_W } from "./flow/transform";
@@ -45,6 +46,8 @@ function Studio() {
   const [saved, setSaved] = useState("Autoguardado activo");
   const [simOpen, setSimOpen] = useState(false);
   const [activeNodeId, setActiveNodeId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
   const wrapperRef = useRef(null);
   const { screenToFlowPosition, fitView, setCenter, getZoom } = useReactFlow();
 
@@ -80,18 +83,9 @@ function Studio() {
     setSelEdgeId(se && se.length ? se[0].id : null);
   }, []);
 
-  // ── Crear nodo por drag & drop desde la paleta ──
-  const onDragOver = useCallback((event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
-
-  const onDrop = useCallback(
-    (event) => {
-      event.preventDefault();
-      const group = event.dataTransfer.getData("application/chatbot-node");
-      if (!group || !GRUPOS[group]) return;
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+  // ── Crear nodos (drag & drop desde la paleta, o clic derecho en el lienzo) ──
+  const addNode = useCallback(
+    (group, position) => {
       const id = `n_${Date.now()}`;
       setNodes((nds) =>
         nds.concat({
@@ -104,10 +98,51 @@ function Studio() {
       setSelNodeId(id);
       setSelEdgeId(null);
     },
-    [screenToFlowPosition, setNodes],
+    [setNodes],
   );
 
-  // ── Edición desde el Inspector ──
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+      const group = event.dataTransfer.getData("application/chatbot-node");
+      if (!group || !GRUPOS[group]) return;
+      addNode(group, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
+    },
+    [screenToFlowPosition, addNode],
+  );
+
+  // ── Menú contextual (clic derecho) ──
+  const openPaneMenu = useCallback(
+    (event) => {
+      event.preventDefault();
+      setMenu({
+        kind: "pane",
+        x: event.clientX,
+        y: event.clientY,
+        flowPos: screenToFlowPosition({ x: event.clientX, y: event.clientY }),
+      });
+    },
+    [screenToFlowPosition],
+  );
+
+  const openNodeMenu = useCallback((event, node) => {
+    event.preventDefault();
+    setMenu({ kind: "node", x: event.clientX, y: event.clientY, id: node.id });
+  }, []);
+
+  const openEdgeMenu = useCallback((event, edge) => {
+    event.preventDefault();
+    setMenu({ kind: "edge", x: event.clientX, y: event.clientY, id: edge.id });
+  }, []);
+
+  const closeMenu = useCallback(() => setMenu(null), []);
+
+  // ── Edición desde el Inspector / el menú contextual ──
   const updateNode = useCallback(
     (id, patch) =>
       setNodes((nds) =>
@@ -139,13 +174,30 @@ function Studio() {
     [setEdges],
   );
 
+  const duplicateNode = useCallback(
+    (id) => {
+      setNodes((nds) => {
+        const src = nds.find((n) => n.id === id);
+        if (!src) return nds;
+        return nds.concat({
+          ...src,
+          id: `n_${Date.now()}`,
+          selected: false,
+          position: { x: src.position.x + 44, y: src.position.y + 44 },
+          data: { ...src.data },
+        });
+      });
+    },
+    [setNodes],
+  );
+
   // ── Toolbar ──
   const handleAutoLayout = useCallback(() => {
     setNodes((nds) => autoLayout(nds, edges, "TB"));
-    setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 60);
+    setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
   }, [edges, setNodes, fitView]);
 
-  const handleFit = useCallback(() => fitView({ padding: 0.15, duration: 400 }), [fitView]);
+  const handleFit = useCallback(() => fitView({ padding: 0.18, duration: 400 }), [fitView]);
 
   const handleSave = useCallback(() => {
     const blob = new Blob([JSON.stringify({ nodes, edges }, null, 2)], {
@@ -170,7 +222,7 @@ function Studio() {
           if (Array.isArray(data.nodes) && Array.isArray(data.edges)) {
             setNodes(data.nodes);
             setEdges(data.edges);
-            setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 60);
+            setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
           } else {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
           }
@@ -191,7 +243,7 @@ function Studio() {
     setEdges(fresh.edges);
     setSelNodeId(null);
     setSelEdgeId(null);
-    setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 60);
+    setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
   }, [setNodes, setEdges, fitView]);
 
   const toggleSim = useCallback(() => {
@@ -200,6 +252,33 @@ function Studio() {
       return !open;
     });
   }, []);
+
+  // Items del menú contextual según dónde se hizo clic derecho.
+  const menuItems = useMemo(() => {
+    if (!menu) return [];
+    if (menu.kind === "pane") {
+      return [
+        { header: "Añadir paso" },
+        ...Object.entries(GRUPOS).map(([key, g]) => ({
+          label: g.nombre,
+          dot: g.color,
+          onSelect: () => addNode(key, menu.flowPos),
+        })),
+        { sep: true },
+        { label: "Auto-organizar", onSelect: handleAutoLayout },
+        { label: "Encuadrar todo", onSelect: handleFit },
+      ];
+    }
+    if (menu.kind === "node") {
+      return [
+        { label: "Duplicar paso", onSelect: () => duplicateNode(menu.id) },
+        { label: "Encuadrar todo", onSelect: handleFit },
+        { sep: true },
+        { label: "Borrar paso", danger: true, onSelect: () => deleteNode(menu.id) },
+      ];
+    }
+    return [{ label: "Borrar conexión", danger: true, onSelect: () => deleteEdge(menu.id) }];
+  }, [menu, addNode, duplicateNode, deleteNode, deleteEdge, handleAutoLayout, handleFit]);
 
   const selNode = nodes.find((n) => n.id === selNodeId) || null;
   const selEdge = edges.find((e) => e.id === selEdgeId) || null;
@@ -216,9 +295,17 @@ function Studio() {
         simOpen={simOpen}
         saved={saved}
       />
-      <div className="app__body">
+      <div className={`app__body${sidebarOpen ? "" : " app__body--collapsed"}`}>
         <Sidebar />
         <div className="canvas" ref={wrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
+          <button
+            className={`canvas__toggle${sidebarOpen ? " is-on" : ""}`}
+            onClick={() => setSidebarOpen((v) => !v)}
+            title={sidebarOpen ? "Ocultar la paleta" : "Mostrar la paleta"}
+          >
+            <span className="canvas__toggle-icon" aria-hidden="true" />
+          </button>
+
           <SimContext.Provider value={{ activeNodeId }}>
             <ReactFlow
               nodes={nodes}
@@ -228,21 +315,32 @@ function Studio() {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onSelectionChange={onSelectionChange}
+              onPaneContextMenu={openPaneMenu}
+              onNodeContextMenu={openNodeMenu}
+              onEdgeContextMenu={openEdgeMenu}
+              onPaneClick={closeMenu}
+              onMoveStart={closeMenu}
               fitView
-              fitViewOptions={{ padding: 0.15 }}
+              fitViewOptions={{ padding: 0.18 }}
               minZoom={0.15}
               proOptions={{ hideAttribution: true }}
             >
-              <Background gap={18} size={1} color="#e2e8f0" />
+              <Background gap={20} size={1.4} color="#232327" />
               <MiniMap
                 pannable
                 zoomable
                 nodeColor={(n) => (GRUPOS[n.data?.group] || GRUPOS.inicio).color}
-                maskColor="rgba(15,23,42,0.06)"
+                nodeStrokeWidth={0}
+                maskColor="rgba(8,8,10,0.7)"
+                bgColor="transparent"
               />
-              <Controls />
+              <ZoomControls />
             </ReactFlow>
           </SimContext.Provider>
+
+          {menu ? (
+            <ContextMenu x={menu.x} y={menu.y} items={menuItems} onClose={closeMenu} />
+          ) : null}
         </div>
         {simOpen ? (
           <Simulator

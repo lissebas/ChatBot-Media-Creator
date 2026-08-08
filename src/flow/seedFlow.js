@@ -11,25 +11,30 @@
  * La primera línea del `label` es el título de la tarjeta; el resto, su texto.
  */
 
-/** Tipos de paso disponibles en la paleta: color + nombre visible. */
+/**
+ * Tipos de paso disponibles en la paleta.
+ *  - `color`  acento de la tarjeta, del minimapa y de la paleta.
+ *  - `pill`   se dibuja como cápsula compacta (solo el título), no como tarjeta.
+ *  - `solid`  cápsula rellena en su color (el paso de entrada).
+ */
 export const GRUPOS = {
-  inicio: { color: "#64748b", nombre: "Inicio" },
-  mensaje: { color: "#0ea5e9", nombre: "Mensaje" },
-  opciones: { color: "#2563eb", nombre: "Menú de opciones" },
-  pregunta: { color: "#16a34a", nombre: "Pregunta" },
-  captura: { color: "#ea580c", nombre: "Captura de datos" },
-  condicion: { color: "#0d9488", nombre: "Condición" },
-  accion: { color: "#7c3aed", nombre: "Acción / integración" },
-  seguimiento: { color: "#db2777", nombre: "Seguimiento" },
-  handoff: { color: "#4f46e5", nombre: "Handoff a humano" },
-  fin: { color: "#dc2626", nombre: "Fin" },
-  global: { color: "#9333ea", nombre: "Comandos globales" },
+  inicio: { color: "#12b76a", nombre: "Inicio", pill: true, solid: true },
+  mensaje: { color: "#38bdf8", nombre: "Mensaje" },
+  opciones: { color: "#60a5fa", nombre: "Menú de opciones" },
+  pregunta: { color: "#34d399", nombre: "Pregunta" },
+  captura: { color: "#fb923c", nombre: "Captura de datos" },
+  condicion: { color: "#2dd4bf", nombre: "Condición" },
+  accion: { color: "#a78bfa", nombre: "Acción / integración" },
+  seguimiento: { color: "#f472b6", nombre: "Seguimiento" },
+  handoff: { color: "#818cf8", nombre: "Handoff a humano" },
+  fin: { color: "#f87171", nombre: "Fin", pill: true },
+  global: { color: "#c084fc", nombre: "Comandos globales" },
 };
 
 export const flujoData = {
   nodes: [
     // ── Entrada ──
-    { id: "start", group: "inicio", label: "Mensaje entrante\n(el usuario escribe por primera vez)" },
+    { id: "start", group: "inicio", label: "Inicio" },
     { id: "bienvenida", group: "mensaje", label: "Bienvenida\n¡Hola! Soy tu asistente virtual.\n¿En qué te puedo ayudar hoy?" },
 
     // ── Menú principal ──
@@ -56,7 +61,7 @@ export const flujoData = {
 
     // ── Salidas ──
     { id: "humano", group: "handoff", label: "Hablar con una persona\n(transfiere la conversación con el contexto)" },
-    { id: "fin", group: "fin", label: "Fin de la conversación\n¡Gracias por escribirnos!" },
+    { id: "fin", group: "fin", label: "Fin\n¡Gracias por escribirnos!" },
   ],
 
   edges: [

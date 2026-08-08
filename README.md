@@ -27,13 +27,17 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
 
 ## Qué puedes hacer
 
-**Editor**
-- **Arrastrar** un tipo de nodo desde la paleta izquierda al lienzo → crea un paso.
+**Editor** — lienzo oscuro con retícula de puntos, tarjetas suaves y cápsulas de
+Inicio/Fin, al estilo de los constructores de flujos modernos.
+- **Crear** un paso: arrástralo desde la paleta izquierda, o haz **clic derecho**
+  sobre el lienzo y elígelo en el menú contextual (se crea donde apuntaste).
 - **Conectar** pasos: arrastra desde el punto inferior de un nodo al superior de otro.
-- **Editar** un paso o conexión: selecciónalo → panel derecho (título, texto,
-  color/grupo, etiqueta de la conexión).
+- **Editar** un paso o conexión: selecciónalo → panel derecho (título, texto, tipo
+  de paso como chips de color, etiqueta de la conexión).
+- **Clic derecho** sobre un nodo → duplicar o borrar; sobre una conexión → borrar.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
-- **Auto-organizar** (layout jerárquico automático), **Ajustar**, minimapa + zoom.
+- **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
+  flotantes con porcentaje, minimapa y paleta plegable.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.
 
 **Simulador** (botón **▶ Probar**)
@@ -48,9 +52,12 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
 |---|---|
 | `docker-compose.yml`, `Dockerfile` | Entorno Docker (Node vive aquí, no en tu Mac). |
 | `src/App.jsx` | App principal: lienzo, drag&drop, edición, guardar/cargar, simulador. |
-| `src/components/FlowNode.jsx` | La tarjeta de nodo (look tipo Botpress). |
+| `src/components/FlowNode.jsx` | Nodo del lienzo: tarjeta o cápsula (Inicio / Fin). |
 | `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
+| `src/components/ContextMenu.jsx` | Menú de clic derecho (lienzo, nodo, conexión). |
+| `src/components/ZoomControls.jsx` | Controles flotantes de zoom / encuadre. |
 | `src/components/Simulator.jsx` | Panel de chat que ejecuta el flujo. |
+| `src/index.css` | Tokens del tema oscuro (colores, radios, sombras). |
 | `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
 | `src/flow/seedFlow.js` | Flujo **semilla** de ejemplo + tipos de paso (`GRUPOS`). |
 | `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |

@@ -34,6 +34,16 @@ import {
   NODE_W,
 } from "./flow/transform";
 import {
+  alCerrar,
+  alSincronizar,
+  borrarEnLaNube,
+  documento,
+  nubeActiva,
+  sincronizar,
+  sincronizarIndice,
+  sincronizarSoloIndice,
+} from "./flow/nube";
+import {
   borrarDocumento,
   cargarDocumento,
   cargarIndice,
@@ -73,9 +83,16 @@ const aristaIgual = (a, b) =>
   a.sourceHandle === b.sourceHandle &&
   a.label === b.label;
 
+/** Lo que se lee en la barra según cómo va la copia en S3. */
+const ESTADO_NUBE = {
+  subiendo: "Guardando en la nube…",
+  guardado: "Guardado en la nube ✓",
+  error: "Solo en este equipo (sin conexión con la nube)",
+};
+
 /* ══════════════════════════ Editor ══════════════════════════ */
 
-function Studio({ nombre, doc, onChange, onRename, onHome }) {
+function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
   // `doc` solo se lee al montar: el lienzo es el dueño del estado a partir de ahí.
   const initial = useMemo(() => doc, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
@@ -446,7 +463,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
         onAnalizar={motorActivo ? handleAnalizar : null}
         onToggleSim={toggleSim}
         simOpen={simOpen}
-        saved={saved}
+        saved={ESTADO_NUBE[nube] || saved}
       />
       <div className={`app__body${sidebarOpen ? "" : " app__body--collapsed"}`}>
         <Sidebar />
@@ -621,13 +638,38 @@ export default function App({ sesion }) {
   // El id abierto también en un ref: así el callback de guardado es estable y no
   // vuelve a montar el efecto de autoguardado del lienzo.
   const abiertoRef = useRef(null);
+  // El índice actual, para los manejadores: al mandarlo a la nube hace falta
+  // cómo queda DESPUÉS del cambio, y el estado aún no se ha actualizado.
+  const indiceRef = useRef(indice);
+  // Cuerpo del flujo abierto: `null` mientras se busca (puede venir de S3).
+  const [doc, setDoc] = useState(null);
+  const [estadoNube, setEstadoNube] = useState(null);
 
   // El índice es estado PURO; persistirlo es un efecto (y pesa ~1 KB).
   // Ojo con las llaves: `guardarIndice` DEVUELVE el índice, y un efecto que
   // devuelve algo que no es función revienta cuando React lo llama al limpiar.
   useEffect(() => {
+    indiceRef.current = indice;
     guardarIndice(indice);
   }, [indice]);
+
+  // Al entrar, se cruza lo de este navegador con lo guardado en S3.
+  useEffect(() => {
+    if (!nubeActiva) return undefined;
+    let vivo = true;
+    sincronizarIndice()
+      .then((combinado) => {
+        if (vivo && combinado) setIndice(combinado);
+      })
+      .catch((e) => console.warn("[nube] no se pudo leer el índice:", e));
+    const quitar = alSincronizar(setEstadoNube);
+    window.addEventListener("pagehide", alCerrar);
+    return () => {
+      vivo = false;
+      quitar();
+      window.removeEventListener("pagehide", alCerrar);
+    };
+  }, []);
 
   const abrir = useCallback((id) => {
     abiertoRef.current = id;
@@ -635,14 +677,29 @@ export default function App({ sesion }) {
   }, []);
 
   const meta = indice.find((m) => m.id === abiertoId) || null;
-  // El cuerpo del flujo se lee UNA vez al abrirlo (no en cada render).
-  const doc = useMemo(() => (abiertoId ? cargarDocumento(abiertoId) : null), [abiertoId]);
+
+  // El cuerpo se lee UNA vez al abrir el flujo, de este navegador o de S3.
+  useEffect(() => {
+    if (!abiertoId) {
+      setDoc(null);
+      return undefined;
+    }
+    let vivo = true;
+    setDoc(null);
+    documento(abiertoId).then((d) => {
+      if (vivo) setDoc(d);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [abiertoId]);
 
   const crear = useCallback(
     (nombre, contenido = { nodes: [], edges: [] }) => {
       const nuevo = nuevoMeta(nombre, contenido);
       guardarDocumento(nuevo.id, contenido);
       setIndice((idx) => [nuevo, ...idx]);
+      sincronizar(nuevo.id);
       abrir(nuevo.id);
     },
     [abrir],
@@ -671,17 +728,23 @@ export default function App({ sesion }) {
     [crear],
   );
 
-  /** Autoguardado: escribe SOLO este flujo y toca el índice solo si su resumen cambió. */
+  /**
+   * Autoguardado: escribe SOLO este flujo, toca el índice solo si su resumen
+   * cambió y encola la subida a S3 (que espera a que pare la ráfaga de edición).
+   */
   const guardar = useCallback((nodes, edges) => {
     const id = abiertoRef.current;
     if (!id) return;
     guardarDocumento(id, { nodes, edges });
     setIndice((idx) => conResumen(idx, id, { nodes, edges }));
+    sincronizar(id);
   }, []);
 
   const renombrar = useCallback((nombre) => {
     const id = abiertoRef.current;
-    if (id) setIndice((idx) => conNombre(idx, id, nombre));
+    if (!id) return;
+    setIndice((idx) => conNombre(idx, id, nombre));
+    sincronizar(id); // agrupado: no sube una versión por cada tecla
   }, []);
 
   const duplicar = useCallback((id) => {
@@ -691,11 +754,19 @@ export default function App({ sesion }) {
     const copia = nuevoMeta(`${orig.nombre} (copia)`, copiaDoc);
     guardarDocumento(copia.id, copiaDoc);
     setIndice((idx) => [copia, ...idx]);
+    sincronizar(copia.id);
   }, [indice]);
 
   const borrar = useCallback((id) => {
     borrarDocumento(id);
     setIndice((idx) => sinFlujo(idx, id));
+    borrarEnLaNube(id, sinFlujo(indiceRef.current, id));
+  }, []);
+
+  /** Renombrar desde la portada: solo cambia la portada, no el cuerpo del flujo. */
+  const renombrarEnPortada = useCallback((id, nombre) => {
+    setIndice((idx) => conNombre(idx, id, nombre));
+    sincronizarSoloIndice(conNombre(indiceRef.current, id, nombre));
   }, []);
 
   const volver = useCallback(() => {
@@ -703,7 +774,17 @@ export default function App({ sesion }) {
     setAbiertoId(null);
   }, []);
 
-  if (!meta || !doc) {
+  // Con `meta` pero sin `doc`, el cuerpo se está bajando de S3.
+  if (meta && !doc) {
+    return (
+      <div className="cargando">
+        <div className="cargando__spinner" />
+        Abriendo «{meta.nombre}»…
+      </div>
+    );
+  }
+
+  if (!meta) {
     return (
       <Home
         sesion={sesion}
@@ -714,7 +795,7 @@ export default function App({ sesion }) {
         onImportar={importar}
         onDuplicar={(tipo, id) => duplicar(id)}
         onBorrar={(tipo, id) => borrar(id)}
-        onRenombrar={(tipo, id, nombre) => setIndice((idx) => conNombre(idx, id, nombre))}
+        onRenombrar={(tipo, id, nombre) => renombrarEnPortada(id, nombre)}
       />
     );
   }
@@ -725,6 +806,7 @@ export default function App({ sesion }) {
         key={meta.id}
         nombre={meta.nombre}
         doc={doc}
+        nube={estadoNube}
         onChange={guardar}
         onRename={renombrar}
         onHome={volver}

@@ -27,7 +27,8 @@ export const motorActivo = Boolean(URL_MOTOR) && firmaDisponible;
 /** Por debajo de esto, la ida y vuelta cuesta más que calcularlo en el navegador. */
 export const MINIMO_REMOTO = 40;
 
-async function llamar(op, datos) {
+/** Invoca la Lambda. Compartido con `nube.js`, que usa las mismas credenciales. */
+export async function invocar(op, datos) {
   const s = sesion();
   if (!s?.idToken) throw new Error("sin sesión");
 
@@ -48,7 +49,7 @@ async function llamar(op, datos) {
  * para un flujo de 100 pasos, en vez de los ~130 KB del flujo entero).
  */
 export async function layoutRemoto(nodes, edges, dir = "TB") {
-  const { posiciones, ms, red } = await llamar("layout", {
+  const { posiciones, ms, red } = await invocar("layout", {
     dir,
     nodes: nodes.map((n) => ({ id: n.id, w: n.width, h: n.height })),
     edges: edges.map((e) => ({ source: e.source, target: e.target })),
@@ -59,7 +60,7 @@ export async function layoutRemoto(nodes, edges, dir = "TB") {
 
 /** Revisión del flujo completo (pasos inalcanzables, callejones, salidas sueltas…). */
 export async function analizarRemoto(nodes, edges) {
-  const informe = await llamar("analizar", { nodes, edges });
+  const informe = await invocar("analizar", { nodes, edges });
   console.info(`[motor] análisis: ${informe.ms} ms de cálculo · ${informe.red} ms con red`);
   return informe;
 }
@@ -67,5 +68,5 @@ export async function analizarRemoto(nodes, edges) {
 /** Despierta la función al abrir un flujo grande, para que el primer uso no pague el arranque en frío. */
 export function precalentar() {
   if (!motorActivo) return;
-  llamar("ping", {}).catch(() => {});
+  invocar("ping", {}).catch(() => {});
 }

@@ -26,6 +26,7 @@ import {
   buildInitialFlow,
   makeEdge,
   migrateFlow,
+  simplificarAristas,
   NODE_H,
   NODE_W,
 } from "./flow/transform";
@@ -64,6 +65,12 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     const guardado = localStorage.getItem("cbc-minimapa");
     if (guardado !== null) return guardado === "1";
     return (initial.nodes?.length || 0) <= 60;
+  });
+  // Aristas ligeras (sin etiquetas): automáticas en flujos con muchas conexiones.
+  const [simples, setSimples] = useState(() => {
+    const guardado = localStorage.getItem("cbc-aristas-simples");
+    if (guardado !== null) return guardado === "1";
+    return (initial.edges?.length || 0) > 80;
   });
   const [reset, setReset] = useState(false);
   const wrapperRef = useRef(null);
@@ -279,6 +286,13 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     [setNodes, setEdges, fitView],
   );
 
+  const toggleSimples = useCallback(() => {
+    setSimples((v) => {
+      localStorage.setItem("cbc-aristas-simples", v ? "0" : "1");
+      return !v;
+    });
+  }, []);
+
   const toggleMapa = useCallback(() => {
     setMapa((v) => {
       localStorage.setItem("cbc-minimapa", v ? "0" : "1");
@@ -335,6 +349,11 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
 
   // Un objeto nuevo aquí invalidaría el memo de TODOS los nodos en cada render.
   const simValue = useMemo(() => ({ activeNodeId }), [activeNodeId]);
+  // Lo que se DIBUJA; el estado `edges` conserva etiquetas y estilo para exportar.
+  const edgesVista = useMemo(
+    () => (simples ? simplificarAristas(edges) : edges),
+    [edges, simples],
+  );
   // En flujos grandes, React Flow solo monta lo que se ve.
   const virtualizar = nodes.length > 60;
 
@@ -367,7 +386,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
           <SimContext.Provider value={simValue}>
             <ReactFlow
               nodes={nodes}
-              edges={edges}
+              edges={edgesVista}
               nodeTypes={nodeTypes}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
@@ -395,7 +414,12 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
                   bgColor="transparent"
                 />
               ) : null}
-              <ZoomControls mapa={mapa} onToggleMapa={toggleMapa} />
+              <ZoomControls
+                mapa={mapa}
+                onToggleMapa={toggleMapa}
+                simples={simples}
+                onToggleSimples={toggleSimples}
+              />
             </ReactFlow>
           </SimContext.Provider>
 

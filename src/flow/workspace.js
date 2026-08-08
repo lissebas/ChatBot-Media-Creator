@@ -13,7 +13,7 @@ import { migrateFlow } from "./transform";
 const KEY = "chatbot-creator-workspace-v1";
 const LEGACY_KEY = "chatbot-creator-flow-v2";
 
-const vacio = () => ({ flujos: [], ultimo: null });
+const vacio = () => ({ flujos: [], formularios: [], ultimo: null });
 
 export function nuevoId() {
   return `f_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -24,7 +24,8 @@ export function cargarEspacio() {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const data = JSON.parse(raw);
-      if (Array.isArray(data.flujos)) return data;
+      // `formularios` (Flows) llegó después: los espacios antiguos no lo traen.
+      if (Array.isArray(data.flujos)) return { ...vacio(), ...data };
     }
   } catch {
     /* ignora JSON corrupto */
@@ -37,7 +38,7 @@ export function cargarEspacio() {
       const viejo = JSON.parse(raw);
       if (Array.isArray(viejo.nodes) && Array.isArray(viejo.edges)) {
         const flujo = crearFlujo("Mi flujo", migrateFlow(viejo));
-        const espacio = { flujos: [flujo], ultimo: flujo.id };
+        const espacio = { ...vacio(), flujos: [flujo], ultimo: flujo.id };
         guardarEspacio(espacio);
         return espacio;
       }
@@ -69,39 +70,63 @@ export function crearFlujo(nombre, flujo = { nodes: [], edges: [] }) {
   };
 }
 
-/** Inserta o actualiza un flujo y devuelve el espacio nuevo (inmutable). */
-export function guardarFlujo(espacio, flujo) {
-  const actualizado = { ...flujo, actualizado: new Date().toISOString() };
-  const existe = espacio.flujos.some((f) => f.id === flujo.id);
+/** Formulario nativo (WhatsApp Flow): pantallas en vez de nodos. */
+export function crearFormulario(nombre, flow) {
+  const ahora = new Date().toISOString();
   return {
-    ...espacio,
-    ultimo: flujo.id,
-    flujos: existe
-      ? espacio.flujos.map((f) => (f.id === flujo.id ? actualizado : f))
-      : [actualizado, ...espacio.flujos],
+    id: nuevoId(),
+    nombre: nombre || "Formulario sin nombre",
+    creado: ahora,
+    actualizado: ahora,
+    version: flow?.version,
+    pantallas: flow?.pantallas || [],
   };
 }
 
-export function borrarFlujo(espacio, id) {
+/*
+ * Las operaciones valen para las dos colecciones del espacio:
+ *   tipo = "flujos" (conversaciones) | "formularios" (Flows).
+ */
+
+/** Inserta o actualiza un documento y devuelve el espacio nuevo (inmutable). */
+export function guardarDoc(espacio, tipo, doc) {
+  const lista = espacio[tipo] || [];
+  const actualizado = { ...doc, actualizado: new Date().toISOString() };
+  const existe = lista.some((d) => d.id === doc.id);
   return {
     ...espacio,
-    flujos: espacio.flujos.filter((f) => f.id !== id),
+    ultimo: doc.id,
+    [tipo]: existe ? lista.map((d) => (d.id === doc.id ? actualizado : d)) : [actualizado, ...lista],
+  };
+}
+
+export function borrarDoc(espacio, tipo, id) {
+  return {
+    ...espacio,
+    [tipo]: (espacio[tipo] || []).filter((d) => d.id !== id),
     ultimo: espacio.ultimo === id ? null : espacio.ultimo,
   };
 }
 
-export function duplicarFlujo(espacio, id) {
-  const orig = espacio.flujos.find((f) => f.id === id);
+export function duplicarDoc(espacio, tipo, id) {
+  const lista = espacio[tipo] || [];
+  const orig = lista.find((d) => d.id === id);
   if (!orig) return espacio;
-  const copia = crearFlujo(`${orig.nombre} (copia)`, { nodes: orig.nodes, edges: orig.edges });
-  return { ...espacio, flujos: [copia, ...espacio.flujos] };
+  const copia = {
+    ...orig,
+    id: nuevoId(),
+    nombre: `${orig.nombre} (copia)`,
+    creado: new Date().toISOString(),
+    actualizado: new Date().toISOString(),
+  };
+  return { ...espacio, [tipo]: [copia, ...lista] };
 }
 
-export function renombrarFlujo(espacio, id, nombre) {
+export function renombrarDoc(espacio, tipo, id, nombre) {
   return {
     ...espacio,
-    flujos: espacio.flujos.map((f) =>
-      f.id === id ? { ...f, nombre: nombre || f.nombre, actualizado: new Date().toISOString() } : f,
+    [tipo]: (espacio[tipo] || []).map((d) =>
+      d.id === id ? { ...d, nombre: nombre || d.nombre, actualizado: new Date().toISOString() } : d,
     ),
   };
 }

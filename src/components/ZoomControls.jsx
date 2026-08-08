@@ -1,11 +1,13 @@
 import { useReactFlow, useStore } from "@xyflow/react";
 
 /**
- * Controles flotantes del lienzo: zoom +/−, porcentaje, encuadrar, y los dos
- * interruptores de rendimiento — el minimapa (se redibuja entero en cada
- * movimiento de la vista) y el modo ligero (monta solo lo visible).
+ * Controles flotantes del lienzo: zoom +/−, porcentaje, encuadrar todo y volver
+ * al primer paso.
+ *
+ * Los dos interruptores de rendimiento que había aquí (minimapa y modo ligero)
+ * ya no existen: los dos van siempre puestos, así que no había nada que elegir.
  */
-export default function ZoomControls({ mapa, onToggleMapa, ligero, onToggleLigero }) {
+export default function ZoomControls({ onInicio }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   // El redondeo va DENTRO del selector: así este componente solo se vuelve a
   // dibujar cuando cambia el porcentaje, no en cada fotograma del zoom.
@@ -29,22 +31,11 @@ export default function ZoomControls({ mapa, onToggleMapa, ligero, onToggleLiger
         ⤢
       </button>
       <button
-        className={`zoomctl__btn${mapa ? " is-on" : ""}`}
-        onClick={onToggleMapa}
-        title={mapa ? "Ocultar el minimapa" : "Mostrar el minimapa"}
+        className="zoomctl__btn zoomctl__btn--inicio"
+        onClick={onInicio}
+        title="Ir al primer paso del flujo (Inicio)"
       >
-        ▣
-      </button>
-      <button
-        className={`zoomctl__btn${ligero ? " is-on" : ""}`}
-        onClick={onToggleLigero}
-        title={
-          ligero
-            ? "Modo ligero activo: solo se dibuja lo que se ve, sin etiquetas ni detalle"
-            : "Activar modo ligero (recomendado en flujos grandes)"
-        }
-      >
-        ⚡
+        ▶
       </button>
     </div>
   );

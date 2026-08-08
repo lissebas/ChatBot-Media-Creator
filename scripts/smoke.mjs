@@ -191,6 +191,18 @@ console.log(`Formato: ${casos.length} casos`);
     if (malos.length) fail(`${nombre}: ${malos.length} efecto(s) con retorno implícito`);
   }
   console.log(`Efectos: ${fuentes.length} archivos revisados`);
+
+  // El minimapa y el modo ligero ya no se pueden apagar: si alguien reintrodujera
+  // los interruptores, las preferencias guardadas volverían a decidir por el
+  // usuario sin que haya nada que las cambie.
+  const zoomSrcActual = leer("src/components/ZoomControls.jsx");
+  for (const muerto of ["cbc-modo-ligero", "cbc-minimapa", "onToggleMapa", "onToggleLigero"]) {
+    if (appSrc.includes(muerto) || zoomSrcActual.includes(muerto)) {
+      fail(`quedó "${muerto}" en el código: esos interruptores ya no existen`);
+    }
+  }
+  if (!appSrc.includes("onlyRenderVisibleElements")) fail("la virtualización dejó de aplicarse");
+  if (!zoomSrcActual.includes("onInicio")) fail("falta el botón para ir al primer paso");
 }
 
 // ── Almacenamiento: índice pequeño + un documento por flujo ──

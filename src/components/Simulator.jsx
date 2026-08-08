@@ -1,82 +1,99 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import WhatsAppMessage from "./WhatsAppMessage";
 import {
   matchEdge,
   entryNode,
   nextEdge,
   nodeById,
-  nodeMessage,
   nodeOptions,
   stepMode,
 } from "../sim/runtime";
 
-/** Burbuja del bot: se dibuja según el tipo de tarjeta de Meta. */
-function BotBubble({ msg }) {
-  if (!msg) return null;
-  const { kind } = msg;
+/** Hora corta tipo WhatsApp (HH:MM). */
+function ahora() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
 
+/**
+ * Hoja inferior de una tarjeta de lista: es lo que abre WhatsApp al tocar el
+ * botón «Ver opciones».
+ */
+function ListSheet({ card, onPick, onClose }) {
+  const secciones = card.props?.sections || [];
   return (
-    <div className="bubble bubble--bot">
-      {msg.header ? <div className="bubble__header">{msg.header}</div> : null}
-
-      {kind === "media" ? (
-        <div className={`bubble__media bubble__media--${msg.media}`}>
-          {msg.media === "image" && msg.link ? (
-            <img src={msg.link} alt="" onError={(e) => (e.currentTarget.style.display = "none")} />
-          ) : (
-            <div className="bubble__file">
-              <span className="bubble__fileicon">{msg.icon}</span>
-              <span className="bubble__filename">{msg.filename || msg.link || msg.media}</span>
+    <div className="wa-sheet" role="dialog">
+      <div className="wa-sheet__backdrop" onClick={onClose} />
+      <div className="wa-sheet__panel">
+        <div className="wa-sheet__head">
+          <span>{card.props?.header_text || "Elige una opción"}</span>
+          <button className="wa-sheet__close" onClick={onClose}>✕</button>
+        </div>
+        <div className="wa-sheet__body">
+          {secciones.map((s, si) => (
+            <div className="wa-sheet__section" key={si}>
+              {s.title ? <div className="wa-sheet__sectitle">{s.title}</div> : null}
+              {(s.rows || []).map((r, ri) => (
+                <button
+                  className="wa-sheet__row"
+                  key={r.id || ri}
+                  onClick={() => onPick(r.id || `row_${si + 1}_${ri + 1}`, r.title)}
+                >
+                  <div>
+                    <div className="wa-sheet__rowtitle">{r.title || "—"}</div>
+                    {r.description ? <div className="wa-sheet__rowsub">{r.description}</div> : null}
+                  </div>
+                  <span className="wa-sheet__radio" />
+                </button>
+              ))}
             </div>
-          )}
+          ))}
         </div>
-      ) : null}
-
-      {kind === "location" || kind === "contact" || kind === "product" ? (
-        <div className="bubble__card">
-          <div className="bubble__cardtitle">{msg.text || "—"}</div>
-          {msg.sub ? <div className="bubble__cardsub">{msg.sub}</div> : null}
-        </div>
-      ) : (
-        msg.text && <div className="bubble__text">{msg.text}</div>
-      )}
-
-      {msg.footer ? <div className="bubble__footer">{msg.footer}</div> : null}
-
-      {kind === "cta" || kind === "location_request" ? (
-        <div className="bubble__cta">{msg.cta || "Abrir"}</div>
-      ) : null}
+      </div>
     </div>
   );
 }
 
 /**
- * Simulador de chat: ejecuta el flujo diseñado. Los mensajes que no esperan
- * respuesta avanzan solos (como en WhatsApp); los botones, listas y acciones
- * nativas esperan al usuario. El nodo activo se resalta en el lienzo.
+ * Emulador de WhatsApp: ejecuta el flujo diseñado con el mismo aspecto y las
+ * mismas interacciones que el chat real — los botones van pegados a la burbuja,
+ * las listas abren su hoja inferior y los mensajes que no esperan respuesta
+ * encadenan solos. El nodo activo se resalta en el lienzo.
  */
 export default function Simulator({ nodes, edges, onActive, onClose }) {
   const [currentId, setCurrentId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [sheet, setSheet] = useState(false);
   const started = useRef(false);
   const pasos = useRef(0);
   const scrollRef = useRef(null);
 
-  const emitir = useCallback((nodeId, extra = []) => {
-    const node = nodeById(nodes, nodeId);
-    const msg = nodeMessage(node);
-    setMessages((m) => [...m, ...extra, ...(msg ? [{ role: "bot", msg }] : [])]);
-    setCurrentId(nodeId);
-    onActive(nodeId);
-  }, [nodes, onActive]);
+  const emitir = useCallback(
+    (nodeId, extra = []) => {
+      const node = nodeById(nodes, nodeId);
+      const propio = node && node.data?.card !== "start" && node.data?.card !== "end"
+        ? [{ role: "bot", card: node.data.card, props: node.data.props || {}, time: ahora() }]
+        : [];
+      setMessages((m) => [...m, ...extra, ...propio]);
+      setCurrentId(nodeId);
+      setSheet(false);
+      onActive(nodeId);
+    },
+    [nodes, onActive],
+  );
 
   const restart = useCallback(() => {
     pasos.current = 0;
+    setSheet(false);
     setMessages([]);
     const entry = entryNode(nodes, edges);
     const node = nodeById(nodes, entry);
-    const msg = nodeMessage(node);
-    setMessages(msg ? [{ role: "bot", msg }] : []);
+    setMessages(
+      node && node.data?.card !== "start" && node.data?.card !== "end"
+        ? [{ role: "bot", card: node.data.card, props: node.data.props || {}, time: ahora() }]
+        : [],
+    );
     setCurrentId(entry);
     onActive(entry);
   }, [nodes, edges, onActive]);
@@ -101,20 +118,38 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
     const t = setTimeout(() => {
       pasos.current += 1;
       emitir(edge.target);
-    }, 550);
+    }, 650);
     return () => clearTimeout(t);
   }, [mode, currentId, edges, emitir]);
 
   // Auto-scroll al último mensaje.
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages, mode]);
 
   const avanzar = (edge, userText) => {
     if (!edge) return;
     pasos.current = 0;
-    emitir(edge.target, userText != null ? [{ role: "user", text: userText }] : []);
+    emitir(edge.target, userText != null ? [{ role: "user", text: userText, time: ahora() }] : []);
   };
+
+  /** Toque en un botón nativo de la burbuja. */
+  const onAction = (id, label) => {
+    if (id === "__list__") {
+      setSheet(true);
+      return;
+    }
+    if (id === "next") {
+      avanzar(nextEdge(edges, currentId), label);
+      return;
+    }
+    const opt = options.find((o) => o.id === id);
+    if (opt?.edge) avanzar(opt.edge, opt.label);
+    else avisar(`«${label}» no lleva a ningún paso todavía.`);
+  };
+
+  const avisar = (texto) =>
+    setMessages((m) => [...m, { role: "sys", text: texto }]);
 
   const send = () => {
     const t = input.trim();
@@ -131,80 +166,96 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
     if (res === undefined) {
       setMessages((m) => [
         ...m,
-        { role: "user", text: t },
-        { role: "bot", msg: { kind: "text", text: "No entendí 🤔 Toca una de las opciones o escríbela." } },
+        { role: "user", text: t, time: ahora() },
+        {
+          role: "bot",
+          card: "text",
+          props: { body: "No entendí 🤔 Toca una de las opciones." },
+          time: ahora(),
+        },
       ]);
       return;
     }
     avanzar(res, t);
   };
 
+  const ultimoBot = messages.map((m) => m.role).lastIndexOf("bot");
+  const interactivo = mode === "options" || mode === "action";
+
   return (
     <aside className="sim">
-      <div className="sim__head">
-        <div>
-          <div className="sim__title">Simulador</div>
-          <div className="sim__sub">
-            {current ? `Paso: ${current.data?.title || current.id}` : "—"}
+      <div className="wa-topbar">
+        <span className="wa-topbar__avatar">🤖</span>
+        <div className="wa-topbar__info">
+          <div className="wa-topbar__name">Mi negocio</div>
+          <div className="wa-topbar__sub">
+            {current ? `Paso: ${current.data?.title || current.id}` : "en línea"}
           </div>
         </div>
-        <div className="sim__headbtns">
-          <button className="sim__iconbtn" onClick={restart} title="Reiniciar conversación">↻</button>
-          <button className="sim__iconbtn" onClick={onClose} title="Cerrar simulador">✕</button>
-        </div>
+        <button className="wa-topbar__btn" onClick={restart} title="Reiniciar conversación">↻</button>
+        <button className="wa-topbar__btn" onClick={onClose} title="Cerrar simulador">✕</button>
       </div>
 
-      <div className="sim__chat" ref={scrollRef}>
+      <div className="wa-chat" ref={scrollRef}>
+        <div className="wa-daysep">HOY</div>
+
         {messages.map((m, i) =>
           m.role === "user" ? (
-            <div key={i} className="bubble bubble--user">{m.text}</div>
+            <div className="wa-msg wa-msg--out" key={i}>
+              <div className="wa-bubble wa-bubble--out">
+                <div className="wa-body">{m.text}</div>
+                <span className="wa-time">{m.time} ✓✓</span>
+              </div>
+            </div>
+          ) : m.role === "sys" ? (
+            <div className="wa-sys" key={i}>{m.text}</div>
           ) : (
-            <BotBubble key={i} msg={m.msg} />
+            <WhatsAppMessage
+              key={i}
+              card={m.card}
+              props={m.props}
+              time={m.time}
+              muted={i !== ultimoBot || !interactivo}
+              onAction={i === ultimoBot && interactivo ? onAction : undefined}
+            />
           ),
         )}
-        {mode === "end" && <div className="sim__ended">— fin del flujo —</div>}
-        {mode === "auto" && <div className="sim__typing"><span /><span /><span /></div>}
+
+        {mode === "auto" && (
+          <div className="wa-typing"><span /><span /><span /></div>
+        )}
+        {mode === "end" && <div className="wa-sys">— fin del flujo —</div>}
       </div>
 
-      <div className="sim__foot">
-        {mode === "options" && (
-          <div className="sim__quick">
-            {options.map((o) => (
-              <button
-                key={o.id}
-                className={`chip${o.edge ? "" : " chip--dead"}`}
-                onClick={() => avanzar(o.edge, o.label)}
-                title={o.edge ? "" : "Esta salida no está conectada a ningún paso"}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        )}
+      {sheet && current ? (
+        <ListSheet
+          card={current.data}
+          onClose={() => setSheet(false)}
+          onPick={(id, label) => {
+            const opt = options.find((o) => o.id === id);
+            if (opt?.edge) avanzar(opt.edge, label);
+            else {
+              setSheet(false);
+              avisar(`«${label}» no lleva a ningún paso todavía.`);
+            }
+          }}
+        />
+      ) : null}
 
-        {mode === "action" && (
-          <button className="btn btn--primary sim__restart" onClick={() => avanzar(nextEdge(edges, currentId))}>
-            {nodeMessage(current)?.cta || "Continuar"}
-          </button>
-        )}
-
+      <div className="wa-composer">
         {mode === "end" ? (
-          <button className="btn btn--primary sim__restart" onClick={restart}>
-            Reiniciar conversación
-          </button>
+          <button className="wa-restart" onClick={restart}>Reiniciar conversación</button>
         ) : (
-          <div className="sim__inputrow">
+          <>
             <input
-              className="sim__input"
+              className="wa-input"
               value={input}
-              placeholder={
-                mode === "options" ? "Escribe o toca una opción…" : "Escribe tu respuesta…"
-              }
+              placeholder="Escribe un mensaje"
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send()}
             />
-            <button className="btn btn--primary" onClick={send}>Enviar</button>
-          </div>
+            <button className="wa-send" onClick={send} title="Enviar">➤</button>
+          </>
         )}
       </div>
     </aside>

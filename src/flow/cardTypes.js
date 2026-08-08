@@ -21,14 +21,34 @@
 
 const DOCS = "https://developers.facebook.com/docs/whatsapp/cloud-api";
 
-/** Categorías de la paleta (dan color a las tarjetas del lienzo). */
+/**
+ * Familias: el primer nivel de la segmentación. Casi todas las tarjetas son
+ * mensajes reales de Meta ("Meta Cards"); solo Inicio y Fin son piezas del
+ * editor que controlan el recorrido y no envían nada.
+ */
+export const FAMILIAS = {
+  meta: {
+    nombre: "Meta Cards",
+    sigla: "META",
+    desc: "Tipos de mensaje reales de la WhatsApp Cloud API.",
+    color: "#25d366",
+  },
+  flujo: {
+    nombre: "Control de flujo",
+    sigla: "FLUJO",
+    desc: "Marcan el recorrido del bot; no envían ningún mensaje.",
+    color: "#12b76a",
+  },
+};
+
+/** Categorías de la paleta (segundo nivel: dan color a las tarjetas del lienzo). */
 export const CATEGORIAS = {
-  flujo: { nombre: "Flujo", color: "#12b76a" },
-  texto: { nombre: "Mensajes", color: "#38bdf8" },
-  media: { nombre: "Multimedia", color: "#fb923c" },
-  interactivo: { nombre: "Interactivos", color: "#60a5fa" },
-  comercio: { nombre: "Comercio", color: "#a78bfa" },
-  avanzado: { nombre: "Avanzados", color: "#2dd4bf" },
+  flujo: { nombre: "Flujo", color: "#12b76a", familia: "flujo" },
+  texto: { nombre: "Mensajes", color: "#38bdf8", familia: "meta" },
+  media: { nombre: "Multimedia", color: "#fb923c", familia: "meta" },
+  interactivo: { nombre: "Interactivos", color: "#60a5fa", familia: "meta" },
+  comercio: { nombre: "Comercio", color: "#a78bfa", familia: "meta" },
+  avanzado: { nombre: "Avanzados", color: "#2dd4bf", familia: "meta" },
 };
 
 /* ── Ayudas para construir el payload ── */
@@ -733,12 +753,46 @@ export const CARDS_POR_CATEGORIA = Object.entries(CATEGORIAS).map(([cat, meta]) 
   cards: CARD_KEYS.filter((k) => CARDS[k].cat === cat).map((k) => ({ key: k, ...CARDS[k] })),
 }));
 
+/**
+ * Segmentación de dos niveles: familia → categorías → tarjetas.
+ * Es lo que dibujan la paleta y el menú contextual.
+ */
+export const CARDS_POR_FAMILIA = Object.entries(FAMILIAS).map(([familia, meta]) => {
+  const grupos = CARDS_POR_CATEGORIA.filter((g) => g.familia === familia);
+  return {
+    familia,
+    ...meta,
+    grupos,
+    total: grupos.reduce((n, g) => n + g.cards.length, 0),
+  };
+});
+
 export function getCard(key) {
   return CARDS[key] || CARDS.text;
 }
 
+export function cardCategoria(key) {
+  return CATEGORIAS[getCard(key).cat] || CATEGORIAS.texto;
+}
+
+export function cardFamilia(key) {
+  return FAMILIAS[cardCategoria(key).familia] || FAMILIAS.meta;
+}
+
 export function cardColor(key) {
-  return (CATEGORIAS[getCard(key).cat] || CATEGORIAS.texto).color;
+  return cardCategoria(key).color;
+}
+
+/** Filtra tarjetas por texto (nombre, descripción o clave). */
+export function buscarCards(texto) {
+  const q = (texto || "").trim().toLowerCase();
+  if (!q) return null;
+  return new Set(
+    CARD_KEYS.filter((k) => {
+      const c = CARDS[k];
+      return `${c.nombre} ${c.desc} ${k}`.toLowerCase().includes(q);
+    }),
+  );
 }
 
 /** Props por defecto de una tarjeta nueva (respeta `default` de cada campo). */

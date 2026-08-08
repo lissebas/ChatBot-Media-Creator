@@ -1,5 +1,14 @@
 // Prueba de humo temporal: valida el catálogo de tarjetas, el flujo semilla y el runtime.
-import { CARDS, CARD_KEYS, buildMessage, cardOutputs, defaultProps, validateCard } from "../src/flow/cardTypes.js";
+import {
+  CARDS,
+  CARDS_POR_FAMILIA,
+  CARD_KEYS,
+  CATEGORIAS,
+  buildMessage,
+  cardOutputs,
+  defaultProps,
+  validateCard,
+} from "../src/flow/cardTypes.js";
 import { buildInitialFlow } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 
@@ -21,6 +30,21 @@ for (const key of CARD_KEYS) {
     fail(`${key}: ${e.message}`);
   }
 }
+
+// La segmentación debe cubrir el catálogo completo: familia → categoría → tarjeta.
+const enFamilias = CARDS_POR_FAMILIA.flatMap((f) => f.grupos.flatMap((g) => g.cards.map((c) => c.key)));
+if (enFamilias.length !== CARD_KEYS.length) {
+  fail(`la segmentación cubre ${enFamilias.length} de ${CARD_KEYS.length} tarjetas`);
+}
+for (const key of CARD_KEYS) {
+  const cat = CATEGORIAS[CARDS[key].cat];
+  if (!cat) fail(`${key}: categoría desconocida "${CARDS[key].cat}"`);
+  else if (!cat.familia) fail(`${key}: la categoría ${CARDS[key].cat} no tiene familia`);
+}
+console.log(
+  "Familias:",
+  CARDS_POR_FAMILIA.map((f) => `${f.nombre} (${f.total})`).join(", "),
+);
 
 const { nodes, edges } = buildInitialFlow();
 console.log(`Semilla: ${nodes.length} nodos, ${edges.length} conexiones`);

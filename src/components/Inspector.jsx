@@ -2,8 +2,10 @@ import { useState } from "react";
 import CardPreview from "./CardPreview";
 import FieldForm from "./FieldForm";
 import {
-  CARDS_POR_CATEGORIA,
+  CARDS_POR_FAMILIA,
   buildMessage,
+  cardCategoria,
+  cardFamilia,
   defaultProps,
   getCard,
   validateCard,
@@ -35,6 +37,13 @@ export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDe
     const { errors, list } = validateCard(node.data.card, props);
     const mensaje = buildMessage(node.data);
     const json = mensaje ? JSON.stringify(mensaje, null, 2) : null;
+    const familia = cardFamilia(node.data.card);
+    const categoria = cardCategoria(node.data.card);
+    const apiTipo = !mensaje
+      ? null
+      : mensaje.type === "interactive"
+        ? `interactive / ${mensaje.interactive?.type}`
+        : mensaje.type;
 
     const copiar = () => {
       navigator.clipboard?.writeText(json || "");
@@ -68,17 +77,25 @@ export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDe
               })
             }
           >
-            {CARDS_POR_CATEGORIA.map((g) => (
-              <optgroup key={g.cat} label={g.nombre}>
-                {g.cards.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.icon} {c.nombre}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
+            {CARDS_POR_FAMILIA.flatMap((f) =>
+              f.grupos.map((g) => (
+                <optgroup key={g.cat} label={`${f.nombre} · ${g.nombre}`}>
+                  {g.cards.map((c) => (
+                    <option key={c.key} value={c.key}>
+                      {c.icon} {c.nombre}
+                    </option>
+                  ))}
+                </optgroup>
+              )),
+            )}
           </select>
         </label>
+
+        <div className="taxo">
+          <span className="taxo__fam" style={{ "--accent": familia.color }}>{familia.sigla}</span>
+          <span className="taxo__cat" style={{ "--accent": categoria.color }}>{categoria.nombre}</span>
+          {apiTipo ? <code className="taxo__api">{apiTipo}</code> : null}
+        </div>
 
         <p className="inspector__desc">
           {card.desc}

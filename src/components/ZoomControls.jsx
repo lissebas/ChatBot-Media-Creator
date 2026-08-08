@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useReactFlow, useStore } from "@xyflow/react";
 
-/** Controles flotantes del lienzo: zoom +/−, porcentaje y encuadrar. */
-export default function ZoomControls() {
+/**
+ * Controles flotantes del lienzo: zoom +/−, porcentaje, encuadrar y mostrar u
+ * ocultar el minimapa (que en flujos grandes se redibuja entero en cada
+ * movimiento de la vista, así que conviene poder apagarlo).
+ */
+export default function ZoomControls({ mapa, onToggleMapa }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const zoom = useStore((s) => s.transform[2]);
   const [pct, setPct] = useState(100);
@@ -25,6 +29,13 @@ export default function ZoomControls() {
         title="Encuadrar todo"
       >
         ⤢
+      </button>
+      <button
+        className={`zoomctl__btn${mapa ? " is-on" : ""}`}
+        onClick={onToggleMapa}
+        title={mapa ? "Ocultar el minimapa" : "Mostrar el minimapa"}
+      >
+        ▣
       </button>
     </div>
   );

@@ -1,4 +1,4 @@
-import { memo, useContext } from "react";
+import { memo, useContext, useMemo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { sinFormato } from "./WaText";
 import { cardColor, cardOutputs, getCard, validateCard } from "../flow/cardTypes";
@@ -16,12 +16,22 @@ function FlowNode({ id, data, selected }) {
   const card = getCard(data.card);
   const color = cardColor(data.card);
   const props = data.props || {};
-  const outs = cardOutputs(data);
-  const options = hasOptionRows(data) ? outs : [];
   const { activeNodeId } = useContext(SimContext);
   const active = activeNodeId === id;
-  const { ok } = validateCard(data.card, props);
   const state = `${selected ? " is-selected" : ""}${active ? " is-active" : ""}`;
+
+  // Validar y calcular salidas cuesta lo suyo y no cambia si `data` no cambia:
+  // con 100 nodos en el lienzo, recalcularlo en cada render se nota al arrastrar.
+  const { outs, options, ok, resumen } = useMemo(() => {
+    const salidas = cardOutputs(data);
+    return {
+      outs: salidas,
+      options: hasOptionRows(data) ? salidas : [],
+      ok: validateCard(data.card, props).ok,
+      // En el lienzo se lee mejor sin los marcadores (*negrita*, _cursiva_…).
+      resumen: sinFormato(card.summary(props)),
+    };
+  }, [data, card, props]);
 
   if (card.pill) {
     const esInicio = !!card.solid;
@@ -38,9 +48,6 @@ function FlowNode({ id, data, selected }) {
       </div>
     );
   }
-
-  // En el lienzo se lee mejor sin los marcadores (*negrita*, _cursiva_…).
-  const resumen = sinFormato(card.summary(props));
 
   return (
     <div className={`fnode${state}`} style={{ "--accent": color }}>

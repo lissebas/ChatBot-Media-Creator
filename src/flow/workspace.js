@@ -1,134 +1,151 @@
 /*
- * Espacio de trabajo: la lista de flujos del usuario, guardada en el navegador.
+ * Espacio de trabajo: los flujos del usuario, guardados en el navegador.
  *
- * Antes el editor guardaba un único flujo autoguardado; ahora la portada muestra
- * todos los que hayas creado, así que el almacenamiento es una colección:
- *   { flujos: [{ id, nombre, creado, actualizado, nodes, edges }], ultimo }
+ * Almacenamiento partido en dos, porque un flujo real pesa cientos de KB:
+ *   índice  → `cbc-index-v1`  : solo metadatos (nombre, fechas, contadores).
+ *   cuerpo  → `cbc-doc-<id>`  : los nodos y aristas de ESE flujo.
  *
- * El flujo autoguardado del modelo anterior se importa la primera vez para no
- * perder trabajo.
+ * Así la portada abre leyendo unos pocos KB y, sobre todo, guardar un flujo no
+ * reserializa los demás: antes cada autoguardado hacía `JSON.stringify` de todo
+ * el espacio (varios cientos de KB) en el hilo principal — eso era el tirón.
  */
 import { migrateFlow } from "./transform";
 
-const KEY = "chatbot-creator-workspace-v1";
-const LEGACY_KEY = "chatbot-creator-flow-v2";
-
-const vacio = () => ({ flujos: [], formularios: [], ultimo: null });
+const IDX = "cbc-index-v1";
+const DOC = (id) => `cbc-doc-${id}`;
+const LEGACY_WS = "chatbot-creator-workspace-v1";
+const LEGACY_FLOW = "chatbot-creator-flow-v2";
 
 export function nuevoId() {
   return `f_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export function cargarEspacio() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      // `formularios` (Flows) llegó después: los espacios antiguos no lo traen.
-      if (Array.isArray(data.flujos)) return { ...vacio(), ...data };
-    }
-  } catch {
-    /* ignora JSON corrupto */
-  }
-
-  // Migración: el flujo único del modelo anterior pasa a ser el primero de la lista.
-  try {
-    const raw = localStorage.getItem(LEGACY_KEY);
-    if (raw) {
-      const viejo = JSON.parse(raw);
-      if (Array.isArray(viejo.nodes) && Array.isArray(viejo.edges)) {
-        const flujo = crearFlujo("Mi flujo", migrateFlow(viejo));
-        const espacio = { ...vacio(), flujos: [flujo], ultimo: flujo.id };
-        guardarEspacio(espacio);
-        return espacio;
-      }
-    }
-  } catch {
-    /* si no se puede migrar, se empieza vacío */
-  }
-
-  return vacio();
+/** Resumen que se guarda en el índice (lo que pinta la portada). */
+function resumir(doc) {
+  const nodes = doc.nodes || [];
+  return {
+    pasos: nodes.length,
+    conexiones: (doc.edges || []).length,
+    cards: [...new Set(nodes.map((n) => n.data?.card).filter(Boolean))].slice(0, 8),
+  };
 }
 
-export function guardarEspacio(espacio) {
+function leerJSON(key) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(espacio));
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function escribirJSON(key, valor) {
+  try {
+    localStorage.setItem(key, JSON.stringify(valor));
+    return true;
   } catch (e) {
     console.warn("[workspace] no se pudo guardar:", e);
+    return false;
   }
 }
 
-export function crearFlujo(nombre, flujo = { nodes: [], edges: [] }) {
+/* ── Índice ── */
+
+export function cargarIndice() {
+  const idx = leerJSON(IDX);
+  if (Array.isArray(idx)) return idx;
+  return migrarDesdeVersionesAnteriores();
+}
+
+export function guardarIndice(indice) {
+  escribirJSON(IDX, indice);
+  return indice;
+}
+
+/** Migra el espacio único anterior (y antes de él, el flujo suelto autoguardado). */
+function migrarDesdeVersionesAnteriores() {
+  const viejo = leerJSON(LEGACY_WS);
+  if (viejo && Array.isArray(viejo.flujos) && viejo.flujos.length) {
+    const indice = viejo.flujos.map((f) => {
+      guardarDocumento(f.id, { nodes: f.nodes || [], edges: f.edges || [] });
+      return {
+        id: f.id,
+        nombre: f.nombre,
+        creado: f.creado,
+        actualizado: f.actualizado,
+        ...resumir(f),
+      };
+    });
+    return guardarIndice(indice);
+  }
+
+  const suelto = leerJSON(LEGACY_FLOW);
+  if (suelto && Array.isArray(suelto.nodes) && Array.isArray(suelto.edges)) {
+    const doc = migrateFlow(suelto);
+    const meta = nuevoMeta("Mi flujo", doc);
+    guardarDocumento(meta.id, doc);
+    return guardarIndice([meta]);
+  }
+
+  return guardarIndice([]);
+}
+
+/* ── Documentos ── */
+
+export function cargarDocumento(id) {
+  const doc = leerJSON(DOC(id));
+  if (!doc || !Array.isArray(doc.nodes)) return { nodes: [], edges: [] };
+  return doc;
+}
+
+export function guardarDocumento(id, doc) {
+  return escribirJSON(DOC(id), { nodes: doc.nodes || [], edges: doc.edges || [] });
+}
+
+export function borrarDocumento(id) {
+  try {
+    localStorage.removeItem(DOC(id));
+  } catch {
+    /* si no se puede, no pasa nada: el índice ya no lo referencia */
+  }
+}
+
+/* ── Operaciones sobre el índice (inmutables) ── */
+
+export function nuevoMeta(nombre, doc = { nodes: [], edges: [] }) {
   const ahora = new Date().toISOString();
   return {
     id: nuevoId(),
-    nombre: nombre || "Flujo sin nombre",
+    nombre: nombre || "Flujo sin título",
     creado: ahora,
     actualizado: ahora,
-    nodes: flujo.nodes || [],
-    edges: flujo.edges || [],
+    ...resumir(doc),
   };
 }
 
-/** Formulario nativo (WhatsApp Flow): pantallas en vez de nodos. */
-export function crearFormulario(nombre, flow) {
-  const ahora = new Date().toISOString();
-  return {
-    id: nuevoId(),
-    nombre: nombre || "Formulario sin nombre",
-    creado: ahora,
-    actualizado: ahora,
-    version: flow?.version,
-    pantallas: flow?.pantallas || [],
-  };
-}
-
-/*
- * Las operaciones valen para las dos colecciones del espacio:
- *   tipo = "flujos" (conversaciones) | "formularios" (Flows).
+/**
+ * Refresca el resumen de un flujo en el índice. Devuelve el MISMO array si nada
+ * cambió — así React no re-renderiza la app en cada autoguardado. La fecha solo
+ * se refresca cada minuto, para no reescribir la portada mientras escribes.
  */
-
-/** Inserta o actualiza un documento y devuelve el espacio nuevo (inmutable). */
-export function guardarDoc(espacio, tipo, doc) {
-  const lista = espacio[tipo] || [];
-  const actualizado = { ...doc, actualizado: new Date().toISOString() };
-  const existe = lista.some((d) => d.id === doc.id);
-  return {
-    ...espacio,
-    ultimo: doc.id,
-    [tipo]: existe ? lista.map((d) => (d.id === doc.id ? actualizado : d)) : [actualizado, ...lista],
-  };
+export function conResumen(indice, id, doc) {
+  const meta = indice.find((m) => m.id === id);
+  if (!meta) return indice;
+  const r = resumir(doc);
+  const igual = meta.pasos === r.pasos && meta.conexiones === r.conexiones;
+  const reciente = Date.now() - new Date(meta.actualizado).getTime() < 60_000;
+  if (igual && reciente) return indice;
+  return indice.map((m) => (m.id === id ? { ...m, ...r, actualizado: new Date().toISOString() } : m));
 }
 
-export function borrarDoc(espacio, tipo, id) {
-  return {
-    ...espacio,
-    [tipo]: (espacio[tipo] || []).filter((d) => d.id !== id),
-    ultimo: espacio.ultimo === id ? null : espacio.ultimo,
-  };
+export function conNombre(indice, id, nombre) {
+  return indice.map((m) =>
+    m.id === id ? { ...m, nombre: nombre || m.nombre, actualizado: new Date().toISOString() } : m,
+  );
 }
 
-export function duplicarDoc(espacio, tipo, id) {
-  const lista = espacio[tipo] || [];
-  const orig = lista.find((d) => d.id === id);
-  if (!orig) return espacio;
-  const copia = {
-    ...orig,
-    id: nuevoId(),
-    nombre: `${orig.nombre} (copia)`,
-    creado: new Date().toISOString(),
-    actualizado: new Date().toISOString(),
-  };
-  return { ...espacio, [tipo]: [copia, ...lista] };
-}
-
-export function renombrarDoc(espacio, tipo, id, nombre) {
-  return {
-    ...espacio,
-    [tipo]: (espacio[tipo] || []).map((d) =>
-      d.id === id ? { ...d, nombre: nombre || d.nombre, actualizado: new Date().toISOString() } : d,
-    ),
-  };
+export function sinFlujo(indice, id) {
+  return indice.filter((m) => m.id !== id);
 }
 
 /** «hace 5 min», «ayer», «12 mar» — para las tarjetas de la portada. */

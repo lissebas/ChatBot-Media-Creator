@@ -14,6 +14,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { buildInitialFlow } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
+import { cargarDocumento, cargarIndice, conResumen } from "../src/flow/workspace.js";
 import {
   COMPONENTES,
   VERSION_FLOW,
@@ -151,6 +152,40 @@ console.log(`Formato: ${casos.length} casos`);
     fail(`tarjeta flow: falta el aviso de publicar (${sinId.list.join(" | ")})`);
   }
   console.log(`Flows: ${Object.keys(COMPONENTES).length} componentes · validación con ${av.length} avisos · tarjeta OK`);
+}
+
+// ── Almacenamiento: índice pequeño + un documento por flujo ──
+{
+  const almacen = new Map();
+  let escrituras = 0;
+  globalThis.localStorage = {
+    getItem: (k) => (almacen.has(k) ? almacen.get(k) : null),
+    setItem: (k, v) => { escrituras++; almacen.set(k, v); },
+    removeItem: (k) => almacen.delete(k),
+  };
+
+  // Migración desde el espacio único anterior.
+  const semilla = buildInitialFlow();
+  almacen.set("chatbot-creator-workspace-v1", JSON.stringify({
+    flujos: [{ id: "f1", nombre: "Viejo", creado: "", actualizado: new Date().toISOString(), ...semilla }],
+  }));
+  let idx = cargarIndice();
+  if (idx.length !== 1 || idx[0].pasos !== semilla.nodes.length) fail("almacén: la migración perdió el flujo");
+  if (!almacen.has("cbc-doc-f1")) fail("almacén: el cuerpo no se guardó aparte");
+  if (JSON.parse(almacen.get("cbc-index-v1"))[0].nodes) fail("almacén: el índice arrastra los nodos");
+  if (cargarDocumento("f1").nodes.length !== semilla.nodes.length) fail("almacén: el cuerpo no se recupera");
+
+  // Guardar sin cambiar los contadores NO debe tocar el índice (evita re-render).
+  const mismo = conResumen(idx, "f1", semilla);
+  if (mismo !== idx) fail("almacén: el índice se reescribe aunque no cambie nada");
+  const otro = conResumen(idx, "f1", { nodes: semilla.nodes.slice(1), edges: semilla.edges });
+  if (otro === idx || otro[0].pasos !== semilla.nodes.length - 1) fail("almacén: no detecta el cambio de tamaño");
+
+  // El índice pesa poco: es lo único que lee la portada.
+  const kb = almacen.get("cbc-index-v1").length / 1024;
+  if (kb > 4) fail(`almacén: el índice pesa ${kb.toFixed(1)} KB`);
+  console.log(`Almacén: índice ${kb.toFixed(2)} KB · documento aparte · ${escrituras} escrituras`);
+  delete globalThis.localStorage;
 }
 
 const { nodes, edges } = buildInitialFlow();

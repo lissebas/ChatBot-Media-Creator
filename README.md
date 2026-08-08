@@ -55,6 +55,19 @@ genérico: mismo fondo, mismas burbujas, misma hora dentro del mensaje.
 
 ## Tarjetas de Meta soportadas
 
+El catálogo está segmentado en **dos niveles**: primero la **familia** y dentro de
+ella la **categoría**.
+
+| Familia | Qué es | Tarjetas |
+|---|---|---|
+| **Meta Cards** | Tipos de mensaje reales de la WhatsApp Cloud API. | 20 (Mensajes, Multimedia, Interactivos, Comercio, Avanzados) |
+| **Control de flujo** | Piezas del editor que marcan el recorrido; no envían nada. | 2 (Inicio, Fin) |
+
+La paleta lateral filtra por familia (**Todas · Meta · Flujo**), tiene buscador y
+grupos plegables; el menú de clic derecho usa la misma segmentación; y el
+inspector muestra la familia, la categoría y el `type` exacto de la API de cada
+tarjeta.
+
 Cada paso del lienzo **es un tipo de mensaje real de la WhatsApp Cloud API**. El
 inspector dibuja el formulario propio de cada tarjeta, aplica los límites de Meta
 (caracteres, número de botones, filas…) y muestra el **JSON exacto** que hay que

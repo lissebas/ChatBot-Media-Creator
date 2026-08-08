@@ -40,7 +40,13 @@ export default function ContextMenu({ x, y, items, onClose }) {
         it.sep ? (
           <div key={`s${i}`} className="ctxmenu__sep" />
         ) : it.header ? (
-          <div key={`h${i}`} className="ctxmenu__header">{it.header}</div>
+          <div
+            key={`h${i}`}
+            className={`ctxmenu__header${it.strong ? " ctxmenu__header--fam" : ""}`}
+            style={it.color ? { "--accent": it.color } : undefined}
+          >
+            {it.header}
+          </div>
         ) : (
           <button
             key={it.label}

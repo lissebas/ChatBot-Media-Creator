@@ -178,6 +178,94 @@ Resources:
         - ALLOW_REFRESH_TOKEN_AUTH
       PreventUserExistenceErrors: ENABLED
 
+  # ── Motor: Lambda con Function URL, invocada DIRECTAMENTE por el navegador
+  # con firma SigV4. Sin API Gateway (coste) y sin CloudFront de por medio
+  # (su OAC no llegó a firmar y la cuenta bloquea las Function URL públicas).
+  RolLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  Motor:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${NombreProyecto}-motor"
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt RolLambda.Arn
+      MemorySize: 1769   # 1 vCPU completa: más memoria = más CPU
+      Timeout: 15
+      # OJO: aquí NO se referencian el user pool ni la distribución: haría un
+      # ciclo. Las variables reales las pone `deploy.sh`.
+      Environment:
+        Variables:
+          ORIGENES: !Ref UrlLocal
+      Code:
+        ZipFile: |
+          exports.handler = async () => ({
+            statusCode: 503,
+            body: JSON.stringify({ error: "Pendiente de desplegar el código" }),
+          });
+
+  LogsMotor:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${NombreProyecto}-motor"
+      RetentionInDays: 14
+
+  # ── Credenciales temporales para el navegador ─────────────────────────────
+  # El Identity Pool cambia el id_token de Cognito por credenciales de AWS de
+  # corta duración; con ellas el navegador firma su llamada a la Lambda.
+  Identidades:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub "${NombreProyecto}_identidades"
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId: !Ref ClienteWeb
+          ProviderName: !GetAtt Usuarios.ProviderName
+          ServerSideTokenCheck: true
+
+  RolUsuario:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Federated: cognito-identity.amazonaws.com }
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "cognito-identity.amazonaws.com:aud": !Ref Identidades
+              "ForAnyValue:StringLike":
+                "cognito-identity.amazonaws.com:amr": authenticated
+      Policies:
+        - PolicyName: invocar-motor
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # `Invoke` y no `InvokeFunctionUrl`: comprobado que esta cuenta
+              # rechaza las credenciales de Cognito en las Function URL, y que
+              # las acepta sin problema en la API.
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt Motor.Arn
+
+  RolesIdentidades:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref Identidades
+      Roles:
+        authenticated: !GetAtt RolUsuario.Arn
+
 Outputs:
   Bucket:
     Description: Bucket del sitio
@@ -200,3 +288,9 @@ Outputs:
   CognitoUserPoolId:
     Description: Id del user pool (para crear usuarios)
     Value: !Ref Usuarios
+  MotorNombre:
+    Description: Nombre de la función (para actualizar su código)
+    Value: !Ref Motor
+  IdentityPoolId:
+    Description: Identity Pool que da credenciales temporales al navegador
+    Value: !Ref Identidades

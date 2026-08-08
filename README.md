@@ -57,7 +57,11 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
   escribes (en las listas, el botón despliega sus filas como la hoja real).
 - **Clic derecho** sobre un nodo → duplicar o borrar; sobre una conexión → borrar.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
-- **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
+- **Auto-organizar** (layout jerárquico automático) — por encima de 40 pasos se
+  calcula **en AWS**, no en tu equipo; si el motor no responde, se hace en local.
+- **Analizar** — revisa el flujo entero en la nube: pasos inalcanzables,
+  callejones sin salida, salidas sin conectar y tarjetas que Meta rechazaría.
+- **Ajustar**, controles de zoom
   flotantes con porcentaje y paleta plegable.
 - Dos **interruptores de rendimiento** en los controles del lienzo, ambos con la
   preferencia recordada:

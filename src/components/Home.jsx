@@ -37,15 +37,17 @@ const PROXIMAMENTE = [
   },
 ];
 
-/** Resumen de una tarjeta de flujo: pasos, conexiones y colores usados. */
-function resumen(flujo) {
-  const nodes = flujo.nodes || [];
-  const cards = nodes.map((n) => n.data?.card).filter(Boolean);
+/**
+ * Resumen de una tarjeta de flujo. Se calcula desde los METADATOS del índice
+ * (pasos, conexiones y tipos usados): la portada no carga los flujos enteros.
+ */
+function resumen(meta) {
+  const cards = meta.cards || [];
   const colores = [...new Set(cards.map((c) => cardColor(c)))].slice(0, 6);
-  const tipos = [...new Set(cards)].filter((c) => c !== "start" && c !== "end");
+  const tipos = cards.filter((c) => c !== "start" && c !== "end");
   return {
-    pasos: nodes.length,
-    conexiones: (flujo.edges || []).length,
+    pasos: meta.pasos || 0,
+    conexiones: meta.conexiones || 0,
     colores,
     tipos: tipos.slice(0, 3).map((c) => getCard(c).nombre),
     mas: Math.max(0, tipos.length - 3),

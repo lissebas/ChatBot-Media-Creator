@@ -30,13 +30,15 @@ import {
   NODE_W,
 } from "./flow/transform";
 import {
-  borrarDoc,
-  cargarEspacio,
-  crearFlujo,
-  duplicarDoc,
-  guardarDoc,
-  guardarEspacio,
-  renombrarDoc,
+  borrarDocumento,
+  cargarDocumento,
+  cargarIndice,
+  conNombre,
+  conResumen,
+  guardarDocumento,
+  guardarIndice,
+  nuevoMeta,
+  sinFlujo,
 } from "./flow/workspace";
 import "./App.css";
 
@@ -44,8 +46,9 @@ const nodeTypes = { card: FlowNode };
 
 /* ══════════════════════════ Editor ══════════════════════════ */
 
-function Studio({ flujo, onChange, onRename, onHome }) {
-  const initial = useMemo(() => ({ nodes: flujo.nodes, edges: flujo.edges }), []); // eslint-disable-line react-hooks/exhaustive-deps
+function Studio({ nombre, doc, onChange, onRename, onHome }) {
+  // `doc` solo se lee al montar: el lienzo es el dueño del estado a partir de ahí.
+  const initial = useMemo(() => doc, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
   const [selNodeId, setSelNodeId] = useState(null);
@@ -72,12 +75,22 @@ function Studio({ flujo, onChange, onRename, onHome }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeNodeId]);
 
-  // Autoguardado en el espacio de trabajo (localStorage).
+  // Autoguardado. Se salta el primer render (acabamos de cargar: no hay nada que
+  // guardar) y escribe en un hueco libre del hilo para no cortar una animación.
+  const montado = useRef(false);
   useEffect(() => {
+    if (!montado.current) {
+      montado.current = true;
+      return;
+    }
     const t = setTimeout(() => {
-      onChange(nodes, edges);
-      setSaved("Guardado ✓");
-    }, 500);
+      const guardar = () => {
+        onChange(nodes, edges);
+        setSaved("Guardado ✓");
+      };
+      if (typeof requestIdleCallback === "function") requestIdleCallback(guardar, { timeout: 1000 });
+      else guardar();
+    }, 700);
     return () => clearTimeout(t);
   }, [nodes, edges, onChange]);
 
@@ -214,10 +227,10 @@ function Studio({ flujo, onChange, onRename, onHome }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(flujo.nombre || "flujo").replace(/[^\w\-]+/g, "-").toLowerCase()}.json`;
+    a.download = `${(nombre || "flujo").replace(/[^\w\-]+/g, "-").toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [nodes, edges, flujo.nombre]);
+  }, [nodes, edges, nombre]);
 
   const handleLoad = useCallback(
     (event) => {
@@ -302,10 +315,15 @@ function Studio({ flujo, onChange, onRename, onHome }) {
   const selNode = nodes.find((n) => n.id === selNodeId) || null;
   const selEdge = edges.find((e) => e.id === selEdgeId) || null;
 
+  // Un objeto nuevo aquí invalidaría el memo de TODOS los nodos en cada render.
+  const simValue = useMemo(() => ({ activeNodeId }), [activeNodeId]);
+  // En flujos grandes, React Flow solo monta lo que se ve.
+  const virtualizar = nodes.length > 60;
+
   return (
     <div className="app">
       <Toolbar
-        nombre={flujo.nombre}
+        nombre={nombre}
         onRename={onRename}
         onHome={onHome}
         onSave={handleSave}
@@ -328,7 +346,7 @@ function Studio({ flujo, onChange, onRename, onHome }) {
             <span className="canvas__toggle-icon" aria-hidden="true" />
           </button>
 
-          <SimContext.Provider value={{ activeNodeId }}>
+          <SimContext.Provider value={simValue}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -345,6 +363,7 @@ function Studio({ flujo, onChange, onRename, onHome }) {
               fitView
               fitViewOptions={{ padding: 0.18 }}
               minZoom={0.15}
+              onlyRenderVisibleElements={virtualizar}
               proOptions={{ hideAttribution: true }}
             >
               <Background gap={20} size={1.4} color="#232327" />
@@ -422,15 +441,33 @@ function Studio({ flujo, onChange, onRename, onHome }) {
 /* ══════════════════════════ App: portada + editor ══════════════════════════ */
 
 export default function App() {
-  const [espacio, setEspacio] = useState(cargarEspacio);
-  const [abierto, setAbierto] = useState(null); // { tipo, id }
+  const [indice, setIndice] = useState(cargarIndice);
+  const [abiertoId, setAbiertoId] = useState(null);
+  // El id abierto también en un ref: así el callback de guardado es estable y no
+  // vuelve a montar el efecto de autoguardado del lienzo.
+  const abiertoRef = useRef(null);
 
-  useEffect(() => guardarEspacio(espacio), [espacio]);
+  // El índice es estado PURO; persistirlo es un efecto (y pesa ~1 KB).
+  useEffect(() => guardarIndice(indice), [indice]);
 
-  const abrirNuevo = useCallback((tipo, doc) => {
-    setEspacio((e) => ({ ...e, ultimo: doc.id, [tipo]: [doc, ...(e[tipo] || [])] }));
-    setAbierto({ tipo, id: doc.id });
+  const abrir = useCallback((id) => {
+    abiertoRef.current = id;
+    setAbiertoId(id);
   }, []);
+
+  const meta = indice.find((m) => m.id === abiertoId) || null;
+  // El cuerpo del flujo se lee UNA vez al abrirlo (no en cada render).
+  const doc = useMemo(() => (abiertoId ? cargarDocumento(abiertoId) : null), [abiertoId]);
+
+  const crear = useCallback(
+    (nombre, contenido = { nodes: [], edges: [] }) => {
+      const nuevo = nuevoMeta(nombre, contenido);
+      guardarDocumento(nuevo.id, contenido);
+      setIndice((idx) => [nuevo, ...idx]);
+      abrir(nuevo.id);
+    },
+    [abrir],
+  );
 
   const importar = useCallback(
     (event) => {
@@ -444,7 +481,7 @@ export default function App() {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
             return;
           }
-          abrirNuevo("flujos", crearFlujo(file.name.replace(/\.json$/i, ""), migrateFlow(data)));
+          crear(file.name.replace(/\.json$/i, ""), migrateFlow(data));
         } catch {
           alert("No se pudo leer el JSON.");
         }
@@ -452,45 +489,52 @@ export default function App() {
       reader.readAsText(file);
       event.target.value = "";
     },
-    [abrirNuevo],
+    [crear],
   );
 
-  const doc = abierto ? (espacio[abierto.tipo] || []).find((d) => d.id === abierto.id) : null;
+  /** Autoguardado: escribe SOLO este flujo y toca el índice solo si su resumen cambió. */
+  const guardar = useCallback((nodes, edges) => {
+    const id = abiertoRef.current;
+    if (!id) return;
+    guardarDocumento(id, { nodes, edges });
+    setIndice((idx) => conResumen(idx, id, { nodes, edges }));
+  }, []);
 
-  const guardarContenido = useCallback(
-    (patch) => {
-      if (!abierto) return;
-      setEspacio((e) => {
-        const actual = (e[abierto.tipo] || []).find((d) => d.id === abierto.id);
-        if (!actual) return e;
-        return guardarDoc(e, abierto.tipo, { ...actual, ...patch });
-      });
-    },
-    [abierto],
-  );
+  const renombrar = useCallback((nombre) => {
+    const id = abiertoRef.current;
+    if (id) setIndice((idx) => conNombre(idx, id, nombre));
+  }, []);
 
-  // Identidades estables: los editores autoguardan en un efecto que depende de
-  // ellas; si cambiaran en cada render, el guardado se repetiría sin parar.
-  const guardarLienzo = useCallback(
-    (nodes, edges) => guardarContenido({ nodes, edges }),
-    [guardarContenido],
-  );
-  const renombrar = useCallback(
-    (nombre) => abierto && setEspacio((e) => renombrarDoc(e, abierto.tipo, abierto.id, nombre)),
-    [abierto],
-  );
+  const duplicar = useCallback((id) => {
+    const orig = indice.find((m) => m.id === id);
+    if (!orig) return;
+    const copiaDoc = cargarDocumento(id);
+    const copia = nuevoMeta(`${orig.nombre} (copia)`, copiaDoc);
+    guardarDocumento(copia.id, copiaDoc);
+    setIndice((idx) => [copia, ...idx]);
+  }, [indice]);
 
-  if (!doc) {
+  const borrar = useCallback((id) => {
+    borrarDocumento(id);
+    setIndice((idx) => sinFlujo(idx, id));
+  }, []);
+
+  const volver = useCallback(() => {
+    abiertoRef.current = null;
+    setAbiertoId(null);
+  }, []);
+
+  if (!meta || !doc) {
     return (
       <Home
-        flujos={espacio.flujos}
-        onAbrir={(id) => setAbierto({ tipo: "flujos", id })}
-        onNuevo={() => abrirNuevo("flujos", crearFlujo("Flujo sin título"))}
-        onEjemplo={() => abrirNuevo("flujos", crearFlujo("Flujo de ejemplo", buildInitialFlow()))}
+        flujos={indice}
+        onAbrir={abrir}
+        onNuevo={() => crear("Flujo sin título")}
+        onEjemplo={() => crear("Flujo de ejemplo", buildInitialFlow())}
         onImportar={importar}
-        onDuplicar={(tipo, id) => setEspacio((e) => duplicarDoc(e, tipo, id))}
-        onBorrar={(tipo, id) => setEspacio((e) => borrarDoc(e, tipo, id))}
-        onRenombrar={(tipo, id, nombre) => setEspacio((e) => renombrarDoc(e, tipo, id, nombre))}
+        onDuplicar={(tipo, id) => duplicar(id)}
+        onBorrar={(tipo, id) => borrar(id)}
+        onRenombrar={(tipo, id, nombre) => setIndice((idx) => conNombre(idx, id, nombre))}
       />
     );
   }
@@ -498,11 +542,12 @@ export default function App() {
   return (
     <ReactFlowProvider>
       <Studio
-        key={doc.id}
-        flujo={doc}
-        onChange={guardarLienzo}
+        key={meta.id}
+        nombre={meta.nombre}
+        doc={doc}
+        onChange={guardar}
         onRename={renombrar}
-        onHome={() => setAbierto(null)}
+        onHome={volver}
       />
     </ReactFlowProvider>
   );

@@ -12,10 +12,14 @@ import { SimContext } from "../sim/SimContext";
  *               por cada salida (botón de respuesta, fila de lista…), cada una
  *               con su propio conector a la derecha.
  */
+/** Constante compartida: `data.props || {}` crearía un objeto nuevo por render
+ *  y rompería el memo de los nodos que aún no tienen props. */
+const SIN_PROPS = {};
+
 function FlowNode({ id, data, selected }) {
   const card = getCard(data.card);
   const color = cardColor(data.card);
-  const props = data.props || {};
+  const props = data.props || SIN_PROPS;
   const { activeNodeId } = useContext(SimContext);
   const active = activeNodeId === id;
   const state = `${selected ? " is-selected" : ""}${active ? " is-active" : ""}`;

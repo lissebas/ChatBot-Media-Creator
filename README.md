@@ -12,6 +12,12 @@ Stack: **React + React Flow** (Vite). **Todo corre en Docker** — no se instala
 > (`src/flow/seedFlow.js`) para que el lienzo no arranque vacío; puedes borrarlo o
 > reemplazarlo por el tuyo.
 
+## Dónde está desplegado
+
+Producción en AWS (us-west-2), como sitio estático con login:
+**https://d3vl8jx5qstlaa.cloudfront.net** — S3 privado + CloudFront + Cognito,
+sin backend ni base de datos. Detalles y despliegue en [`infra/`](./infra).
+
 ## Cómo correrlo (localhost)
 
 Necesitas solo **Docker**.

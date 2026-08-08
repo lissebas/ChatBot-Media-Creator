@@ -2,6 +2,7 @@ import { useState } from "react";
 import Modal from "./Modal";
 import { cardColor, getCard } from "../flow/cardTypes";
 import { haceCuanto } from "../flow/workspace";
+import { authActivo, salir } from "../auth";
 
 /** Lo que viene después: se muestra apagado, sin prometer fechas. */
 const PROXIMAMENTE = [
@@ -55,6 +56,7 @@ function resumen(meta) {
 }
 
 export default function Home({
+  sesion,
   flujos,
   onAbrir,
   onNuevo,
@@ -105,6 +107,12 @@ export default function Home({
           </div>
         </div>
         <div className="home__topactions">
+          {authActivo ? (
+            <div className="home__user" title="Cerrar sesión">
+              <span className="home__usermail">{sesion?.correo}</span>
+              <button className="btn btn--ghost" onClick={salir}>Salir</button>
+            </div>
+          ) : null}
           <label className="btn" title="Cargar un flujo desde JSON">
             Importar
             <input

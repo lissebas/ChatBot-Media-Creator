@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import WhatsAppMessage from "./WhatsAppMessage";
 import WaText from "./WaText";
+import { getCard } from "../flow/cardTypes";
+import { buscarPaso, interceptar, notaDe, resolver } from "../sim/motores";
 import {
+  conVariables,
   matchEdge,
   entryNode,
   nextEdge,
   nodeById,
   nodeOptions,
+  outgoing,
   stepMode,
 } from "../sim/runtime";
 
@@ -14,6 +18,17 @@ import {
 function ahora() {
   const d = new Date();
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+/** Aplica cambios de variables; `undefined` borra. */
+function aplicar(base, cambios) {
+  if (!cambios) return base;
+  const out = { ...base };
+  for (const [k, v] of Object.entries(cambios)) {
+    if (v === undefined || v === null || v === "") delete out[k];
+    else out[k] = v;
+  }
+  return out;
 }
 
 /**
@@ -60,22 +75,67 @@ function ListSheet({ card, onPick, onClose }) {
  * mismas interacciones que el chat real — los botones van pegados a la burbuja,
  * las listas abren su hoja inferior y los mensajes que no esperan respuesta
  * encadenan solos. El nodo activo se resalta en el lienzo.
+ *
+ * Los pasos de automatización no se dibujan como mensajes (el cliente no los
+ * vería): salen como una nota técnica con lo que decidieron. Las validaciones,
+ * las condiciones y las intenciones se ejecutan de verdad, así que el simulador
+ * sirve para probar las reglas, no solo el guion.
  */
 export default function Simulator({ nodes, edges, onActive, onClose }) {
   const [currentId, setCurrentId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sheet, setSheet] = useState(false);
+  const [vars, setVars] = useState({});
+  const [verVars, setVerVars] = useState(false);
   const started = useRef(false);
   const pasos = useRef(0);
   const scrollRef = useRef(null);
+  // Las variables también en un ref: al encadenar pasos hay que leer el valor
+  // recién escrito, y el estado de React todavía no lo tiene.
+  const varsRef = useRef({});
+  const intentos = useRef(0);
+  const decision = useRef(null);
 
+  /** Entra en un nodo: emite su mensaje (o su nota) y guarda lo que decidió. */
   const emitir = useCallback(
-    (nodeId, extra = []) => {
+    (nodeId, { extra = [], vars: cambios, nota } = {}) => {
       const node = nodeById(nodes, nodeId);
-      const propio = node && node.data?.card !== "start" && node.data?.card !== "end"
-        ? [{ role: "bot", card: node.data.card, props: node.data.props || {}, time: ahora() }]
-        : [];
+      const card = getCard(node?.data?.card);
+      const props = node?.data?.props || {};
+
+      let actuales = aplicar(varsRef.current, cambios);
+      let linea = nota;
+
+      // Las tarjetas que deciden solas se resuelven al entrar: así la nota que
+      // se enseña es la decisión de verdad y no una promesa.
+      decision.current = null;
+      if (node && card.decide) {
+        const r = resolver(node.data.card, props, { vars: actuales });
+        if (r) {
+          actuales = aplicar(actuales, r.vars);
+          linea = r.nota;
+          decision.current = r;
+        }
+      }
+
+      varsRef.current = actuales;
+      setVars(actuales);
+      intentos.current = 0;
+
+      const propio =
+        node && card.chat !== false
+          ? [
+              {
+                role: "bot",
+                card: node.data.card,
+                props: conVariables(props, actuales),
+                time: ahora(),
+                nota: card.tecnica ? linea || notaDe(node.data.card, props, actuales) : undefined,
+              },
+            ]
+          : [];
+
       setMessages((m) => [...m, ...extra, ...propio]);
       setCurrentId(nodeId);
       setSheet(false);
@@ -86,18 +146,17 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
 
   const restart = useCallback(() => {
     pasos.current = 0;
+    intentos.current = 0;
+    decision.current = null;
+    varsRef.current = {};
+    setVars({});
     setSheet(false);
     setMessages([]);
+    setCurrentId(null);
     const entry = entryNode(nodes, edges);
-    const node = nodeById(nodes, entry);
-    setMessages(
-      node && node.data?.card !== "start" && node.data?.card !== "end"
-        ? [{ role: "bot", card: node.data.card, props: node.data.props || {}, time: ahora() }]
-        : [],
-    );
-    setCurrentId(entry);
-    onActive(entry);
-  }, [nodes, edges, onActive]);
+    if (entry) emitir(entry);
+    else onActive(null);
+  }, [nodes, edges, emitir, onActive]);
 
   // Arranca una vez al abrir el simulador (ref evita doble arranque en StrictMode).
   useEffect(() => {
@@ -110,18 +169,57 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
   const mode = stepMode(current, edges);
   const options = nodeOptions(current, edges);
 
+  const avisar = useCallback(
+    (texto) => setMessages((m) => [...m, { role: "sys", text: texto }]),
+    [],
+  );
+
+  /** Sigue por una salida concreta del nodo actual. */
+  const porSalida = useCallback(
+    (nodeId, salida, opciones) => {
+      const edge = outgoing(edges, nodeId).find((e) => (e.sourceHandle || "next") === salida);
+      if (!edge) {
+        avisar(`La salida «${salida}» no lleva a ningún paso todavía.`);
+        return false;
+      }
+      emitir(edge.target, opciones);
+      return true;
+    },
+    [edges, emitir, avisar],
+  );
+
   // Los mensajes que no esperan respuesta encadenan solos, con una pausa corta.
   useEffect(() => {
-    if (mode !== "auto" || !currentId) return;
-    if (pasos.current > 40) return; // freno ante ciclos infinitos
-    const edge = nextEdge(edges, currentId);
-    if (!edge) return;
-    const t = setTimeout(() => {
-      pasos.current += 1;
-      emitir(edge.target);
-    }, 650);
-    return () => clearTimeout(t);
-  }, [mode, currentId, edges, emitir]);
+    if (!currentId) return undefined;
+    if (pasos.current > 40) return undefined; // freno ante ciclos infinitos
+
+    if (mode === "auto") {
+      const edge = nextEdge(edges, currentId);
+      if (!edge) return undefined;
+      const t = setTimeout(() => {
+        pasos.current += 1;
+        emitir(edge.target);
+      }, 650);
+      return () => clearTimeout(t);
+    }
+
+    if (mode === "decide") {
+      const t = setTimeout(() => {
+        pasos.current += 1;
+        const d = decision.current;
+        if (!d) return;
+        if (d.saltarA) {
+          const destino = buscarPaso(nodes, d.saltarA);
+          if (destino) emitir(destino);
+          else avisar(`No encuentro el paso «${d.saltarA}».`);
+          return;
+        }
+        porSalida(currentId, d.salida);
+      }, 550);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [mode, currentId, edges, nodes, emitir, porSalida, avisar]);
 
   // Auto-scroll al último mensaje.
   useEffect(() => {
@@ -131,10 +229,13 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
   const avanzar = (edge, userText) => {
     if (!edge) return;
     pasos.current = 0;
-    emitir(edge.target, userText != null ? [{ role: "user", text: userText, time: ahora() }] : []);
+    emitir(edge.target, {
+      extra: userText != null ? [{ role: "user", text: userText, time: ahora() }] : [],
+      vars: userText != null ? { respuesta: userText } : undefined,
+    });
   };
 
-  /** Toque en un botón nativo de la burbuja. */
+  /** Toque en un botón nativo de la burbuja (o en una rama de un paso técnico). */
   const onAction = (id, label) => {
     if (id === "__list__") {
       setSheet(true);
@@ -145,17 +246,55 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
       return;
     }
     const opt = options.find((o) => o.id === id);
-    if (opt?.edge) avanzar(opt.edge, opt.label);
+    if (opt?.edge) avanzar(opt.edge, getCard(current?.data?.card).tecnica ? null : label);
     else avisar(`«${label}» no lleva a ningún paso todavía.`);
   };
-
-  const avisar = (texto) =>
-    setMessages((m) => [...m, { role: "sys", text: texto }]);
 
   const send = () => {
     const t = input.trim();
     if (!t || mode === "end") return;
     setInput("");
+    const escrito = { role: "user", text: t, time: ahora() };
+
+    // Los comandos globales mandan sobre el paso actual: «menú» funciona en
+    // mitad de un formulario, que es justo para lo que existen.
+    const cmd = interceptar(nodes, t);
+    if (cmd && cmd.nodo !== currentId) {
+      pasos.current = 0;
+      const edge = outgoing(edges, cmd.nodo).find((e) => (e.sourceHandle || "next") === cmd.salida);
+      if (edge) {
+        emitir(edge.target, { extra: [escrito], vars: { respuesta: t }, nota: `Comando: ${cmd.etiqueta}` });
+      } else {
+        setMessages((m) => [...m, escrito]);
+        avisar(`El comando «${cmd.etiqueta}» no lleva a ningún paso todavía.`);
+      }
+      return;
+    }
+
+    // Pregunta y valida / intención: aquí decide el motor, no un botón.
+    if (mode === "captura") {
+      const r = resolver(current.data.card, current.data.props || {}, {
+        vars: varsRef.current,
+        texto: t,
+        intentos: intentos.current,
+      });
+      setMessages((m) => [...m, escrito]);
+      if (!r) return;
+
+      if (r.reintentar) {
+        intentos.current += 1;
+        setMessages((m) => [
+          ...m,
+          { role: "bot", card: "text", props: { body: r.mensaje }, time: ahora() },
+        ]);
+        return;
+      }
+      pasos.current = 0;
+      const edge = outgoing(edges, currentId).find((e) => (e.sourceHandle || "next") === r.salida);
+      if (edge) emitir(edge.target, { vars: { ...r.vars, respuesta: t }, nota: r.nota });
+      else avisar(`La salida «${r.salida}» no lleva a ningún paso todavía.`);
+      return;
+    }
 
     if (mode === "text" || mode === "action") {
       avanzar(nextEdge(edges, currentId), t);
@@ -167,7 +306,7 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
     if (res === undefined) {
       setMessages((m) => [
         ...m,
-        { role: "user", text: t, time: ahora() },
+        escrito,
         {
           role: "bot",
           card: "text",
@@ -182,6 +321,7 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
 
   const ultimoBot = messages.map((m) => m.role).lastIndexOf("bot");
   const interactivo = mode === "options" || mode === "action";
+  const nombresVar = Object.keys(vars);
 
   return (
     <aside className="sim">
@@ -216,13 +356,14 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
               card={m.card}
               props={m.props}
               time={m.time}
+              nota={m.nota}
               muted={i !== ultimoBot || !interactivo}
               onAction={i === ultimoBot && interactivo ? onAction : undefined}
             />
           ),
         )}
 
-        {mode === "auto" && (
+        {(mode === "auto" || mode === "decide") && (
           <div className="wa-typing"><span /><span /><span /></div>
         )}
         {mode === "end" && <div className="wa-sys">— fin del flujo —</div>}
@@ -243,6 +384,26 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
         />
       ) : null}
 
+      {nombresVar.length ? (
+        <div className={`wa-vars${verVars ? " is-open" : ""}`}>
+          <button className="wa-vars__toggle" onClick={() => setVerVars((v) => !v)}>
+            <span className="wa-vars__chev">▸</span>
+            Variables
+            <span className="wa-vars__count">{nombresVar.length}</span>
+          </button>
+          {verVars ? (
+            <ul className="wa-vars__list">
+              {nombresVar.map((k) => (
+                <li key={k}>
+                  <code>{k}</code>
+                  <span>{String(vars[k])}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="wa-composer">
         {mode === "end" ? (
           <button className="wa-restart" onClick={restart}>Reiniciar conversación</button>
@@ -251,7 +412,7 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
             <input
               className="wa-input"
               value={input}
-              placeholder="Escribe un mensaje"
+              placeholder={mode === "captura" ? "Escribe tu respuesta" : "Escribe un mensaje"}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send()}
             />

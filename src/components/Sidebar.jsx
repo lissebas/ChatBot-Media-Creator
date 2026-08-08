@@ -59,7 +59,7 @@ export default function Sidebar() {
             onClick={() => setFamilia(f.familia)}
             title={f.desc}
           >
-            {f.familia === "meta" ? "Meta" : "Flujo"}
+            {f.tab || f.nombre}
             <span className="seg__count">{f.total}</span>
           </button>
         ))}

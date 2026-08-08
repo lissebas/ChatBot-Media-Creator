@@ -45,7 +45,7 @@ const PROXIMAMENTE = [
 function resumen(meta) {
   const cards = meta.cards || [];
   const colores = [...new Set(cards.map((c) => cardColor(c)))].slice(0, 6);
-  const tipos = cards.filter((c) => c !== "start" && c !== "end");
+  const tipos = cards.filter((c) => getCard(c).chat !== false);
   return {
     pasos: meta.pasos || 0,
     conexiones: meta.conexiones || 0,

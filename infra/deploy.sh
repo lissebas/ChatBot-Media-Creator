@@ -48,7 +48,7 @@ echo "▸ Empaquetando la Lambda…"
 # El bundle se hace en el contenedor (esbuild); el zip, con el `zip` de macOS.
 docker run --rm -v "$RAIZ":/app -v chatbotcreator_studio_node_modules:/app/node_modules -w /app \
   node:20-alpine ./node_modules/.bin/esbuild api/handler.mjs --bundle --platform=node \
-    --format=esm --target=node20 --outfile=api/dist/index.mjs
+    --format=esm --target=node20 '--external:@aws-sdk/*' --outfile=api/dist/index.mjs
 (cd "$RAIZ/api/dist" && zip -q ../motor.zip index.mjs)
 aws lambda update-function-code --function-name "$MOTOR" \
   --zip-file "fileb://$RAIZ/api/motor.zip" --query 'LastModified' --output text >/dev/null
@@ -57,7 +57,7 @@ aws lambda wait function-updated --function-name "$MOTOR"
 
 # El pool y el cliente se inyectan aquí (en la plantilla crearían un ciclo).
 aws lambda update-function-configuration --function-name "$MOTOR" \
-  --environment "Variables={USER_POOL_ID=$(salida CognitoUserPoolId),CLIENT_ID=$(salida CognitoClienteId),ORIGENES=$URL\,http://localhost:5174}" \
+  --environment "Variables={USER_POOL_ID=$(salida CognitoUserPoolId),CLIENT_ID=$(salida CognitoClienteId),BUCKET=$BUCKET,ORIGENES=$URL\,http://localhost:5174}" \
   --query 'LastModified' --output text >/dev/null
 aws lambda wait function-updated --function-name "$MOTOR"
 
@@ -77,8 +77,11 @@ docker run --rm \
 
 echo "▸ Subiendo a s3://${BUCKET}…"
 # Los assets llevan hash en el nombre: se cachean para siempre.
+# OJO con `--delete`: el bucket también guarda los flujos de los usuarios en
+# `flujos/`, y sin esta exclusión cada despliegue los borraría (pasó una vez).
 aws s3 sync "$RAIZ/dist" "s3://$BUCKET" --delete \
-  --exclude index.html --cache-control "public,max-age=31536000,immutable"
+  --exclude index.html --exclude "flujos/*" \
+  --cache-control "public,max-age=31536000,immutable"
 # El index.html cambia en cada despliegue: nunca se cachea.
 aws s3 cp "$RAIZ/dist/index.html" "s3://$BUCKET/index.html" \
   --cache-control "no-cache,no-store,must-revalidate" --content-type "text/html; charset=utf-8"

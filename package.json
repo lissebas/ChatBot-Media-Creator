@@ -1,7 +1,7 @@
 {
   "name": "chatbot-creator",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.10.0",
   "type": "module",
   "description": "ChatBot Creator — plataforma propia (tipo Botpress) para diseñar y simular flujos conversacionales",
   "author": "Johan Sebastián Gómez Rubio <gomezrubiosebas@gmail.com>",
@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "smoke": "esbuild scripts/smoke.mjs --bundle --platform=node --format=cjs --jsx=automatic --outfile=node_modules/.cache/smoke.cjs && node node_modules/.cache/smoke.cjs",
+    "smoke": "esbuild scripts/smoke.mjs --bundle --platform=node --format=cjs --jsx=automatic --define:import.meta.env={} --outfile=node_modules/.cache/smoke.cjs && node node_modules/.cache/smoke.cjs",
     "presets": "esbuild scripts/gen-preset.mjs --bundle --platform=node --format=cjs --outfile=node_modules/.cache/presets.cjs && node node_modules/.cache/presets.cjs",
     "render": "esbuild scripts/render.mjs --bundle --platform=node --format=esm --target=node20 --outfile=node_modules/.cache/render.mjs --external:@resvg/resvg-wasm && node node_modules/.cache/render.mjs"
   },

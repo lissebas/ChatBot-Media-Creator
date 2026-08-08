@@ -11,6 +11,7 @@ import {
 } from "../src/flow/cardTypes.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { combinarIndices } from "../src/flow/nube.js";
 import { buildInitialFlow, migrateFlow, nodeSize, simplificarAristas } from "../src/flow/transform.js";
 import { anclas, cajaFlujo, svgDeRegion } from "../api/svg.mjs";
 import { TEMA } from "../src/flow/tema.js";
@@ -214,6 +215,34 @@ console.log(`Formato: ${casos.length} casos`);
   if (kb > 4) fail(`almacén: el índice pesa ${kb.toFixed(1)} KB`);
   console.log(`Almacén: índice ${kb.toFixed(2)} KB · documento aparte · ${escrituras} escrituras`);
   delete globalThis.localStorage;
+}
+
+// ── Nube: al entrar se cruza lo local con lo de S3 y gana lo más reciente ──
+{
+  const t = (min) => new Date(Date.now() - min * 60000).toISOString();
+  const local = [
+    { id: "a", nombre: "Solo aquí", actualizado: t(5) },
+    { id: "b", nombre: "Mío nuevo", actualizado: t(1) },
+    { id: "c", nombre: "Viejo aquí", actualizado: t(90) },
+  ];
+  const remoto = [
+    { id: "b", nombre: "Suyo viejo", actualizado: t(60) },
+    { id: "c", nombre: "Suyo nuevo", actualizado: t(2) },
+    { id: "d", nombre: "Solo en la nube", actualizado: t(30) },
+  ];
+  const { combinado, subir, bajar } = combinarIndices(local, remoto);
+
+  if (combinado.length !== 4) fail(`nube: quedan ${combinado.length} flujos, deberían ser 4`);
+  const por = new Map(combinado.map((m) => [m.id, m]));
+  if (por.get("b").nombre !== "Mío nuevo") fail("nube: la copia local más reciente no gana");
+  if (por.get("c").nombre !== "Suyo nuevo") fail("nube: la copia de la nube más reciente no gana");
+  if (subir.join() !== "a,b") fail(`nube: se suben ${subir.join() || "ninguno"}, deberían ser a,b`);
+  if (bajar.sort().join() !== "c,d") fail(`nube: se bajan ${bajar.join() || "ninguno"}, deberían ser c,d`);
+  // La portada los pinta por fecha, del más reciente al más antiguo.
+  const fechas = combinado.map((m) => new Date(m.actualizado).getTime());
+  if (fechas.some((f, i) => i && f > fechas[i - 1])) fail("nube: el índice combinado no queda ordenado");
+  // Nada del estado local puede acabar en S3, y nada se pierde por el camino.
+  console.log(`Nube: ${combinado.length} flujos combinados · sube ${subir.length} · baja ${bajar.length}`);
 }
 
 const { nodes, edges } = buildInitialFlow();

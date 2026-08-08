@@ -45,6 +45,12 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
   la portada solo lee un índice de metadatos (~0,2 KB) y el autoguardado escribe
   únicamente el flujo abierto, no los demás. Lo que tuvieras guardado antes se
   migra solo la primera vez.
+- **Y además en la nube**: cada flujo se copia a S3 —el mismo bucket que sirve
+  CloudFront, bajo `flujos/<usuario>/`— unos segundos después de dejar de editar.
+  El navegador sigue siendo la copia de trabajo (abrir un flujo es instantáneo y
+  sin conexión puedes seguir trabajando); S3 es la copia duradera. Al entrar se
+  cruzan ambas y **gana la más reciente de cada flujo**: entras desde otro equipo
+  y tienes tus flujos. La barra del editor dice en qué estado va la copia.
 
 **Editor** — lienzo oscuro con retícula de puntos, tarjetas suaves y cápsulas de
 Inicio/Fin, al estilo de los constructores de flujos modernos.
@@ -213,6 +219,7 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/components/Home.jsx` | Portada: tus flujos y lo que viene. |
 | `src/components/Modal.jsx` | Diálogos de la app (confirmar, renombrar). |
 | `src/flow/workspace.js` | Índice + documentos de los flujos en el navegador. |
+| `src/flow/nube.js` | Copia de los flujos en S3: reconciliación al entrar y subida agrupada. |
 | `src/flow/flowJson.js` | **Catálogo de componentes de Flows**: campos, límites y Flow JSON. |
 | `src/components/FlowDesigner.jsx` | Diseñador de pantallas de la tarjeta Flow. |
 | `src/components/FlowScreen.jsx` | Vista previa de una pantalla de Flow. |

@@ -1,17 +1,19 @@
 # Infraestructura (AWS · us-west-2)
 
-ChatBot Creator es una app **100 % cliente**: no hay backend ni base de datos.
-Los flujos viven en el navegador y se mueven con Exportar/Importar JSON.
+ChatBot Creator no tiene base de datos: los flujos viven en el navegador y su
+copia duradera son **objetos JSON en el mismo bucket de S3** que sirve el sitio.
 
 ```
-navegador ──► CloudFront ──► S3 (privado, solo accesible por CloudFront)
-     │
-     └──────► Cognito Hosted UI (login con Authorization Code + PKCE)
+navegador ──► CloudFront ──► S3  (privado, solo accesible por CloudFront)
+     │                        ▲
+     │                        │  flujos/<sub>/…  ← escribe solo la Lambda
+     ├──────► Cognito         │
+     └──────► Lambda ─────────┘  (invocada con SigV4, verifica el token)
 ```
 
 | Pieza | Para qué |
 |---|---|
-| **S3** | Los archivos compilados. Bucket privado: no se sirve nada directamente desde él. |
+| **S3** | Los archivos compilados **y los flujos de los usuarios** (`flujos/<sub>/`, versionado). Bucket privado: no se sirve nada directamente desde él. |
 | **CloudFront** | CDN + HTTPS. Devuelve `index.html` en cualquier ruta desconocida (SPA). |
 | **Cognito** | Login. Sin auto-registro: los usuarios los crea un administrador. El formulario es de la propia app (no el Hosted UI): se llama a la API de Cognito desde el navegador, así nunca se sale del dominio. |
 
@@ -54,6 +56,30 @@ Dos caminos que **no** funcionan en esta cuenta y por qué, para no repetirlos:
 Sin API Gateway, por tanto sin coste fijo. El endpoint de Lambda admite CORS
 (`access-control-allow-origin: *`), así que el navegador puede llamarlo directo.
 
+## Flujos guardados (persistencia)
+
+Cada flujo se guarda en `s3://<bucket>/flujos/<sub>/<id>.json`, con un
+`index.json` por usuario para la portada. `<sub>` es el identificador del usuario
+**tomado del token verificado en la Lambda**, nunca de lo que mande el navegador,
+y el `id` se valida contra `[A-Za-z0-9_-]{1,64}` (nada de `../`).
+
+Tres cosas que hacen que compartir bucket con el sitio sea seguro y no un riesgo:
+
+- La política del bucket **deniega** a CloudFront leer `flujos/*`: aunque alguien
+  acierte la ruta, recibe 403 (que el mapeo SPA convierte en `index.html`).
+- El rol de la Lambda solo puede tocar ese prefijo; el rol del navegador **no
+  tiene permisos de S3**: todo pasa por la función.
+- `deploy.sh` excluye `flujos/*` del `aws s3 sync --delete`. Sin esa exclusión,
+  cada despliegue borraría los flujos de todo el mundo (pasó una vez, en pruebas).
+
+El bucket tiene **versionado** con expiración de versiones antiguas a los 30 días:
+un guardado malo o un borrado accidental se puede recuperar dentro de ese plazo.
+
+El navegador sube el flujo **2,5 s después de dejar de editar**, agrupando la
+ráfaga del autoguardado; al entrar cruza su índice con el de S3 y gana la copia
+más reciente de cada flujo. Si la nube falla, se sigue editando en local y la
+subida se reintenta.
+
 ## Dominio propio
 
 La app responde en **https://dev.sebasgomezrubio.com** (CloudFront + certificado
@@ -86,8 +112,8 @@ cambiarla en el primer acceso.
 - Los tokens se guardan en `sessionStorage` (mueren al cerrar la pestaña), nunca
   junto a los flujos. No hay refresco automático: al expirar, se vuelve a pedir
   login.
-- El bucket tiene `DeletionPolicy: Retain` — borrar el stack no borra los
-  archivos.
+- El bucket tiene `DeletionPolicy: Retain` — borrar el stack no borra ni los
+  archivos del sitio ni los flujos.
 - **Cuando haga falta backend** (publicar en la Cloud API, recibir webhooks de
   Meta): API Gateway HTTP API + Lambda + Secrets Manager, que sigue sin coste en
   reposo. No hace falta tocar nada de lo de aquí.

@@ -16,6 +16,7 @@ const REDIRECT = import.meta.env.VITE_URL_APP || `${window.location.origin}/`;
 
 const CLAVE_VERIFICADOR = "cbc-pkce";
 const CLAVE_SESION = "cbc-sesion";
+const CLAVE_REINTENTO = "cbc-reintento";
 
 export const authActivo = Boolean(DOMINIO && CLIENTE);
 
@@ -47,6 +48,20 @@ function leerToken(idToken) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Reintenta el login desde cero UNA sola vez (un bucle de redirecciones sería
+ * peor que el error). El segundo intento fallido sí se muestra.
+ */
+async function reintentarLogin(motivo) {
+  if (sessionStorage.getItem(CLAVE_REINTENTO)) {
+    sessionStorage.removeItem(CLAVE_REINTENTO);
+    throw new Error(`No se pudo completar el login (${motivo}).`);
+  }
+  sessionStorage.setItem(CLAVE_REINTENTO, "1");
+  await entrar();
+  return new Promise(() => {});
 }
 
 /* ── Sesión ── */
@@ -90,13 +105,13 @@ export async function entrar() {
 export function salir() {
   sessionStorage.removeItem(CLAVE_SESION);
   sessionStorage.removeItem(CLAVE_VERIFICADOR);
+  sessionStorage.removeItem(CLAVE_REINTENTO);
   if (!authActivo) return;
   const q = new URLSearchParams({ client_id: CLIENTE, logout_uri: REDIRECT });
   window.location.replace(`${DOMINIO}/logout?${q}`);
 }
 
-async function canjear(code) {
-  const verificador = sessionStorage.getItem(CLAVE_VERIFICADOR) || "";
+async function canjear(code, verificador) {
   const r = await fetch(`${DOMINIO}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -108,7 +123,18 @@ async function canjear(code) {
       code_verifier: verificador,
     }),
   });
-  if (!r.ok) throw new Error(`Cognito devolvió ${r.status} al canjear el código`);
+  if (!r.ok) {
+    // El motivo exacto viene en el cuerpo (invalid_grant, invalid_client…):
+    // sin él, un 400 no dice nada y hay que adivinar.
+    let detalle = "";
+    try {
+      const cuerpo = await r.json();
+      detalle = cuerpo.error_description || cuerpo.error || "";
+    } catch {
+      detalle = (await r.text().catch(() => "")).slice(0, 200);
+    }
+    throw new Error(`Cognito ${r.status}${detalle ? `: ${detalle}` : ""} (redirect_uri: ${REDIRECT})`);
+  }
   sessionStorage.removeItem(CLAVE_VERIFICADOR);
   return guardarSesion(await r.json());
 }
@@ -126,16 +152,31 @@ export async function resolverSesion() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
   if (code) {
-    const s = await canjear(code);
+    // La URL se limpia SIEMPRE: un código de Cognito es de un solo uso, así que
+    // recargar con `?code=` en la barra garantiza un 400 la segunda vez.
+    const verificador = sessionStorage.getItem(CLAVE_VERIFICADOR);
     window.history.replaceState({}, "", window.location.pathname);
-    return s;
+
+    // Sin verificador (otra pestaña, sesión limpiada, vuelta atrás del navegador)
+    // el canje no puede funcionar: se empieza el login de cero, una sola vez.
+    if (!verificador) return reintentarLogin("se perdió el verificador PKCE");
+
+    try {
+      return await canjear(code, verificador);
+    } catch (e) {
+      if (/invalid_grant/i.test(String(e.message))) return reintentarLogin(e.message);
+      throw e;
+    }
   }
   if (params.get("error")) {
     throw new Error(`Cognito: ${params.get("error_description") || params.get("error")}`);
   }
 
   const actual = sesion();
-  if (actual) return actual;
+  if (actual) {
+    sessionStorage.removeItem(CLAVE_REINTENTO);
+    return actual;
+  }
 
   await entrar();
   return new Promise(() => {}); // la página está navegando al login

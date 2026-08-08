@@ -16,6 +16,7 @@ export default function Sidebar() {
 
   const filtro = useMemo(() => buscarCards(q), [q]);
   const buscando = filtro !== null;
+  const total = CARDS_POR_FAMILIA.reduce((n, f) => n + f.total, 0);
 
   const onDragStart = (event, cardKey) => {
     event.dataTransfer.setData("application/chatbot-node", cardKey);
@@ -49,17 +50,19 @@ export default function Sidebar() {
         <button
           className={`seg__btn${familia === "todas" ? " is-on" : ""}`}
           onClick={() => setFamilia("todas")}
+          title="Todas las tarjetas"
         >
-          Todas
+          <span className="seg__label">Todas</span>
+          <span className="seg__count">{total}</span>
         </button>
         {CARDS_POR_FAMILIA.map((f) => (
           <button
             key={f.familia}
             className={`seg__btn${familia === f.familia ? " is-on" : ""}`}
             onClick={() => setFamilia(f.familia)}
-            title={f.desc}
+            title={`${f.nombre} — ${f.desc}`}
           >
-            {f.tab || f.nombre}
+            <span className="seg__label">{f.tab || f.nombre}</span>
             <span className="seg__count">{f.total}</span>
           </button>
         ))}

@@ -24,6 +24,15 @@ import {
   validarFlow,
 } from "../src/flow/flowJson.js";
 
+import { readFileSync } from "node:fs";
+// Rutas relativas a la raíz del proyecto (así se ejecuta `npm run smoke`).
+const leer = (r) => readFileSync(r, "utf8");
+const appSrc = leer("src/App.jsx");
+const zoomSrc = leer("src/components/ZoomControls.jsx");
+const simSrc = leer("src/components/Simulator.jsx");
+const modalSrc = leer("src/components/Modal.jsx");
+const ctxSrc = leer("src/components/ContextMenu.jsx");
+
 let fallos = 0;
 const fail = (m) => { console.log("  ✗", m); fallos++; };
 
@@ -152,6 +161,23 @@ console.log(`Formato: ${casos.length} casos`);
     fail(`tarjeta flow: falta el aviso de publicar (${sinId.list.join(" | ")})`);
   }
   console.log(`Flows: ${Object.keys(COMPONENTES).length} componentes · validación con ${av.length} avisos · tarjeta OK`);
+}
+
+// Ningún efecto debe devolver algo que no sea una función: React lo llama al
+// limpiar y rompe la app entera (pantalla de error). Se revisa el código fuente.
+{
+  const fuentes = [
+    ["src/App.jsx", appSrc],
+    ["src/components/ZoomControls.jsx", zoomSrc],
+    ["src/components/Simulator.jsx", simSrc],
+    ["src/components/Modal.jsx", modalSrc],
+    ["src/components/ContextMenu.jsx", ctxSrc],
+  ];
+  for (const [nombre, src] of fuentes) {
+    const malos = [...src.matchAll(/useEffect\(\(\)\s*=>\s*([^\s{])/g)];
+    if (malos.length) fail(`${nombre}: ${malos.length} efecto(s) con retorno implícito`);
+  }
+  console.log(`Efectos: ${fuentes.length} archivos revisados`);
 }
 
 // ── Almacenamiento: índice pequeño + un documento por flujo ──

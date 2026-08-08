@@ -489,7 +489,11 @@ export default function App() {
   const abiertoRef = useRef(null);
 
   // El índice es estado PURO; persistirlo es un efecto (y pesa ~1 KB).
-  useEffect(() => guardarIndice(indice), [indice]);
+  // Ojo con las llaves: `guardarIndice` DEVUELVE el índice, y un efecto que
+  // devuelve algo que no es función revienta cuando React lo llama al limpiar.
+  useEffect(() => {
+    guardarIndice(indice);
+  }, [indice]);
 
   const abrir = useCallback((id) => {
     abiertoRef.current = id;

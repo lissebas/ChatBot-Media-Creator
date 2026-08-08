@@ -4,9 +4,9 @@ import { useReactFlow, useStore } from "@xyflow/react";
 /**
  * Controles flotantes del lienzo: zoom +/−, porcentaje, encuadrar, y los dos
  * interruptores de rendimiento — el minimapa (se redibuja entero en cada
- * movimiento de la vista) y las aristas ligeras (sin etiquetas).
+ * movimiento de la vista) y el modo ligero (monta solo lo visible).
  */
-export default function ZoomControls({ mapa, onToggleMapa, simples, onToggleSimples }) {
+export default function ZoomControls({ mapa, onToggleMapa, ligero, onToggleLigero }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const zoom = useStore((s) => s.transform[2]);
   const [pct, setPct] = useState(100);
@@ -40,15 +40,15 @@ export default function ZoomControls({ mapa, onToggleMapa, simples, onToggleSimp
         ▣
       </button>
       <button
-        className={`zoomctl__btn${simples ? " is-on" : ""}`}
-        onClick={onToggleSimples}
+        className={`zoomctl__btn${ligero ? " is-on" : ""}`}
+        onClick={onToggleLigero}
         title={
-          simples
-            ? "Aristas ligeras: sin etiquetas (toca para verlas)"
-            : "Aristas completas: con etiquetas (toca para aligerar)"
+          ligero
+            ? "Modo ligero activo: solo se dibuja lo que se ve, sin etiquetas ni detalle"
+            : "Activar modo ligero (recomendado en flujos grandes)"
         }
       >
-        ⤳
+        ⚡
       </button>
     </div>
   );

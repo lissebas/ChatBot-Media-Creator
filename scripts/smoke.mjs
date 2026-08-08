@@ -11,7 +11,7 @@ import {
 } from "../src/flow/cardTypes.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { buildInitialFlow, simplificarAristas } from "../src/flow/transform.js";
+import { buildInitialFlow, migrateFlow, simplificarAristas } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
 import { cargarDocumento, cargarIndice, conResumen } from "../src/flow/workspace.js";
@@ -237,6 +237,18 @@ for (const n of nodes) {
       fail(`${n.id}: la salida "${o.id}" no está conectada`);
     }
   }
+}
+
+// Todo nodo debe traer dimensiones iniciales: sin ellas React Flow no sabe qué
+// está a la vista antes de medir el DOM y el modo ligero deja el lienzo VACÍO
+// (pasó de verdad: pantalla en negro en la v0.5.2).
+{
+  const sinMedidas = nodes.filter((n) => !n.width || !n.height);
+  if (sinMedidas.length) fail(`${sinMedidas.length} nodos sin width/height inicial`);
+  const importado = migrateFlow({ nodes: nodes.map(({ width, height, ...n }) => n), edges });
+  const perdidos = importado.nodes.filter((n) => !n.width || !n.height);
+  if (perdidos.length) fail(`al importar, ${perdidos.length} nodos se quedan sin dimensiones`);
+  console.log(`Dimensiones: ${nodes.length} nodos con medida inicial (también al importar)`);
 }
 
 // Aristas ligeras: solo cambia el dibujo, nunca los datos que se guardan.

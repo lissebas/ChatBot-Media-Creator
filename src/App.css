@@ -1379,3 +1379,16 @@ kbd {
   font-size: 11.5px; color: var(--faint);
   max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* ── Nivel de detalle: alejado y en modo ligero, las tarjetas pierden el texto ──
+   El texto es lo más caro de rasterizar y a ese zoom no se lee de todas formas.
+   Es solo CSS: no re-renderiza nada, solo evita pintar. */
+.canvas.is-lod .fnode__text,
+.canvas.is-lod .fnode__opts,
+.canvas.is-lod .fnode__thumb,
+.canvas.is-lod .fnode__head,
+.canvas.is-lod .react-flow__edge-textwrapper { display: none; }
+.canvas.is-lod .fnode { padding: 16px 14px; }
+.canvas.is-lod .fnode__title {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}

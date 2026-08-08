@@ -1275,3 +1275,70 @@ kbd {
 @media (max-width: 1100px) {
   .fj-body { grid-template-columns: 200px 1fr 300px; }
 }
+
+/* ══════════════ Formulario dentro de la tarjeta Flow ══════════════ */
+.flowblock {
+  margin: 4px 0 16px;
+  padding: 12px 13px 13px;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 2px solid #25d366;
+  border-radius: 11px;
+}
+.flowblock__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.flowblock__title { font-size: 12px; font-weight: 650; color: var(--text); }
+.flowblock__badge {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .04em;
+  padding: 2px 6px; border-radius: 5px;
+  color: #25d366; background: rgba(37, 211, 102, .12);
+  border: 1px solid rgba(37, 211, 102, .3);
+}
+.flowblock__meta { margin-top: 6px; font-size: 11.5px; color: var(--muted); }
+.flowblock__hint { margin: 7px 0 11px; font-size: 11.5px; color: var(--faint); line-height: 1.55; }
+.flowblock__screens { display: flex; flex-wrap: wrap; gap: 5px; margin: 9px 0 11px; }
+.flowblock__chip {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px; color: var(--muted);
+  padding: 3px 7px; border-radius: 5px;
+  background: var(--panel); border: 1px solid var(--border);
+}
+.preview__form { margin: 12px -10px -14px; }
+.preview__form .fj-phone { max-width: 100%; }
+.preview__form .fj-sheet { min-height: 0; border-radius: 12px 12px 0 0; }
+.preview__form .fj-item { cursor: default; }
+.preview__form .fj-item:hover { border-color: transparent; background: transparent; }
+.preview__form .fj-item__tools { display: none !important; }
+
+/* ── Diseñador a pantalla completa ── */
+.fd { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 18px; }
+.fd__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(6, 6, 8, .72); backdrop-filter: blur(3px);
+  animation: fade-in .12s ease-out;
+}
+.fd__panel {
+  position: relative;
+  width: min(1180px, 100%); height: min(88vh, 900px);
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+  animation: modal-in .16s ease-out;
+}
+.fd__head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.fd__title { font-size: 13.5px; font-weight: 650; color: var(--text); }
+.fd__sub { display: block; font-size: 11px; font-weight: 400; color: var(--faint); margin-top: 2px; }
+.fd__actions { margin-left: auto; display: flex; gap: 6px; }
+.fd__body {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: 226px 1fr 320px;
+}
+.fd__body .sidebar, .fd__body .inspector { overflow-y: auto; }
+.fd__body .fj-canvas { padding: 22px 18px 32px; }

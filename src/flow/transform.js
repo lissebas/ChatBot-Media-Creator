@@ -94,12 +94,15 @@ export function buildInitialFlow(dir = "TB") {
  * React Flow, con auto-layout. Lo usan el flujo de ejemplo y los presets.
  */
 export function buildFlowFrom(data, dir = "TB") {
-  const nodes = data.nodes.map((n) => ({
-    id: n.id,
-    type: "card",
-    position: { x: 0, y: 0 },
-    data: { card: n.card, title: n.title, props: { ...defaultProps(n.card), ...n.props } },
-  }));
+  const nodes = data.nodes.map((n) => {
+    const nodo = {
+      id: n.id,
+      type: "card",
+      position: { x: 0, y: 0 },
+      data: { card: n.card, title: n.title, props: { ...defaultProps(n.card), ...n.props } },
+    };
+    return { ...nodo, ...nodeSize(nodo) };
+  });
 
   const edges = data.edges.map((e, i) => ({
     id: `e${i}`,
@@ -161,17 +164,18 @@ const GRUPO_A_CARD = {
 export function migrateFlow(data) {
   const nodes = (data.nodes || []).map((n) => {
     const d = n.data || {};
-    if (d.card) return { ...n, type: "card", data: { ...d, props: d.props || {} } };
+    // Dimensiones iniciales: permiten virtualizar desde el primer fotograma.
+    if (d.card) {
+      const nodo = { ...n, type: "card", data: { ...d, props: d.props || {} } };
+      return { ...nodeSize(nodo), ...nodo };
+    }
     const card = GRUPO_A_CARD[d.group] || "text";
     const props = { ...defaultProps(card) };
     const body = d.text || d.title || "";
     if (card === "text") props.body = body;
     if (card === "buttons") props.body = body;
-    return {
-      ...n,
-      type: "card",
-      data: { card, title: d.title || n.id, props },
-    };
+    const nodo = { ...n, type: "card", data: { card, title: d.title || n.id, props } };
+    return { ...nodeSize(nodo), ...nodo };
   });
   return { nodes, edges: data.edges || [] };
 }

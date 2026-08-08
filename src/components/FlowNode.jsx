@@ -1,48 +1,93 @@
 import { memo, useContext } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { GRUPOS } from "../flow/seedFlow";
+import { cardColor, cardOutputs, getCard, validateCard } from "../flow/cardTypes";
+import { hasOptionRows } from "../flow/transform";
 import { SimContext } from "../sim/SimContext";
 
 /**
- * Tarjeta de nodo. Dos variantes según el grupo:
- *  - `pill`  → cápsula compacta (Inicio / Fin): solo el título.
- *  - tarjeta → etiqueta del grupo en su color, título y texto del paso.
- * Un handle de entrada (arriba) y otro de salida (abajo) para conectar arrastrando.
+ * Nodo del lienzo. Se dibuja según el tipo de tarjeta de Meta:
+ *  - `pill`   → cápsula compacta (Inicio / Fin).
+ *  - tarjeta  → icono + tipo, título, previsualización del contenido y una fila
+ *               por cada salida (botón de respuesta, fila de lista…), cada una
+ *               con su propio conector a la derecha.
  */
 function FlowNode({ id, data, selected }) {
-  const grupo = GRUPOS[data.group] || GRUPOS.inicio;
-  const color = grupo.color;
+  const card = getCard(data.card);
+  const color = cardColor(data.card);
+  const props = data.props || {};
+  const outs = cardOutputs(data);
+  const options = hasOptionRows(data) ? outs : [];
   const { activeNodeId } = useContext(SimContext);
   const active = activeNodeId === id;
+  const { ok } = validateCard(data.card, props);
   const state = `${selected ? " is-selected" : ""}${active ? " is-active" : ""}`;
 
-  if (grupo.pill) {
+  if (card.pill) {
+    const esInicio = !!card.solid;
     return (
-      <div
-        className={`pill${grupo.solid ? " pill--solid" : ""}${state}`}
-        style={{ "--accent": color }}
-      >
-        <Handle type="target" position={Position.Top} className="fnode__handle" />
+      <div className={`pill${esInicio ? " pill--solid" : ""}${state}`} style={{ "--accent": color }}>
+        {esInicio ? null : (
+          <Handle type="target" position={Position.Top} className="fnode__handle" />
+        )}
         <span className="pill__grip" aria-hidden="true" />
-        <span className="pill__label">{data.title}</span>
-        <Handle type="source" position={Position.Bottom} className="fnode__handle" />
+        <span className="pill__label">{data.title || card.nombre}</span>
+        {outs.length ? (
+          <Handle type="source" position={Position.Bottom} id="next" className="fnode__handle" />
+        ) : null}
       </div>
     );
   }
+
+  const resumen = card.summary(props);
 
   return (
     <div className={`fnode${state}`} style={{ "--accent": color }}>
       <Handle type="target" position={Position.Top} className="fnode__handle" />
 
       <div className="fnode__head">
-        <span className="fnode__dot" />
-        <span className="fnode__group">{grupo.nombre}</span>
+        <span className="fnode__icon">{card.icon}</span>
+        <span className="fnode__group">{card.nombre}</span>
+        {ok ? null : (
+          <span className="fnode__warn" title="Falta información o se excede un límite de Meta">
+            !
+          </span>
+        )}
       </div>
 
-      <div className="fnode__title">{data.title}</div>
-      {data.text ? <div className="fnode__text">{data.text}</div> : null}
+      <div className="fnode__title">{data.title || card.nombre}</div>
 
-      <Handle type="source" position={Position.Bottom} className="fnode__handle" />
+      {card.media === "image" && props.link ? (
+        <img
+          className="fnode__thumb"
+          src={props.link}
+          alt=""
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
+      ) : null}
+
+      {resumen ? <div className="fnode__text">{resumen}</div> : null}
+
+      {options.length ? (
+        <div className="fnode__opts">
+          {options.map((o) => (
+            <div className="opt" key={o.id}>
+              <span className="opt__label">{o.label}</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={o.id}
+                className="fnode__handle opt__handle"
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {!options.length && outs.length ? (
+        <Handle type="source" position={Position.Bottom} id="next" className="fnode__handle" />
+      ) : null}
     </div>
   );
 }

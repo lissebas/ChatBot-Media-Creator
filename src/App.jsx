@@ -18,11 +18,18 @@ import Simulator from "./components/Simulator";
 import ContextMenu from "./components/ContextMenu";
 import ZoomControls from "./components/ZoomControls";
 import { SimContext } from "./sim/SimContext";
-import { GRUPOS } from "./flow/seedFlow";
-import { autoLayout, buildInitialFlow, makeEdge, NODE_H, NODE_W } from "./flow/transform";
+import { CARDS, CARDS_POR_CATEGORIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
+import {
+  autoLayout,
+  buildInitialFlow,
+  makeEdge,
+  migrateFlow,
+  NODE_H,
+  NODE_W,
+} from "./flow/transform";
 import "./App.css";
 
-const STORAGE_KEY = "chatbot-creator-flow-v1";
+const STORAGE_KEY = "chatbot-creator-flow-v2";
 const nodeTypes = { card: FlowNode };
 
 function loadFromStorage() {
@@ -30,7 +37,7 @@ function loadFromStorage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
-    if (Array.isArray(data.nodes) && Array.isArray(data.edges)) return data;
+    if (Array.isArray(data.nodes) && Array.isArray(data.edges)) return migrateFlow(data);
   } catch {
     /* ignora JSON corrupto */
   }
@@ -85,14 +92,14 @@ function Studio() {
 
   // ── Crear nodos (drag & drop desde la paleta, o clic derecho en el lienzo) ──
   const addNode = useCallback(
-    (group, position) => {
+    (cardKey, position) => {
       const id = `n_${Date.now()}`;
       setNodes((nds) =>
         nds.concat({
           id,
           type: "card",
           position,
-          data: { title: "Nuevo paso", text: "", group },
+          data: { card: cardKey, title: getCard(cardKey).nombre, props: defaultProps(cardKey) },
         }),
       );
       setSelNodeId(id);
@@ -109,9 +116,9 @@ function Studio() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-      const group = event.dataTransfer.getData("application/chatbot-node");
-      if (!group || !GRUPOS[group]) return;
-      addNode(group, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
+      const cardKey = event.dataTransfer.getData("application/chatbot-node");
+      if (!cardKey || !CARDS[cardKey]) return;
+      addNode(cardKey, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
     },
     [screenToFlowPosition, addNode],
   );
@@ -220,8 +227,9 @@ function Studio() {
         try {
           const data = JSON.parse(String(reader.result));
           if (Array.isArray(data.nodes) && Array.isArray(data.edges)) {
-            setNodes(data.nodes);
-            setEdges(data.edges);
+            const flujo = migrateFlow(data);
+            setNodes(flujo.nodes);
+            setEdges(flujo.edges);
             setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
           } else {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
@@ -258,12 +266,15 @@ function Studio() {
     if (!menu) return [];
     if (menu.kind === "pane") {
       return [
-        { header: "Añadir paso" },
-        ...Object.entries(GRUPOS).map(([key, g]) => ({
-          label: g.nombre,
-          dot: g.color,
-          onSelect: () => addNode(key, menu.flowPos),
-        })),
+        ...CARDS_POR_CATEGORIA.flatMap((g) => [
+          { header: g.nombre },
+          ...g.cards.map((c) => ({
+            label: c.nombre,
+            dot: g.color,
+            hint: c.icon,
+            onSelect: () => addNode(c.key, menu.flowPos),
+          })),
+        ]),
         { sep: true },
         { label: "Auto-organizar", onSelect: handleAutoLayout },
         { label: "Encuadrar todo", onSelect: handleFit },
@@ -329,7 +340,7 @@ function Studio() {
               <MiniMap
                 pannable
                 zoomable
-                nodeColor={(n) => (GRUPOS[n.data?.group] || GRUPOS.inicio).color}
+                nodeColor={(n) => cardColor(n.data?.card)}
                 nodeStrokeWidth={0}
                 maskColor="rgba(8,8,10,0.7)"
                 bgColor="transparent"

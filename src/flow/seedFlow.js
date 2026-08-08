@@ -1,101 +1,158 @@
 /*
  * Flujo SEMILLA de ChatBot Creator.
  *
- * Es un ejemplo genérico (bienvenida → menú → captura de datos → cierre) que se
- * carga la primera vez para que el lienzo no arranque vacío y se vea de qué es
- * capaz el editor. Después el editor guarda tus cambios en el navegador
- * (localStorage) y puedes exportar/importar el flujo como JSON, o pulsar
- * «Reiniciar» para volver a este ejemplo.
+ * Ejemplo genérico que se carga la primera vez para que el lienzo no arranque
+ * vacío y se vea cómo se combinan las tarjetas de la WhatsApp Cloud API. Después
+ * el editor guarda tus cambios en el navegador (localStorage); puedes exportar /
+ * importar el flujo como JSON o pulsar «Reiniciar» para volver a este ejemplo.
  *
- * Formato: `nodes` (id, group, label) y `edges` (from, to, label?, dashes?).
- * La primera línea del `label` es el título de la tarjeta; el resto, su texto.
+ * Formato:
+ *   nodes: { id, card, title, props }        → `card` es una clave de CARDS.
+ *   edges: { from, out?, to, label? }        → `out` es la salida del nodo origen
+ *                                              (id de botón / fila). Por defecto "next".
  */
-
-/**
- * Tipos de paso disponibles en la paleta.
- *  - `color`  acento de la tarjeta, del minimapa y de la paleta.
- *  - `pill`   se dibuja como cápsula compacta (solo el título), no como tarjeta.
- *  - `solid`  cápsula rellena en su color (el paso de entrada).
- */
-export const GRUPOS = {
-  inicio: { color: "#12b76a", nombre: "Inicio", pill: true, solid: true },
-  mensaje: { color: "#38bdf8", nombre: "Mensaje" },
-  opciones: { color: "#60a5fa", nombre: "Menú de opciones" },
-  pregunta: { color: "#34d399", nombre: "Pregunta" },
-  captura: { color: "#fb923c", nombre: "Captura de datos" },
-  condicion: { color: "#2dd4bf", nombre: "Condición" },
-  accion: { color: "#a78bfa", nombre: "Acción / integración" },
-  seguimiento: { color: "#f472b6", nombre: "Seguimiento" },
-  handoff: { color: "#818cf8", nombre: "Handoff a humano" },
-  fin: { color: "#f87171", nombre: "Fin", pill: true },
-  global: { color: "#c084fc", nombre: "Comandos globales" },
-};
-
 export const flujoData = {
   nodes: [
-    // ── Entrada ──
-    { id: "start", group: "inicio", label: "Inicio" },
-    { id: "bienvenida", group: "mensaje", label: "Bienvenida\n¡Hola! Soy tu asistente virtual.\n¿En qué te puedo ayudar hoy?" },
-
-    // ── Menú principal ──
-    { id: "menu", group: "opciones", label: "MENÚ PRINCIPAL\n[Información] · [Dejar mis datos]\n[Hablar con una persona]" },
-
-    // ── Comandos globales (desde cualquier paso) ──
-    { id: "g_menu", group: "global", label: "«menú» → vuelve al menú principal" },
-    { id: "g_humano", group: "global", label: "«asesor» → handoff a una persona\n(desde cualquier paso)" },
-
-    // ── Rama: información ──
-    { id: "info", group: "mensaje", label: "Responde la duda\n(horarios, precios, cobertura…)" },
-    { id: "info_util", group: "pregunta", label: "¿Te sirvió esta respuesta?\n[Sí] · [No]" },
-
-    // ── Rama: captura de datos ──
-    { id: "pide_nombre", group: "captura", label: "¿Cuál es tu nombre?" },
-    { id: "pide_correo", group: "captura", label: "¿Cuál es tu correo?" },
-    { id: "valida_correo", group: "condicion", label: "¿El correo tiene formato válido?\n[Sí] · [No]" },
-    { id: "reintento_correo", group: "captura", label: "Correo inválido\nEscríbelo de nuevo, por favor." },
-    { id: "guarda_lead", group: "accion", label: "Guardar el contacto\n(llamada a tu API / CRM / hoja de cálculo)" },
-    { id: "confirma", group: "mensaje", label: "Confirmación\n¡Listo! Te escribiremos muy pronto." },
-
-    // ── Seguimiento ──
-    { id: "recordatorio", group: "seguimiento", label: "Sin respuesta\nRecordatorio a las 2h / 24h\n(fin al segundo intento)" },
-
-    // ── Salidas ──
-    { id: "humano", group: "handoff", label: "Hablar con una persona\n(transfiere la conversación con el contexto)" },
-    { id: "fin", group: "fin", label: "Fin\n¡Gracias por escribirnos!" },
+    {
+      id: "start",
+      card: "start",
+      title: "Inicio",
+      props: {},
+    },
+    {
+      id: "bienvenida",
+      card: "text",
+      title: "Bienvenida",
+      props: {
+        body: "¡Hola! 👋 Soy tu asistente virtual. Estoy aquí para ayudarte.",
+      },
+    },
+    {
+      id: "menu",
+      card: "buttons",
+      title: "Menú principal",
+      props: {
+        body: "¿Qué te gustaría hacer?",
+        footer: "Elige una opción",
+        buttons: [
+          { id: "btn_info", title: "Información" },
+          { id: "btn_datos", title: "Dejar mis datos" },
+          { id: "btn_humano", title: "Hablar con alguien" },
+        ],
+      },
+    },
+    {
+      id: "info",
+      card: "list",
+      title: "Temas de información",
+      props: {
+        header_text: "Información",
+        body: "Estos son los temas sobre los que puedo ayudarte:",
+        button: "Ver temas",
+        sections: [
+          {
+            title: "Temas frecuentes",
+            rows: [
+              { id: "row_horarios", title: "Horarios", description: "Cuándo atendemos" },
+              { id: "row_precios", title: "Precios", description: "Planes y tarifas" },
+              { id: "row_cobertura", title: "Cobertura", description: "Dónde tenemos servicio" },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: "horarios",
+      card: "text",
+      title: "Respuesta: horarios",
+      props: { body: "Atendemos de lunes a viernes, de 8:00 a 18:00. 🕗" },
+    },
+    {
+      id: "precios",
+      card: "cta_url",
+      title: "Respuesta: precios",
+      props: {
+        body: "Puedes ver todos los planes y tarifas en nuestra página.",
+        footer: "Se abre en tu navegador",
+        display_text: "Ver planes",
+        url: "https://example.com/planes",
+      },
+    },
+    {
+      id: "cobertura",
+      card: "image",
+      title: "Respuesta: cobertura",
+      props: {
+        link: "https://example.com/mapa-cobertura.jpg",
+        caption: "Este es nuestro mapa de cobertura actual.",
+      },
+    },
+    {
+      id: "pedir_ubicacion",
+      card: "location_request",
+      title: "Pedir ubicación",
+      props: { body: "Compárteme tu ubicación y te digo si llegamos hasta allí." },
+    },
+    {
+      id: "datos",
+      card: "flow",
+      title: "Formulario de contacto",
+      props: {
+        body: "Déjame tus datos y un asesor te contacta hoy mismo.",
+        flow_id: "1234567890",
+        flow_cta: "Dejar mis datos",
+        flow_action: "navigate",
+        screen: "CONTACT_FORM",
+      },
+    },
+    {
+      id: "gracias",
+      card: "text",
+      title: "Gracias",
+      props: { body: "¡Listo! Recibimos tus datos, te escribimos muy pronto. 🙌" },
+    },
+    {
+      id: "permiso_llamada",
+      card: "call_permission_request",
+      title: "Permiso para llamar",
+      props: { body: "¿Nos autorizas a llamarte por WhatsApp para ayudarte mejor?" },
+    },
+    {
+      id: "agente",
+      card: "text",
+      title: "Handoff a un asesor",
+      props: { body: "Te comunico con un asesor humano. Un momento, por favor. 🧑‍💼" },
+    },
+    {
+      id: "fin",
+      card: "end",
+      title: "Fin",
+      props: {},
+    },
   ],
 
   edges: [
     { from: "start", to: "bienvenida" },
     { from: "bienvenida", to: "menu" },
 
-    // menú → ramas
-    { from: "menu", to: "info", label: "Información" },
-    { from: "menu", to: "pide_nombre", label: "Dejar mis datos" },
-    { from: "menu", to: "humano", label: "Hablar con una persona" },
-    { from: "menu", to: "recordatorio", label: "sin respuesta", dashes: true },
+    { from: "menu", out: "btn_info", to: "info", label: "Información" },
+    { from: "menu", out: "btn_datos", to: "datos", label: "Dejar mis datos" },
+    { from: "menu", out: "btn_humano", to: "permiso_llamada", label: "Hablar con alguien" },
 
-    // información
-    { from: "info", to: "info_util" },
-    { from: "info_util", to: "menu", label: "Sí" },
-    { from: "info_util", to: "humano", label: "No" },
+    { from: "info", out: "row_horarios", to: "horarios", label: "Horarios" },
+    { from: "info", out: "row_precios", to: "precios", label: "Precios" },
+    { from: "info", out: "row_cobertura", to: "cobertura", label: "Cobertura" },
 
-    // captura de datos
-    { from: "pide_nombre", to: "pide_correo" },
-    { from: "pide_correo", to: "valida_correo" },
-    { from: "valida_correo", to: "guarda_lead", label: "Sí" },
-    { from: "valida_correo", to: "reintento_correo", label: "No" },
-    { from: "reintento_correo", to: "valida_correo" },
-    { from: "guarda_lead", to: "confirma" },
-    { from: "confirma", to: "fin" },
+    { from: "horarios", to: "fin" },
+    { from: "precios", to: "fin" },
+    { from: "cobertura", to: "pedir_ubicacion" },
+    { from: "pedir_ubicacion", to: "fin" },
 
-    // seguimiento
-    { from: "recordatorio", to: "menu", label: "responde", dashes: true },
-    { from: "recordatorio", to: "fin", label: "no responde", dashes: true },
+    { from: "datos", to: "gracias" },
+    { from: "gracias", to: "fin" },
 
-    // comandos globales
-    { from: "g_menu", to: "menu", dashes: true },
-    { from: "g_humano", to: "humano", dashes: true },
-
-    { from: "humano", to: "fin" },
+    { from: "permiso_llamada", out: "accept", to: "agente", label: "Acepta" },
+    { from: "permiso_llamada", out: "reject", to: "fin", label: "Rechaza" },
+    { from: "agente", to: "fin" },
   ],
 };

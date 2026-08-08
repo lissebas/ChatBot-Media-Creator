@@ -46,6 +46,46 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 - Reglas: nodo sin salidas = fin; 1 salida sin etiqueta = espera texto libre;
   1 con etiqueta o varias = opciones (botones), con match por texto sin tildes.
 
+## Tarjetas de Meta soportadas
+
+Cada paso del lienzo **es un tipo de mensaje real de la WhatsApp Cloud API**. El
+inspector dibuja el formulario propio de cada tarjeta, aplica los límites de Meta
+(caracteres, número de botones, filas…) y muestra el **JSON exacto** que hay que
+enviar a `POST /<PHONE_NUMBER_ID>/messages`.
+
+| Categoría | Tarjeta | `type` de la API | Límites clave |
+|---|---|---|---|
+| Mensajes | Texto | `text` | cuerpo 4096 |
+| Mensajes | Reacción | `reaction` | emoji + `message_id` |
+| Mensajes | Plantilla | `template` | nombre + idioma + parámetros |
+| Multimedia | Imagen | `image` | caption 1024 |
+| Multimedia | Video | `video` | caption 1024 |
+| Multimedia | Audio | `audio` | solo enlace |
+| Multimedia | Documento | `document` | caption 1024 + filename |
+| Multimedia | Sticker | `sticker` | `.webp` |
+| Multimedia | Ubicación | `location` | lat + lon (+ nombre y dirección) |
+| Multimedia | Contacto | `contacts` | vCard |
+| Interactivos | Botones de respuesta | `interactive/button` | 3 botones, título 20, cuerpo 1024, pie 60 |
+| Interactivos | Lista de opciones | `interactive/list` | 10 secciones, **10 filas en total**, fila 24 / desc. 72, botón 20 |
+| Interactivos | Botón con enlace | `interactive/cta_url` | botón 20, cuerpo 1024 |
+| Interactivos | Pedir ubicación | `interactive/location_request_message` | solo cuerpo |
+| Interactivos | Flow | `interactive/flow` | `flow_id` o `flow_name`, CTA 20, pantalla inicial |
+| Interactivos | Permiso de llamada | `interactive/call_permission_request` | acepta / rechaza |
+| Avanzados | Pedir dirección | `interactive/address_message` | solo India |
+| Comercio | Catálogo | `interactive/catalog_message` | SKU de miniatura |
+| Comercio | Producto | `interactive/product` | `catalog_id` + SKU |
+| Comercio | Lista de productos | `interactive/product_list` | secciones de SKUs |
+
+Además, **Inicio** y **Fin** marcan la entrada y la salida del flujo (no son
+mensajes de Meta). El catálogo completo, con sus campos y validaciones, vive en
+`src/flow/cardTypes.js`: añadir un tipo nuevo es añadir una entrada ahí.
+
+Cómo se ramifica el flujo: las tarjetas de **botones** y de **lista** exponen una
+salida por cada botón o fila, con su propio conector a la derecha de la tarjeta,
+así que el simulador sabe exactamente a qué paso lleva cada opción.
+
+Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/).
+
 ## Estructura
 
 | Archivo | Qué es |
@@ -56,8 +96,11 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 | `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
 | `src/components/ContextMenu.jsx` | Menú de clic derecho (lienzo, nodo, conexión). |
 | `src/components/ZoomControls.jsx` | Controles flotantes de zoom / encuadre. |
+| `src/components/FieldForm.jsx` | Formulario que se dibuja solo desde la definición de la tarjeta. |
 | `src/components/Simulator.jsx` | Panel de chat que ejecuta el flujo. |
+| `src/flow/cardTypes.js` | **Catálogo de tarjetas de Meta**: campos, límites, salidas y JSON. |
 | `src/index.css` | Tokens del tema oscuro (colores, radios, sombras). |
+| `scripts/smoke.mjs` | Chequeo rápido: payloads, flujo semilla y runtime (`npm run smoke`). |
 | `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
 | `src/flow/seedFlow.js` | Flujo **semilla** de ejemplo + tipos de paso (`GRUPOS`). |
 | `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |
@@ -66,7 +109,8 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 
 - ✅ **Fase 1** — Editor visual de flujos.
 - ✅ **Fase 2** — Runtime + simulador de chat.
-- ⏳ **Fase 3** — Conectar el runtime a un canal real (WhatsApp).
+- ✅ **Fase 3** — Tarjetas de la WhatsApp Cloud API con su JSON y sus límites.
+- ⏳ **Fase 4** — Backend que envía esos payloads y procesa los webhooks de Meta.
 
 ## Licencia
 

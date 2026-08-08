@@ -27,6 +27,16 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
 
 ## Qué puedes hacer
 
+**Portada** — al abrir la app ves tus flujos, no un lienzo suelto.
+- Tarjeta por flujo con sus pasos, conexiones, los tipos de tarjeta que usa y
+  cuándo lo editaste; se abre con un clic.
+- **Nuevo flujo** (lienzo en blanco), **Importar** un JSON, y por flujo:
+  renombrar, duplicar y borrar (con confirmación propia, no la del navegador).
+- Sección **Próximamente** con lo que viene: publicar en la Cloud API, webhooks
+  entrantes, variables y contexto, analítica, plantillas de Meta e historial.
+- Todo se guarda en el navegador (localStorage); el flujo que tuvieras del
+  modelo anterior se migra solo la primera vez.
+
 **Editor** — lienzo oscuro con retícula de puntos, tarjetas suaves y cápsulas de
 Inicio/Fin, al estilo de los constructores de flujos modernos.
 - **Crear** un paso: arrástralo desde la paleta izquierda, o haz **clic derecho**
@@ -40,6 +50,8 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
 - **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
   flotantes con porcentaje, minimapa y paleta plegable.
+- **Reiniciar** abre un diálogo con dos salidas: **vaciar el lienzo** o volver al
+  **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.
 
 **Simulador** (botón **▶ Probar**) — es un **emulador de WhatsApp**, no un chat
@@ -108,21 +120,26 @@ Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsap
 
 ## Flujos de ejemplo
 
-En `examples/` hay flujos listos para cargar con el botón **Importar** del editor.
+`examples/` **no se versiona** (está en `.gitignore`): los flujos se generan en
+local con `npm run presets` y se cargan con **Importar**, desde la portada o
+desde el editor.
 
 | Archivo | Qué trae |
 |---|---|
 | `examples/gys-legal.json` | Bot de campo de **G&S Legal** («Amaranta»): wizard del informe de asistencia jurídica — 103 pasos, 182 conexiones, con sus bifurcaciones por resultado del servicio, tercero y titular de la póliza. |
 
-Se regeneran con `npm run presets` desde `src/flow/presets/` (ahí vive el flujo
-como datos: catálogos, textos y salidas).
+La fuente vive en `src/flow/presets/` (catálogos, textos y salidas) y esa sí se
+versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 
 ## Estructura
 
 | Archivo | Qué es |
 |---|---|
 | `docker-compose.yml`, `Dockerfile` | Entorno Docker (Node vive aquí, no en tu Mac). |
-| `src/App.jsx` | App principal: lienzo, drag&drop, edición, guardar/cargar, simulador. |
+| `src/App.jsx` | Portada + editor: lienzo, drag&drop, edición, guardar/cargar, simulador. |
+| `src/components/Home.jsx` | Portada: tus flujos y lo que viene. |
+| `src/components/Modal.jsx` | Diálogos de la app (confirmar, renombrar). |
+| `src/flow/workspace.js` | Los flujos guardados en el navegador. |
 | `src/components/FlowNode.jsx` | Nodo del lienzo: tarjeta o cápsula (Inicio / Fin). |
 | `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
 | `src/components/ContextMenu.jsx` | Menú de clic derecho (lienzo, nodo, conexión). |

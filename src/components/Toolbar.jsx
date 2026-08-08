@@ -1,18 +1,34 @@
 /**
- * Barra superior: marca + acciones (probar, auto-organizar, ajustar,
- * exportar/importar JSON, reiniciar al flujo semilla). El estado de guardado se
- * muestra a la derecha.
+ * Barra superior del editor: volver a la portada, nombre del flujo y acciones
+ * (probar, auto-organizar, ajustar, exportar/importar JSON, reiniciar). El
+ * estado de guardado se muestra a la derecha.
  */
-export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, onToggleSim, simOpen, saved }) {
+export default function Toolbar({
+  nombre,
+  onRename,
+  onHome,
+  onSave,
+  onLoad,
+  onAutoLayout,
+  onFit,
+  onReset,
+  onToggleSim,
+  simOpen,
+  saved,
+}) {
   return (
     <header className="toolbar">
-      <div className="toolbar__brand">
-        <span className="toolbar__logo">C</span>
-        <div>
-          <div className="toolbar__name">ChatBot Creator</div>
-          <div className="toolbar__sub">Constructor visual de flujos conversacionales</div>
-        </div>
-      </div>
+      <button className="btn btn--ghost toolbar__home" onClick={onHome} title="Volver a la portada">
+        ← Inicio
+      </button>
+
+      <input
+        className="toolbar__title"
+        value={nombre}
+        onChange={(e) => onRename(e.target.value)}
+        placeholder="Nombre del flujo"
+        title="Nombre del flujo"
+      />
 
       <div className="toolbar__actions">
         <span className="toolbar__saved">{saved}</span>
@@ -34,7 +50,7 @@ export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, 
             onChange={onLoad}
           />
         </label>
-        <button className="btn btn--ghost" onClick={onReset} title="Volver al flujo de ejemplo">
+        <button className="btn btn--ghost" onClick={onReset} title="Vaciar el lienzo o volver al ejemplo">
           Reiniciar
         </button>
         <span className="toolbar__sep" />

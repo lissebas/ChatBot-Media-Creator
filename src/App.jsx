@@ -17,6 +17,8 @@ import Toolbar from "./components/Toolbar";
 import Simulator from "./components/Simulator";
 import ContextMenu from "./components/ContextMenu";
 import ZoomControls from "./components/ZoomControls";
+import Modal from "./components/Modal";
+import Home from "./components/Home";
 import { SimContext } from "./sim/SimContext";
 import { CARDS, CARDS_POR_FAMILIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
 import {
@@ -27,25 +29,23 @@ import {
   NODE_H,
   NODE_W,
 } from "./flow/transform";
+import {
+  borrarFlujo,
+  cargarEspacio,
+  crearFlujo,
+  duplicarFlujo,
+  guardarEspacio,
+  guardarFlujo,
+  renombrarFlujo,
+} from "./flow/workspace";
 import "./App.css";
 
-const STORAGE_KEY = "chatbot-creator-flow-v2";
 const nodeTypes = { card: FlowNode };
 
-function loadFromStorage() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (Array.isArray(data.nodes) && Array.isArray(data.edges)) return migrateFlow(data);
-  } catch {
-    /* ignora JSON corrupto */
-  }
-  return null;
-}
+/* ══════════════════════════ Editor ══════════════════════════ */
 
-function Studio() {
-  const initial = useMemo(() => loadFromStorage() || buildInitialFlow(), []);
+function Studio({ flujo, onChange, onRename, onHome }) {
+  const initial = useMemo(() => ({ nodes: flujo.nodes, edges: flujo.edges }), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
   const [selNodeId, setSelNodeId] = useState(null);
@@ -55,6 +55,7 @@ function Studio() {
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
+  const [reset, setReset] = useState(false);
   const wrapperRef = useRef(null);
   const { screenToFlowPosition, fitView, setCenter, getZoom } = useReactFlow();
 
@@ -71,14 +72,14 @@ function Studio() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeNodeId]);
 
-  // Autoguardado en el navegador (localStorage).
+  // Autoguardado en el espacio de trabajo (localStorage).
   useEffect(() => {
     const t = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, edges }));
+      onChange(nodes, edges);
       setSaved("Guardado ✓");
     }, 500);
     return () => clearTimeout(t);
-  }, [nodes, edges]);
+  }, [nodes, edges, onChange]);
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(makeEdge(params), eds)),
@@ -213,10 +214,10 @@ function Studio() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "flujo.json";
+    a.download = `${(flujo.nombre || "flujo").replace(/[^\w\-]+/g, "-").toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [nodes, edges]);
+  }, [nodes, edges, flujo.nombre]);
 
   const handleLoad = useCallback(
     (event) => {
@@ -227,9 +228,9 @@ function Studio() {
         try {
           const data = JSON.parse(String(reader.result));
           if (Array.isArray(data.nodes) && Array.isArray(data.edges)) {
-            const flujo = migrateFlow(data);
-            setNodes(flujo.nodes);
-            setEdges(flujo.edges);
+            const cargado = migrateFlow(data);
+            setNodes(cargado.nodes);
+            setEdges(cargado.edges);
             setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
           } else {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
@@ -244,15 +245,19 @@ function Studio() {
     [setNodes, setEdges, fitView],
   );
 
-  const handleReset = useCallback(() => {
-    if (!confirm("¿Volver al flujo de ejemplo? Se perderán tus cambios.")) return;
-    const fresh = buildInitialFlow();
-    setNodes(fresh.nodes);
-    setEdges(fresh.edges);
-    setSelNodeId(null);
-    setSelEdgeId(null);
-    setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
-  }, [setNodes, setEdges, fitView]);
+  /** Reinicia el lienzo: vacío o con el flujo de ejemplo. */
+  const aplicarReset = useCallback(
+    (modo) => {
+      const fresh = modo === "ejemplo" ? buildInitialFlow() : { nodes: [], edges: [] };
+      setNodes(fresh.nodes);
+      setEdges(fresh.edges);
+      setSelNodeId(null);
+      setSelEdgeId(null);
+      setReset(false);
+      if (fresh.nodes.length) setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
+    },
+    [setNodes, setEdges, fitView],
+  );
 
   const toggleSim = useCallback(() => {
     setSimOpen((open) => {
@@ -300,11 +305,14 @@ function Studio() {
   return (
     <div className="app">
       <Toolbar
+        nombre={flujo.nombre}
+        onRename={onRename}
+        onHome={onHome}
         onSave={handleSave}
         onLoad={handleLoad}
         onAutoLayout={handleAutoLayout}
         onFit={handleFit}
-        onReset={handleReset}
+        onReset={() => setReset(true)}
         onToggleSim={toggleSim}
         simOpen={simOpen}
         saved={saved}
@@ -352,6 +360,16 @@ function Studio() {
             </ReactFlow>
           </SimContext.Provider>
 
+          {nodes.length === 0 ? (
+            <div className="canvas__empty">
+              <div className="canvas__emptytitle">Lienzo en blanco</div>
+              <p>
+                Arrastra una tarjeta desde la paleta, o haz <b>clic derecho</b> aquí
+                para crear el primer paso.
+              </p>
+            </div>
+          ) : null}
+
           {menu ? (
             <ContextMenu x={menu.x} y={menu.y} items={menuItems} onClose={closeMenu} />
           ) : null}
@@ -377,14 +395,103 @@ function Studio() {
           />
         )}
       </div>
+
+      {reset ? (
+        <Modal
+          icon="🔄"
+          title="Reiniciar el lienzo"
+          onClose={() => setReset(false)}
+          acciones={[
+            { label: "Cancelar", onClick: () => setReset(false), variant: "ghost", autoFocus: true },
+            { label: "Cargar el ejemplo", onClick: () => aplicarReset("ejemplo") },
+            { label: "Vaciar lienzo", variant: "danger", onClick: () => aplicarReset("blanco") },
+          ]}
+        >
+          Vas a reemplazar <b>{nodes.length} pasos</b> y <b>{edges.length} conexiones</b>.
+          Esto no se puede deshacer.
+          <ul className="modal__list">
+            <li><b>Vaciar lienzo</b> — empiezas de cero, sin ningún paso.</li>
+            <li><b>Cargar el ejemplo</b> — vuelve el flujo de demostración.</li>
+          </ul>
+        </Modal>
+      ) : null}
     </div>
   );
 }
 
+/* ══════════════════════════ App: portada + editor ══════════════════════════ */
+
 export default function App() {
+  const [espacio, setEspacio] = useState(cargarEspacio);
+  const [abiertoId, setAbiertoId] = useState(null);
+
+  useEffect(() => guardarEspacio(espacio), [espacio]);
+
+  const abrirNuevo = useCallback((nombre, contenido) => {
+    const nuevo = crearFlujo(nombre, contenido);
+    setEspacio((e) => ({ ...e, ultimo: nuevo.id, flujos: [nuevo, ...e.flujos] }));
+    setAbiertoId(nuevo.id);
+  }, []);
+
+  const importar = useCallback(
+    (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result));
+          if (!Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
+            alert("El archivo no tiene el formato esperado (nodes / edges).");
+            return;
+          }
+          abrirNuevo(file.name.replace(/\.json$/i, ""), migrateFlow(data));
+        } catch {
+          alert("No se pudo leer el JSON.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    },
+    [abrirNuevo],
+  );
+
+  const flujo = espacio.flujos.find((f) => f.id === abiertoId) || null;
+
+  const guardarContenido = useCallback(
+    (nodes, edges) =>
+      setEspacio((e) => {
+        const actual = e.flujos.find((f) => f.id === abiertoId);
+        if (!actual) return e;
+        return guardarFlujo(e, { ...actual, nodes, edges });
+      }),
+    [abiertoId],
+  );
+
+  if (!flujo) {
+    return (
+      <Home
+        flujos={espacio.flujos}
+        onAbrir={setAbiertoId}
+        onNuevo={() => abrirNuevo("Flujo sin título", { nodes: [], edges: [] })}
+        onEjemplo={() => abrirNuevo("Flujo de ejemplo", buildInitialFlow())}
+        onImportar={importar}
+        onDuplicar={(id) => setEspacio((e) => duplicarFlujo(e, id))}
+        onBorrar={(id) => setEspacio((e) => borrarFlujo(e, id))}
+        onRenombrar={(id, nombre) => setEspacio((e) => renombrarFlujo(e, id, nombre))}
+      />
+    );
+  }
+
   return (
     <ReactFlowProvider>
-      <Studio />
+      <Studio
+        key={flujo.id}
+        flujo={flujo}
+        onChange={guardarContenido}
+        onRename={(nombre) => setEspacio((e) => renombrarFlujo(e, flujo.id, nombre))}
+        onHome={() => setAbiertoId(null)}
+      />
     </ReactFlowProvider>
   );
 }

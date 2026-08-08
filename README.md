@@ -176,6 +176,21 @@ el bloque **Formulario nativo**.
 
 Versión de Flow JSON por defecto: **7.3** (editable por tarjeta).
 
+## Exportar un flujo como imagen
+
+El flujo se puede dibujar **fuera del navegador**, con el mismo catálogo y la
+misma geometría que usa el editor:
+
+```bash
+docker compose run --rm studio npm run render -- "examples/gys-legal.json" \
+  --w 1400 --h 1000 --zoom 1 --out /app/flujo.png
+```
+
+Genera un PNG de la región indicada (SVG propio + rasterizado con
+`@resvg/resvg-wasm`, sin dependencias nativas). Detalles a tener en cuenta: el
+render del servidor va **sin sombras** —el desenfoque es carísimo de rasterizar—
+y **sin emoji**, porque resvg no dibuja fuentes de color.
+
 ## Flujos de ejemplo
 
 `examples/` **no se versiona** (está en `.gitignore`): los flujos se generan en
@@ -215,6 +230,8 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/flow/presets/` | Flujos reales reconstruidos como tarjetas (G&S Legal). |
 | `scripts/smoke.mjs` | Chequeo rápido: payloads, flujo semilla y runtime (`npm run smoke`). |
 | `scripts/gen-preset.mjs` | Genera los JSON de `examples/` (`npm run presets`). |
+| `api/svg.mjs` | Dibuja un flujo como SVG reutilizando el catálogo y `nodeSize`. |
+| `scripts/render.mjs` | Exporta un flujo a PNG (`npm run render`). |
 | `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
 | `src/flow/seedFlow.js` | Flujo **semilla** de ejemplo + tipos de paso (`GRUPOS`). |
 | `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |

@@ -11,7 +11,9 @@ import {
 } from "../src/flow/cardTypes.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { buildInitialFlow, migrateFlow, simplificarAristas } from "../src/flow/transform.js";
+import { buildInitialFlow, migrateFlow, nodeSize, simplificarAristas } from "../src/flow/transform.js";
+import { anclas, cajaFlujo, svgDeRegion } from "../api/svg.mjs";
+import { TEMA } from "../src/flow/tema.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
 import { cargarDocumento, cargarIndice, conResumen } from "../src/flow/workspace.js";
@@ -270,6 +272,32 @@ for (const n of nodes) {
   if (recuperado.edges.length !== edges.length) fail("al abrir se pierden aristas");
   console.log(`Apertura: ${recuperado.nodes.length} nodos con dimensiones recuperadas`);
   delete globalThis.localStorage;
+}
+
+// El renderizador del servidor: mismo catálogo y misma geometría que el editor.
+{
+  const region = cajaFlujo(nodes);
+  const svg = svgDeRegion({ nodes, edges }, { region, zoom: 1 });
+  if (!svg.startsWith("<svg") || !svg.endsWith("</svg>")) fail("render: el SVG no está bien formado");
+  if (svg.includes("feGaussianBlur")) fail("render: hay desenfoques (rasterizar eso es carísimo)");
+  if (!svg.includes(TEMA.tarjeta)) fail("render: no usa los colores del tema");
+  for (const n of nodes) {
+    if (n.data.card === "start" || n.data.card === "end") continue;
+    if (!svg.includes(`>${n.data.title.split(" ")[0]}`)) continue; // título recortado: basta con que aparezca alguno
+  }
+  // Con LOD (alejado) desaparecen resumen y filas de opciones.
+  const lejos = svgDeRegion({ nodes, edges }, { region, zoom: 0.3 });
+  if (lejos.length >= svg.length) fail("render: el modo alejado no simplifica el dibujo");
+  // Omitir un nodo lo quita a él y a sus conexiones (para el arrastre).
+  const sinUno = svgDeRegion({ nodes, edges }, { region, zoom: 1, omitir: [nodes[3].id] });
+  if (sinUno.length >= svg.length) fail("render: `omitir` no quita nada");
+  // Las anclas caen dentro de la caja del nodo.
+  for (const n of nodes) {
+    const { entrada } = anclas(n);
+    const { width } = nodeSize(n);
+    if (entrada.x < n.position.x || entrada.x > n.position.x + width) fail(`render: ancla fuera de ${n.id}`);
+  }
+  console.log(`Render: SVG de ${(svg.length / 1024).toFixed(0)} KB para ${nodes.length} nodos · LOD y omitir funcionan`);
 }
 
 // Aristas ligeras: solo cambia el dibujo, nunca los datos que se guardan.

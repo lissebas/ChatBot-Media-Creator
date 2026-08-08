@@ -13,6 +13,12 @@
  */
 import { createPublicKey, verify } from "node:crypto";
 import dagre from "dagre";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { cardOutputs, getCard, validateCard } from "../src/flow/cardTypes.js";
 
 const REGION = process.env.AWS_REGION || "us-west-2";
@@ -82,6 +88,40 @@ async function verificarToken(valor) {
   if ((datos.exp || 0) * 1000 < Date.now()) throw new Error("token caducado");
   return datos;
 }
+
+/* ── Almacenamiento de flujos ──────────────────────────────────────────────
+ * Viven en el MISMO bucket que el sitio, bajo `flujos/<sub>/`, donde `sub` es
+ * el identificador del usuario dentro del token de Cognito ya verificado. La
+ * carpeta la decide el servidor, nunca el cliente: así un usuario no puede
+ * pedir los flujos de otro por mucho que manipule la petición. La política del
+ * bucket además impide que CloudFront sirva nada bajo `flujos/`.
+ */
+const BUCKET = process.env.BUCKET || "";
+const s3 = new S3Client({});
+
+const rutaIndice = (sub) => `flujos/${sub}/index.json`;
+const rutaDoc = (sub, id) => `flujos/${sub}/${id}.json`;
+
+/** Ids sanos: nada de `../` ni rutas absolutas. */
+const idValido = (id) => typeof id === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(id);
+
+async function leerJson(clave, porDefecto = null) {
+  try {
+    const r = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: clave }));
+    return JSON.parse(await r.Body.transformToString());
+  } catch (e) {
+    if (e.name === "NoSuchKey" || e.$metadata?.httpStatusCode === 404) return porDefecto;
+    throw e;
+  }
+}
+
+const escribirJson = (clave, valor) =>
+  s3.send(new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: clave,
+    Body: JSON.stringify(valor),
+    ContentType: "application/json; charset=utf-8",
+  }));
 
 /* ── Operaciones ── */
 
@@ -175,16 +215,19 @@ export async function handler(evento) {
     return { statusCode: 204, headers: cors(origen) };
   }
 
+  let sub;
   try {
     // El token llega en `x-id-token`: `Authorization` la ocupa la firma SigV4 con
     // la que el navegador demuestra ante IAM que puede invocar esta función.
     // Doble puerta: IAM valida la firma (solo usuarios del Identity Pool) y aquí
     // se comprueba además de qué usuario de Cognito se trata.
-    await verificarToken(
+    const datosToken = await verificarToken(
       evento.__token ||
       cabeceras["x-id-token"] || cabeceras["X-Id-Token"] ||
       cabeceras.authorization || cabeceras.Authorization,
     );
+    sub = datosToken.sub;
+    if (!sub) throw new Error("el token no identifica al usuario");
   } catch (e) {
     return respuesta(401, { error: `No autorizado: ${e.message}` }, origen);
   }
@@ -208,6 +251,41 @@ export async function handler(evento) {
       case "analizar":
         return respuesta(200, { ...analizar(cuerpo), ms: Date.now() - t0 }, origen);
       case "ping":
+        return respuesta(200, { ok: true, ms: Date.now() - t0 }, origen);
+
+      // ── Flujos del usuario ──
+      case "indice":
+        return respuesta(200, { indice: await leerJson(rutaIndice(sub), []), ms: Date.now() - t0 }, origen);
+
+      case "leer": {
+        if (!idValido(cuerpo.id)) return respuesta(400, { error: "id inválido" }, origen);
+        const doc = await leerJson(rutaDoc(sub, cuerpo.id));
+        if (!doc) return respuesta(404, { error: "ese flujo no existe" }, origen);
+        return respuesta(200, { doc, ms: Date.now() - t0 }, origen);
+      }
+
+      case "guardar": {
+        if (!idValido(cuerpo.id)) return respuesta(400, { error: "id inválido" }, origen);
+        if (!cuerpo.doc || !Array.isArray(cuerpo.doc.nodes)) {
+          return respuesta(400, { error: "el documento no tiene nodos" }, origen);
+        }
+        await escribirJson(rutaDoc(sub, cuerpo.id), {
+          nodes: cuerpo.doc.nodes,
+          edges: cuerpo.doc.edges || [],
+        });
+        if (cuerpo.indice) await escribirJson(rutaIndice(sub), cuerpo.indice);
+        return respuesta(200, { ok: true, ms: Date.now() - t0 }, origen);
+      }
+
+      case "borrar": {
+        if (!idValido(cuerpo.id)) return respuesta(400, { error: "id inválido" }, origen);
+        await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: rutaDoc(sub, cuerpo.id) }));
+        if (cuerpo.indice) await escribirJson(rutaIndice(sub), cuerpo.indice);
+        return respuesta(200, { ok: true, ms: Date.now() - t0 }, origen);
+      }
+
+      case "indice-guardar":
+        await escribirJson(rutaIndice(sub), cuerpo.indice || []);
         return respuesta(200, { ok: true, ms: Date.now() - t0 }, origen);
       default:
         return respuesta(400, { error: `Operación desconocida: ${cuerpo.op}` }, origen);

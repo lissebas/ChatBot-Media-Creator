@@ -1433,3 +1433,18 @@ kbd {
 }
 .login__enviar { width: 100%; justify-content: center; padding: 10px; font-size: 13.5px; }
 .login__pie { margin: 16px 0 0; font-size: 10.5px; color: var(--faint); text-align: center; line-height: 1.6; }
+
+/* ── Abriendo un flujo que se está bajando de la nube ── */
+.cargando {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: var(--bg);
+  font-size: 13px; color: var(--muted);
+}
+.cargando__spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border-hi); border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: girar .7s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }

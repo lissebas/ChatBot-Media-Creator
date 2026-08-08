@@ -1345,3 +1345,31 @@ kbd {
 }
 .fd__body .sidebar, .fd__body .inspector { overflow-y: auto; }
 .fd__body .fj-canvas { padding: 22px 18px 32px; }
+
+/* ══════════════════════════ Pantalla de error ══════════════════════════ */
+.crash {
+  height: 100%;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+.crash__panel {
+  width: min(560px, 100%);
+  padding: 26px;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.crash__icon { font-size: 26px; }
+.crash__title { margin: 10px 0 8px; font-size: 17px; font-weight: 650; color: var(--text); }
+.crash__text { margin: 0 0 14px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+.crash__error {
+  max-height: 220px; overflow: auto; margin: 0 0 16px;
+  padding: 12px;
+  background: var(--canvas); border: 1px solid var(--border); border-radius: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; line-height: 1.5; color: #ff9ea1;
+  white-space: pre-wrap; word-break: break-word;
+}
+.crash__actions { display: flex; gap: 8px; flex-wrap: wrap; }

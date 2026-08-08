@@ -8,6 +8,7 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  useStore,
 } from "@xyflow/react";
 
 import FlowNode from "./components/FlowNode";
@@ -66,11 +67,12 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     if (guardado !== null) return guardado === "1";
     return (initial.nodes?.length || 0) <= 60;
   });
-  // Aristas ligeras (sin etiquetas): automáticas en flujos con muchas conexiones.
-  const [simples, setSimples] = useState(() => {
-    const guardado = localStorage.getItem("cbc-aristas-simples");
+  // Modo ligero: React Flow monta solo lo que se ve, las aristas van sin
+  // etiqueta y las tarjetas pierden detalle. Automático en flujos grandes.
+  const [ligero, setLigero] = useState(() => {
+    const guardado = localStorage.getItem("cbc-modo-ligero");
     if (guardado !== null) return guardado === "1";
-    return (initial.edges?.length || 0) > 80;
+    return (initial.nodes?.length || 0) > 60 || (initial.edges?.length || 0) > 80;
   });
   const [reset, setReset] = useState(false);
   const wrapperRef = useRef(null);
@@ -286,9 +288,9 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
     [setNodes, setEdges, fitView],
   );
 
-  const toggleSimples = useCallback(() => {
-    setSimples((v) => {
-      localStorage.setItem("cbc-aristas-simples", v ? "0" : "1");
+  const toggleLigero = useCallback(() => {
+    setLigero((v) => {
+      localStorage.setItem("cbc-modo-ligero", v ? "0" : "1");
       return !v;
     });
   }, []);
@@ -349,10 +351,11 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
 
   // Un objeto nuevo aquí invalidaría el memo de TODOS los nodos en cada render.
   const simValue = useMemo(() => ({ activeNodeId }), [activeNodeId]);
+  const lejos = useStore((s) => s.transform[2] < 0.5);
   // Lo que se DIBUJA; el estado `edges` conserva etiquetas y estilo para exportar.
   const edgesVista = useMemo(
-    () => (simples ? simplificarAristas(edges) : edges),
-    [edges, simples],
+    () => (ligero ? simplificarAristas(edges) : edges),
+    [edges, ligero],
   );
 
   return (
@@ -372,7 +375,12 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
       />
       <div className={`app__body${sidebarOpen ? "" : " app__body--collapsed"}`}>
         <Sidebar />
-        <div className="canvas" ref={wrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
+        <div
+          className={`canvas${ligero && lejos ? " is-lod" : ""}`}
+          ref={wrapperRef}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+        >
           <button
             className={`canvas__toggle${sidebarOpen ? " is-on" : ""}`}
             onClick={() => setSidebarOpen((v) => !v)}
@@ -398,6 +406,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
               fitView
               fitViewOptions={{ padding: 0.18 }}
               minZoom={0.15}
+              onlyRenderVisibleElements={ligero}
               proOptions={{ hideAttribution: true }}
             >
               <Background gap={20} size={1.4} color="#232327" />
@@ -414,8 +423,8 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
               <ZoomControls
                 mapa={mapa}
                 onToggleMapa={toggleMapa}
-                simples={simples}
-                onToggleSimples={toggleSimples}
+                ligero={ligero}
+                onToggleLigero={toggleLigero}
               />
             </ReactFlow>
           </SimContext.Provider>

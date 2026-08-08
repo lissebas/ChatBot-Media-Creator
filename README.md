@@ -62,9 +62,11 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
   preferencia recordada:
   - **▣ Minimapa** — redibuja todos los nodos en cada movimiento de la vista;
     arranca apagado por encima de 60 pasos.
-  - **⤳ Aristas ligeras** — oculta las etiquetas y usa trazado en escalones;
-    arranca activo por encima de 80 conexiones. Solo cambia el dibujo: las
-    etiquetas siguen ahí al guardar, exportar y simular.
+  - **⚡ Modo ligero** — monta **solo los nodos visibles** (en un flujo de 103
+    pasos, ~25 en vez de 103: 76 % menos DOM), dibuja las aristas sin etiqueta y,
+    al alejar el zoom, quita el texto de las tarjetas. Arranca activo por encima
+    de 60 pasos u 80 conexiones. Solo cambia el dibujo: al guardar, exportar y
+    simular está todo. Si algún día el lienzo se ve vacío, apágalo con ⚡.
 - **Reiniciar** abre un diálogo con dos salidas: **vaciar el lienzo** o volver al
   **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.

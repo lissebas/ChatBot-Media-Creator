@@ -1380,6 +1380,14 @@ kbd {
   max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
+/* En modo ligero, sin sombras: `--shadow` lleva un desenfoque de 24 px que el
+   navegador rasteriza por software, y multiplicado por 100 tarjetas es de lo más
+   caro que hay en el lienzo. El borde solo ya separa la tarjeta del fondo. */
+.canvas.is-ligero .fnode,
+.canvas.is-ligero .pill { box-shadow: none; }
+.canvas.is-ligero .fnode.is-selected,
+.canvas.is-ligero .pill.is-selected { box-shadow: 0 0 0 1.5px var(--accent); }
+
 /* ── Nivel de detalle: alejado y en modo ligero, las tarjetas pierden el texto ──
    El texto es lo más caro de rasterizar y a ese zoom no se lee de todas formas.
    Es solo CSS: no re-renderiza nada, solo evita pintar. */

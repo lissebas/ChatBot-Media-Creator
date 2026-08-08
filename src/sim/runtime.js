@@ -51,20 +51,25 @@ export function nodeById(nodes, id) {
 }
 
 /**
- * Contenido que muestra el simulador al entrar a un nodo:
- * { kind, text, caption, link, filename, cta, ... } según el tipo de tarjeta.
+ * Descripción de cómo se ve una tarjeta en el chat, independiente del nodo:
+ * { kind, text, footer, header, link, cta, ... }. La usan tanto el simulador
+ * como la vista previa del inspector.
  */
-export function nodeMessage(node) {
-  if (!node) return null;
-  const data = node.data || {};
-  const card = getCard(data.card);
-  const p = data.props || {};
+export function describeCard(cardKey, props = {}) {
+  const card = getCard(cardKey);
+  const p = props;
 
-  switch (data.card) {
+  // Encabezado de las tarjetas interactivas (texto o media).
+  const header = p.header_type === "text" ? p.header_text : undefined;
+  const headerMedia = ["image", "video", "document"].includes(p.header_type)
+    ? { type: p.header_type, link: p.header_link, icon: card.icon }
+    : undefined;
+
+  switch (cardKey) {
     case "start":
       return null; // el inicio no emite mensaje
     case "end":
-      return { kind: "end", text: data.title || "Fin" };
+      return null; // el fin tampoco emite mensaje
     case "text":
       return { kind: "text", text: p.body };
     case "image":
@@ -74,7 +79,7 @@ export function nodeMessage(node) {
     case "sticker":
       return {
         kind: "media",
-        media: data.card,
+        media: cardKey,
         link: p.link,
         filename: p.filename,
         text: p.caption,
@@ -93,11 +98,19 @@ export function nodeMessage(node) {
     case "template":
       return { kind: "text", text: `[plantilla: ${p.name || "sin nombre"}]` };
     case "cta_url":
-      return { kind: "cta", text: p.body, footer: p.footer, cta: p.display_text, url: p.url };
+      return {
+        kind: "cta",
+        text: p.body,
+        footer: p.footer,
+        header,
+        headerMedia,
+        cta: p.display_text,
+        url: p.url,
+      };
     case "location_request":
       return { kind: "location_request", text: p.body, cta: "Enviar ubicación" };
     case "flow":
-      return { kind: "cta", text: p.body, footer: p.footer, cta: p.flow_cta };
+      return { kind: "cta", text: p.body, footer: p.footer, header, headerMedia, cta: p.flow_cta };
     case "call_permission_request":
       return { kind: "text", text: p.body, footer: "Solicitud de permiso de llamada" };
     case "address_message":
@@ -114,12 +127,18 @@ export function nodeMessage(node) {
         footer: p.footer,
       };
     case "buttons":
-      return { kind: "text", text: p.body, footer: p.footer, header: p.header_text };
+      return { kind: "text", text: p.body, footer: p.footer, header, headerMedia };
     case "list":
       return { kind: "text", text: p.body, footer: p.footer, header: p.header_text };
     default:
-      return { kind: "text", text: data.title };
+      return { kind: "text", text: card.nombre };
   }
+}
+
+/** Mensaje que emite un nodo al entrar en él (o null si no envía nada). */
+export function nodeMessage(node) {
+  if (!node) return null;
+  return describeCard(node.data?.card, node.data?.props || {});
 }
 
 /**

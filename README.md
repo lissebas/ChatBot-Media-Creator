@@ -32,19 +32,26 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 - **Crear** un paso: arrástralo desde la paleta izquierda, o haz **clic derecho**
   sobre el lienzo y elígelo en el menú contextual (se crea donde apuntaste).
 - **Conectar** pasos: arrastra desde el punto inferior de un nodo al superior de otro.
-- **Editar** un paso o conexión: selecciónalo → panel derecho (título, texto, tipo
-  de paso como chips de color, etiqueta de la conexión).
+- **Editar** un paso o conexión: selecciónalo → panel derecho. El formulario es el
+  de su tipo de tarjeta, con los límites de Meta y una **vista previa en vivo** —
+  fija arriba del panel— que muestra cómo se verá el mensaje en WhatsApp mientras
+  escribes (en las listas, el botón despliega sus filas como la hoja real).
 - **Clic derecho** sobre un nodo → duplicar o borrar; sobre una conexión → borrar.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
 - **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
   flotantes con porcentaje, minimapa y paleta plegable.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.
 
-**Simulador** (botón **▶ Probar**)
-- Ejecuta el flujo como un chat: escribe o toca opciones y el bot avanza por el grafo.
-- El **nodo activo se resalta** (pulso verde) en el lienzo y la vista se centra en él.
-- Reglas: nodo sin salidas = fin; 1 salida sin etiqueta = espera texto libre;
-  1 con etiqueta o varias = opciones (botones), con match por texto sin tildes.
+**Simulador** (botón **▶ Probar**) — es un **emulador de WhatsApp**, no un chat
+genérico: mismo fondo, mismas burbujas, misma hora dentro del mensaje.
+- Los **botones van pegados a la burbuja**, como en el chat real: las respuestas
+  rápidas se apilan bajo el mensaje y las listas abren su **hoja inferior** con
+  secciones y filas. Nada de opciones sueltas al pie del panel.
+- Los mensajes que no esperan respuesta **encadenan solos**, con indicador de
+  «escribiendo…»; las tarjetas que sí esperan (botones, lista, Flow, ubicación)
+  se quedan a la espera.
+- El **nodo activo se resalta** en el lienzo y la vista se centra en él.
+- Las salidas **sin conectar** se avisan al tocarlas, para detectar huecos del flujo.
 
 ## Tarjetas de Meta soportadas
 
@@ -97,7 +104,9 @@ Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsap
 | `src/components/ContextMenu.jsx` | Menú de clic derecho (lienzo, nodo, conexión). |
 | `src/components/ZoomControls.jsx` | Controles flotantes de zoom / encuadre. |
 | `src/components/FieldForm.jsx` | Formulario que se dibuja solo desde la definición de la tarjeta. |
-| `src/components/Simulator.jsx` | Panel de chat que ejecuta el flujo. |
+| `src/components/WhatsAppMessage.jsx` | Render fiel de una tarjeta en WhatsApp (simulador y vista previa). |
+| `src/components/CardPreview.jsx` | Vista previa en vivo dentro del inspector. |
+| `src/components/Simulator.jsx` | Emulador de WhatsApp que ejecuta el flujo. |
 | `src/flow/cardTypes.js` | **Catálogo de tarjetas de Meta**: campos, límites, salidas y JSON. |
 | `src/index.css` | Tokens del tema oscuro (colores, radios, sombras). |
 | `scripts/smoke.mjs` | Chequeo rápido: payloads, flujo semilla y runtime (`npm run smoke`). |

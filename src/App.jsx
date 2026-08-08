@@ -451,7 +451,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
       <div className={`app__body${sidebarOpen ? "" : " app__body--collapsed"}`}>
         <Sidebar />
         <div
-          className={`canvas${ligero && lejos ? " is-lod" : ""}`}
+          className={`canvas${ligero ? " is-ligero" : ""}${ligero && lejos ? " is-lod" : ""}`}
           ref={wrapperRef}
           onDrop={onDrop}
           onDragOver={onDragOver}

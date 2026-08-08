@@ -31,6 +31,22 @@ esos valores (`VITE_COGNITO_DOMINIO`, `VITE_COGNITO_CLIENTE`, `VITE_URL_APP`),
 sube los assets con caché de un año y el `index.html` sin caché, e invalida
 CloudFront.
 
+## Dominio propio
+
+La app responde en **https://dev.sebasgomezrubio.com** (CloudFront + certificado
+de ACM en *us-east-1*, que es donde CloudFront los exige).
+
+El DNS del dominio **no está en Route 53** (lo gestiona Hostinger), así que el
+registro se crea allí a mano:
+
+| Tipo | Nombre | Valor | TTL |
+|---|---|---|---|
+| CNAME | `dev` | `d3vl8jx5qstlaa.cloudfront.net` | 300 |
+
+El dominio y el certificado se pasan como parámetros del stack (ver `deploy.sh`):
+`DominioApp` y `CertificadoArn`. Con `DominioApp=""` se vuelve al dominio de
+CloudFront sin tocar nada más.
+
 ## Usuarios
 
 ```bash

@@ -13,7 +13,7 @@ navegador ──► CloudFront ──► S3 (privado, solo accesible por CloudFr
 |---|---|
 | **S3** | Los archivos compilados. Bucket privado: no se sirve nada directamente desde él. |
 | **CloudFront** | CDN + HTTPS. Devuelve `index.html` en cualquier ruta desconocida (SPA). |
-| **Cognito** | Login. Sin auto-registro: los usuarios los crea un administrador. |
+| **Cognito** | Login. Sin auto-registro: los usuarios los crea un administrador. El formulario es de la propia app (no el Hosted UI): se llama a la API de Cognito desde el navegador, así nunca se sale del dominio. |
 
 Todo el stack lleva la etiqueta `Project=ChatBotMediaCreator`.
 

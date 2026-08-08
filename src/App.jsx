@@ -481,7 +481,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
 
 /* ══════════════════════════ App: portada + editor ══════════════════════════ */
 
-export default function App() {
+export default function App({ sesion }) {
   const [indice, setIndice] = useState(cargarIndice);
   const [abiertoId, setAbiertoId] = useState(null);
   // El id abierto también en un ref: así el callback de guardado es estable y no
@@ -572,6 +572,7 @@ export default function App() {
   if (!meta || !doc) {
     return (
       <Home
+        sesion={sesion}
         flujos={indice}
         onAbrir={abrir}
         onNuevo={() => crear("Flujo sin título")}

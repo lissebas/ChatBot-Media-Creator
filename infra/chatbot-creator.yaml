@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  ChatBot Creator — sitio estático (S3 privado + CloudFront) con login de Cognito.
+  Sin backend ni base de datos: la app es 100% cliente y los flujos viajan como JSON.
+
+Parameters:
+  NombreProyecto:
+    Type: String
+    Default: chatbot-creator
+    Description: Prefijo de los recursos.
+  UrlLocal:
+    Type: String
+    Default: http://localhost:5174/
+    Description: Callback extra para probar el login desde el entorno de desarrollo.
+
+Resources:
+  # ── Sitio: bucket privado, solo accesible por CloudFront ──────────────────
+  Sitio:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "${NombreProyecto}-${AWS::AccountId}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  # El acceso va por Origin Access Control: nadie llega al bucket directamente.
+  AccesoOrigen:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${NombreProyecto}-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  PoliticaSitio:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Sitio
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: SoloCloudFront
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${Sitio.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribucion}"
+
+  Distribucion:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub "${NombreProyecto} — editor visual de flujos"
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: sitio
+            DomainName: !GetAtt Sitio.RegionalDomainName
+            OriginAccessControlId: !GetAtt AccesoOrigen.Id
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: sitio
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          # CachingOptimized (gestionada por AWS): assets con hash en el nombre.
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        CacheBehaviors:
+          - PathPattern: /index.html
+            TargetOriginId: sitio
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            Compress: true
+            # CachingDisabled (gestionada por AWS): el index.html nunca se cachea.
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+        # SPA: cualquier ruta desconocida devuelve el index (y el router del navegador decide).
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+  # ── Login ─────────────────────────────────────────────────────────────────
+  # Sin auto-registro: los usuarios los crea el administrador (es una herramienta interna).
+  Usuarios:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${NombreProyecto}-usuarios"
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      MfaConfiguration: "OFF"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireUppercase: true
+          RequireSymbols: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+
+  DominioLogin:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "${NombreProyecto}-${AWS::AccountId}"
+      UserPoolId: !Ref Usuarios
+
+  # Cliente público (sin secreto): el navegador usa Authorization Code + PKCE.
+  ClienteWeb:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${NombreProyecto}-web"
+      UserPoolId: !Ref Usuarios
+      GenerateSecret: false
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows: [code]
+      AllowedOAuthScopes: [openid, email, profile]
+      SupportedIdentityProviders: [COGNITO]
+      CallbackURLs:
+        - !Sub "https://${Distribucion.DomainName}/"
+        - !Ref UrlLocal
+      LogoutURLs:
+        - !Sub "https://${Distribucion.DomainName}/"
+        - !Ref UrlLocal
+      ExplicitAuthFlows: [ALLOW_USER_SRP_AUTH, ALLOW_REFRESH_TOKEN_AUTH]
+      PreventUserExistenceErrors: ENABLED
+
+Outputs:
+  Bucket:
+    Description: Bucket del sitio
+    Value: !Ref Sitio
+  DistribucionId:
+    Description: Id de CloudFront (para invalidar la caché)
+    Value: !Ref Distribucion
+  Url:
+    Description: URL pública de la app
+    Value: !Sub "https://${Distribucion.DomainName}"
+  CognitoDominio:
+    Description: Dominio del Hosted UI
+    Value: !Sub "https://${DominioLogin}.auth.${AWS::Region}.amazoncognito.com"
+  CognitoClienteId:
+    Description: Id del cliente web
+    Value: !Ref ClienteWeb
+  CognitoUserPoolId:
+    Description: Id del user pool (para crear usuarios)
+    Value: !Ref Usuarios

@@ -22,6 +22,7 @@ import Modal from "./components/Modal";
 import Home from "./components/Home";
 import { MINIMO_REMOTO, analizarRemoto, layoutRemoto, motorActivo, precalentar } from "./flow/remoto";
 import { SimContext } from "./sim/SimContext";
+import { entryNode } from "./sim/runtime";
 import { CARDS, CARDS_POR_FAMILIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
 import {
   autoLayout,
@@ -105,20 +106,6 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
   const [informe, setInforme] = useState(null); // revisión del flujo en la nube
-  // El minimapa redibuja TODOS los nodos en cada movimiento de la vista: en
-  // flujos grandes arranca apagado, y la preferencia se recuerda.
-  const [mapa, setMapa] = useState(() => {
-    const guardado = localStorage.getItem("cbc-minimapa");
-    if (guardado !== null) return guardado === "1";
-    return (initial.nodes?.length || 0) <= 60;
-  });
-  // Modo ligero: React Flow monta solo lo que se ve, las aristas van sin
-  // etiqueta y las tarjetas pierden detalle. Automático en flujos grandes.
-  const [ligero, setLigero] = useState(() => {
-    const guardado = localStorage.getItem("cbc-modo-ligero");
-    if (guardado !== null) return guardado === "1";
-    return (initial.nodes?.length || 0) > 60 || (initial.edges?.length || 0) > 80;
-  });
   const [reset, setReset] = useState(false);
   const wrapperRef = useRef(null);
   const { screenToFlowPosition, fitView, setCenter, getZoom } = useReactFlow();
@@ -379,19 +366,19 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
     [setNodes, setEdges, fitView],
   );
 
-  const toggleLigero = useCallback(() => {
-    setLigero((v) => {
-      localStorage.setItem("cbc-modo-ligero", v ? "0" : "1");
-      return !v;
+  /** Lleva la vista al primer paso del flujo (el Inicio, o el disparador). */
+  const irAlInicio = useCallback(() => {
+    const id = entryNode(nodes, edges);
+    const node = id && nodes.find((n) => n.id === id);
+    if (!node) return;
+    const { width, height } = nodeSize(node);
+    setCenter(node.position.x + width / 2, node.position.y + height / 2, {
+      zoom: Math.max(getZoom(), 0.8),
+      duration: 500,
     });
-  }, []);
-
-  const toggleMapa = useCallback(() => {
-    setMapa((v) => {
-      localStorage.setItem("cbc-minimapa", v ? "0" : "1");
-      return !v;
-    });
-  }, []);
+    setSelNodeId(node.id);
+    setSelEdgeId(null);
+  }, [nodes, edges, setCenter, getZoom]);
 
   // Identidad estable: si esta función cambia en cada render, el minimapa se
   // repinta aunque no haya cambiado nada.
@@ -445,8 +432,8 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
   const lejos = useStore((s) => s.transform[2] < 0.5);
   // Lo que se DIBUJA; el estado `edges` conserva etiquetas y estilo para exportar.
   const edgesVista = useMemo(
-    () => (ligero ? simplificarAristas(edges) : edges),
-    [edges, ligero],
+    () => simplificarAristas(edges),
+    [edges],
   );
 
   return (
@@ -468,7 +455,7 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
       <div className={`app__body${sidebarOpen ? "" : " app__body--collapsed"}`}>
         <Sidebar />
         <div
-          className={`canvas${ligero ? " is-ligero" : ""}${ligero && lejos ? " is-lod" : ""}`}
+          className={`canvas is-ligero${lejos ? " is-lod" : ""}`}
           ref={wrapperRef}
           onDrop={onDrop}
           onDragOver={onDragOver}
@@ -498,26 +485,19 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
               fitView
               fitViewOptions={{ padding: 0.18 }}
               minZoom={0.15}
-              onlyRenderVisibleElements={ligero}
+              onlyRenderVisibleElements
               proOptions={{ hideAttribution: true }}
             >
               <Background gap={20} size={1.4} color="#232327" />
-              {mapa ? (
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor={colorNodo}
-                  nodeStrokeWidth={0}
-                  maskColor="rgba(8,8,10,0.7)"
-                  bgColor="transparent"
-                />
-              ) : null}
-              <ZoomControls
-                mapa={mapa}
-                onToggleMapa={toggleMapa}
-                ligero={ligero}
-                onToggleLigero={toggleLigero}
+              <MiniMap
+                pannable
+                zoomable
+                nodeColor={colorNodo}
+                nodeStrokeWidth={0}
+                maskColor="rgba(8,8,10,0.7)"
+                bgColor="transparent"
               />
+              <ZoomControls onInicio={irAlInicio} />
             </ReactFlow>
           </SimContext.Provider>
 

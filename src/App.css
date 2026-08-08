@@ -414,6 +414,9 @@
 }
 .zoomctl__btn:hover { background: var(--raised-hi); color: var(--text); }
 .zoomctl__btn.is-on { color: var(--ok); }
+/* Ir al primer paso: el mismo verde que la cápsula de Inicio en el lienzo. */
+.zoomctl__btn--inicio { color: var(--ok); font-size: 11px; }
+.zoomctl__btn--inicio:hover { background: rgba(18, 183, 106, 0.14); color: var(--ok); }
 .zoomctl__pct {
   font-size: 10px; color: var(--faint); padding: 2px 0; user-select: none;
   font-variant-numeric: tabular-nums;

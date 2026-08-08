@@ -251,6 +251,27 @@ for (const n of nodes) {
   console.log(`Dimensiones: ${nodes.length} nodos con medida inicial (también al importar)`);
 }
 
+// Un documento guardado SIN dimensiones debe recuperarlas al abrirlo: si no, la
+// virtualización no filtra nada y se montan todos los nodos (era el caso real de
+// los flujos importados antes de la v0.7.0).
+{
+  const almacen = new Map();
+  globalThis.localStorage = {
+    getItem: (k) => (almacen.has(k) ? almacen.get(k) : null),
+    setItem: (k, v) => almacen.set(k, v),
+    removeItem: (k) => almacen.delete(k),
+  };
+  const viejo = { nodes: nodes.map(({ width, height, ...n }) => n), edges };
+  almacen.set("cbc-doc-x", JSON.stringify(viejo));
+  if (viejo.nodes.some((n) => n.width || n.height)) fail("el documento de prueba ya traía dimensiones");
+  const recuperado = cargarDocumento("x");
+  const sinMedida = recuperado.nodes.filter((n) => !n.width || !n.height);
+  if (sinMedida.length) fail(`al abrir, ${sinMedida.length} nodos siguen sin dimensiones`);
+  if (recuperado.edges.length !== edges.length) fail("al abrir se pierden aristas");
+  console.log(`Apertura: ${recuperado.nodes.length} nodos con dimensiones recuperadas`);
+  delete globalThis.localStorage;
+}
+
 // Aristas ligeras: solo cambia el dibujo, nunca los datos que se guardan.
 {
   const ligeras = simplificarAristas(edges);

@@ -15,7 +15,17 @@ import { combinarIndices } from "../src/flow/nube.js";
 import { buildInitialFlow, migrateFlow, nodeSize, simplificarAristas } from "../src/flow/transform.js";
 import { anclas, cajaFlujo, svgDeRegion } from "../api/svg.mjs";
 import { TEMA } from "../src/flow/tema.js";
-import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
+import {
+  conVariables,
+  entryNode,
+  nodeOptions,
+  nextEdge,
+  nodeMessage,
+  stepMode,
+} from "../src/sim/runtime.js";
+import { buscarPaso, interceptar, resolver } from "../src/sim/motores.js";
+import { REGLAS, interpolar, resolverLimite, validarRespuesta } from "../src/flow/validadores.js";
+import { coincidir } from "../src/flow/coincidencias.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
 import { cargarDocumento, cargarIndice, conResumen } from "../src/flow/workspace.js";
 import {
@@ -243,6 +253,288 @@ console.log(`Formato: ${casos.length} casos`);
   if (fechas.some((f, i) => i && f > fechas[i - 1])) fail("nube: el índice combinado no queda ordenado");
   // Nada del estado local puede acabar en S3, y nada se pierde por el camino.
   console.log(`Nube: ${combinado.length} flujos combinados · sube ${subir.length} · baja ${bajar.length}`);
+}
+
+// ══ Automatizaciones: validar, decidir y ejecutar de verdad ══
+
+// La regla de geometría del lienzo: con UNA sola salida, tiene que llamarse
+// `next`. Con otro nombre el nodo dibuja fila de opción en vez de conector
+// inferior y el SVG del servidor se salta las aristas guardadas como `next`.
+{
+  // `next` es la salida "sigue de largo": el lienzo la dibuja como conector
+  // inferior y las aristas viejas sin `sourceHandle` caen ahí. Por eso, si una
+  // tarjeta la declara, tiene que ser su ÚNICA salida; mezclarla con ramas deja
+  // aristas apuntando a un conector que no se dibuja.
+  for (const key of CARD_KEYS) {
+    for (const props of [{}, defaultProps(key)]) {
+      const outs = CARDS[key].outputs(props);
+      if (outs.some((o) => o.id === "next") && outs.length !== 1) {
+        fail(`${key}: mezcla la salida «next» con ${outs.length - 1} rama(s)`);
+      }
+    }
+  }
+  // Y toda salida necesita id y etiqueta: el id va en la arista, la etiqueta la
+  // lee el usuario en el lienzo y en el simulador.
+  const sinNombre = CARD_KEYS.filter((k) =>
+    CARDS[k].outputs(defaultProps(k)).some((o) => !o.id || !o.label),
+  );
+  if (sinNombre.length) fail(`salidas sin id o sin etiqueta: ${sinNombre.join(", ")}`);
+}
+
+// Las reglas de validación: lo que el usuario escribe y lo que se guarda.
+{
+  const casos = [
+    ["correo", "  Juan@Ejemplo.COM ", {}, {}, "juan@ejemplo.com"],
+    ["correo", "juan(arroba)ejemplo", {}, {}, null],
+    ["documento", "1.020.304.050", {}, {}, "1020304050"],
+    ["documento", "123", {}, {}, null],
+    ["telefono", "+57 300 123 4567", {}, {}, "+573001234567"],
+    ["fecha", "15/03/1990", {}, {}, "1990-03-15"],
+    ["fecha", "3 de marzo de 2026", {}, {}, "2026-03-03"],
+    ["fecha", "1990-03-15", {}, {}, "1990-03-15"],
+    ["fecha", "31/02/2020", {}, {}, null],
+    ["fecha", "03/04/2026", { orden: "mdy" }, {}, "2026-03-04"],
+    ["entero", "2026", { min: "1990", max: "año actual + 1" }, {}, 2026],
+    ["entero", "1980", { min: "1990" }, {}, null],
+    ["numero", "1.250.000", { min: "1000000", max: "2000000000" }, {}, 1250000],
+    ["hora", "3 pm", {}, {}, "15:00"],
+    ["si_no", "Claro", {}, {}, "si"],
+    ["si_no", "quizá", {}, {}, null],
+    ["opcion", "2", { opciones: "Moto\nCarro\nCamión" }, {}, "Carro"],
+    ["opcion", "camion", { opciones: "Moto\nCarro\nCamión" }, {}, "Camión"],
+    ["texto", "ab", { min: "3" }, {}, null],
+    ["patron", "abc123", { patron: "^[A-Z]{3}\\d{3}$" }, {}, "ABC123"],
+    ["patron", "ab1234", { patron: "^[A-Z]{3}\\d{3}$" }, {}, null],
+    // El formato puede depender de algo capturado antes (coche vs moto).
+    ["patron", "abc12d", { patron: "{{formato}}" }, { formato: "^[A-Z]{3}\\d{2}[A-Z]$" }, "ABC12D"],
+  ];
+  for (const [regla, texto, op, vars, esperado] of casos) {
+    const r = validarRespuesta(regla, texto, op, vars);
+    if (esperado === null) {
+      if (r.ok) fail(`validación: "${texto}" debería fallar con la regla ${regla}`);
+      else if (!r.error) fail(`validación: ${regla} falla sin explicar por qué`);
+    } else if (!r.ok) {
+      fail(`validación: "${texto}" debería valer como ${regla} (${r.error})`);
+    } else if (r.valor !== esperado) {
+      fail(`validación ${regla}: se guarda ${JSON.stringify(r.valor)} y se esperaba ${JSON.stringify(esperado)}`);
+    }
+  }
+  if (resolverLimite("año actual + 1") !== new Date().getFullYear() + 1) {
+    fail("los límites dinámicos no resuelven «año actual + 1»");
+  }
+  if (Object.keys(REGLAS).some((k) => !REGLAS[k].nombre || typeof REGLAS[k].valida !== "function")) {
+    fail("alguna regla no declara nombre o función");
+  }
+  console.log(`Validación: ${casos.length} casos · ${Object.keys(REGLAS).length} reglas`);
+}
+
+// Emparejado contra un catálogo: resolver, dudar o rendirse (nunca adivinar).
+{
+  const catalogo = "Mazda\nMazda 2\nMazda 3\nRenault\nChevrolet";
+  const uno = coincidir("mazda 3", catalogo);
+  if (uno.tipo !== "unico" || uno.valor !== "Mazda 3") fail(`catálogo: "mazda 3" → ${uno.tipo}`);
+  const varios = coincidir("mazd", catalogo);
+  if (varios.tipo !== "varios" || varios.opciones.length !== 3) {
+    fail(`catálogo: "mazd" debería dar 3 candidatos y dio ${varios.opciones.length} (${varios.tipo})`);
+  }
+  if (coincidir("ferrari", catalogo).tipo !== "ninguno") fail("catálogo: «ferrari» no debería coincidir");
+  if (coincidir("renualt", catalogo).tipo !== "unico") fail("catálogo: no tolera la errata «renualt»");
+  console.log("Catálogo: único / varios / ninguno, y aguanta erratas");
+}
+
+// El motor: quién decide la salida y qué variables deja escritas.
+{
+  const ask = { variable: "correo", regla: "correo", intentos: "2", error: "Ese correo no sirve." };
+  const primero = resolver("ask", ask, { texto: "no soy un correo", intentos: 0 });
+  if (!primero.reintentar || primero.mensaje !== "Ese correo no sirve.") fail("ask: el primer fallo debería reintentar");
+  const segundo = resolver("ask", ask, { texto: "sigue mal", intentos: 1 });
+  if (segundo.salida !== "fail") fail("ask: agotados los intentos debería salir por «fail»");
+  const bien = resolver("ask", ask, { texto: "Ana@Ejemplo.com", intentos: 1 });
+  if (bien.salida !== "ok" || bien.vars.correo !== "ana@ejemplo.com") fail("ask: no guarda el correo normalizado");
+
+  const cond = {
+    rutas: [
+      { id: "vip", etiqueta: "VIP", modo: "todas", condiciones: [
+        { variable: "plan", operador: "igual", valor: "oro" },
+        { variable: "saldo", operador: "mayor", valor: "100" },
+      ] },
+    ],
+  };
+  if (resolver("condition", cond, { vars: { plan: "oro", saldo: "500" } }).salida !== "vip") {
+    fail("condición: no toma la ruta que se cumple");
+  }
+  if (resolver("condition", cond, { vars: { plan: "oro", saldo: "10" } }).salida !== "else") {
+    fail("condición: con «todas» basta que falle una para irse por «Si no»");
+  }
+
+  const intent = { intenciones: [{ id: "cot", etiqueta: "Cotizar", palabras: "cotizar, precio, cuánto vale" }] };
+  if (resolver("intent", intent, { texto: "quiero saber el precio" }).salida !== "cot") fail("intención: no reconoce la palabra clave");
+  if (resolver("intent", intent, { texto: "hola" }).salida !== "sin_coincidencia") fail("intención: debería no reconocer «hola»");
+
+  const asignadas = resolver("vars", {
+    asignaciones: [
+      { variable: "saludo", origen: "fijo", valor: "Hola {{nombre}}" },
+      { variable: "eco", origen: "respuesta" },
+    ],
+  }, { vars: { nombre: "Ana", respuesta: "sí" } });
+  if (asignadas.vars.saludo !== "Hola Ana" || asignadas.vars.eco !== "sí") fail("variables: no interpola o no copia la respuesta");
+
+  const horario = { dias: "todos", apertura: "08:00", cierre: "17:00", zona: "America/Bogota" };
+  const manana = new Date("2026-08-05T14:00:00Z"); // 09:00 en Bogotá
+  const noche = new Date("2026-08-05T02:00:00Z"); // 21:00 del día anterior
+  if (resolver("hours", horario, { momento: manana }).salida !== "abierto") fail("horario: las 9 a. m. deberían estar abiertas");
+  if (resolver("hours", horario, { momento: noche }).salida !== "cerrado") fail("horario: las 9 p. m. deberían estar cerradas");
+  if (resolver("hours", { ...horario, festivos: "2026-08-05" }, { momento: manana }).salida !== "cerrado") {
+    fail("horario: no respeta los festivos");
+  }
+
+  const conCmd = [
+    { id: "c1", data: { card: "commands", props: { comandos: [{ id: "menu", etiqueta: "Menú", palabras: "menu, inicio" }] } } },
+    { id: "n1", data: { card: "text", title: "Menú principal", props: {} } },
+  ];
+  const cmd = interceptar(conCmd, "quiero volver al menu");
+  if (!cmd || cmd.salida !== "menu") fail("comandos globales: no interceptan «menu»");
+  if (interceptar(conCmd, "hola")) fail("comandos globales: interceptan cuando no deberían");
+  if (buscarPaso(conCmd, "Menú principal") !== "n1") fail("«Ir a»: no encuentra el paso por su título");
+
+  console.log("Motor: valida, reintenta, escala, ramifica, interpola y respeta el horario");
+}
+
+// El simulador tiene que esperar texto en «Pregunta y valida» aunque la tarjeta
+// tenga varias salidas: esas salidas NO son botones que se puedan tocar.
+{
+  const flujo = {
+    nodes: [
+      { id: "a", data: { card: "ask", props: defaultProps("ask") } },
+      { id: "b", data: { card: "condition", props: defaultProps("condition") } },
+      { id: "c", data: { card: "http", props: defaultProps("http") } },
+      { id: "d", data: { card: "handoff", props: defaultProps("handoff") } },
+      { id: "e", data: { card: "end", props: {} } },
+    ],
+    edges: [
+      { id: "e1", source: "a", sourceHandle: "ok", target: "b" },
+      { id: "e2", source: "b", sourceHandle: "ruta_1", target: "c" },
+      { id: "e3", source: "c", sourceHandle: "ok", target: "d" },
+      { id: "e4", source: "d", sourceHandle: "next", target: "e" },
+    ],
+  };
+  const modo = (id) => stepMode(flujo.nodes.find((n) => n.id === id), flujo.edges);
+  if (modo("a") !== "captura") fail(`ask debería esperar texto y da "${modo("a")}"`);
+  if (modo("b") !== "decide") fail(`condition debería decidir sola y da "${modo("b")}"`);
+  if (modo("c") !== "options") fail(`http debería ofrecer sus ramas y da "${modo("c")}"`);
+  if (modo("d") !== "auto") fail(`handoff debería seguir solo y da "${modo("d")}"`);
+  if (modo("e") !== "end") fail("end debería terminar");
+  // Un paso técnico no es un mensaje: en el chat no puede salir una burbuja.
+  for (const key of CARD_KEYS.filter((k) => CARDS[k].tecnica)) {
+    if (nodeMessage({ data: { card: key, props: defaultProps(key) } })) fail(`${key}: una automatización no debería emitir mensaje`);
+  }
+  // Y el disparador externo tiene que poder ser la entrada del flujo.
+  const conDisparador = [{ id: "t", data: { card: "trigger", props: {} } }, { id: "x", data: { card: "text", props: {} } }];
+  if (entryNode(conDisparador, [{ id: "z", source: "t", target: "x" }]) !== "t") {
+    fail("el disparador externo debería poder empezar el flujo");
+  }
+  console.log("Simulador: modos correctos y automatizaciones sin burbuja");
+}
+
+// Las variables se sustituyen en el texto que ve el usuario.
+{
+  const props = conVariables({ body: "Hola {{nombre}}", sections: [{ rows: [{ title: "{{ciudad}}" }] }] }, { nombre: "Ana", ciudad: "Cali" });
+  if (props.body !== "Hola Ana") fail("interpolación: no sustituye en el cuerpo");
+  if (props.sections[0].rows[0].title !== "Cali") fail("interpolación: no entra en las listas anidadas");
+  if (interpolar("Hola {{falta}}", {}) !== "Hola ") fail("interpolación: una variable sin valor debería quedar vacía");
+  console.log("Variables: {{nombre}} se sustituye en textos y listas");
+}
+
+// Una conversación entera, con el mismo recorrido que hace el simulador:
+// preguntar, validar, reintentar, escalar, ramificar e interpolar.
+{
+  const paso = (id, card, props = {}) => ({ id, data: { card, title: id, props: { ...defaultProps(card), ...props } } });
+  const flujo = {
+    nodes: [
+      paso("inicio", "start"),
+      paso("doc", "ask", {
+        body: "¿Cuál es tu documento?",
+        variable: "documento",
+        regla: "documento",
+        error: "Solo números, entre 5 y 12 dígitos.",
+        intentos: "2",
+      }),
+      paso("vip", "condition", {
+        rutas: [{ id: "es_vip", etiqueta: "VIP", modo: "todas", condiciones: [{ variable: "plan", operador: "igual", valor: "oro" }] }],
+      }),
+      paso("saludo", "text", { body: "Hola {{nombre}} 👑" }),
+      paso("normal", "text", { body: "Hola, ¿en qué te ayudo?" }),
+      paso("asesor", "handoff"),
+      paso("fin", "end"),
+    ],
+    edges: [
+      { id: "a", source: "inicio", sourceHandle: "next", target: "doc" },
+      { id: "b", source: "doc", sourceHandle: "ok", target: "vip" },
+      { id: "c", source: "doc", sourceHandle: "fail", target: "asesor" },
+      { id: "d", source: "vip", sourceHandle: "es_vip", target: "saludo" },
+      { id: "e", source: "vip", sourceHandle: "else", target: "normal" },
+      { id: "f", source: "saludo", sourceHandle: "next", target: "fin" },
+      { id: "g", source: "normal", sourceHandle: "next", target: "fin" },
+      { id: "h", source: "asesor", sourceHandle: "next", target: "fin" },
+    ],
+  };
+
+  /** Recorre el flujo como el simulador: mismas decisiones, sin interfaz. */
+  const caminar = (escritos, varsIniciales = {}) => {
+    const cola = [...escritos];
+    let vars = { ...varsIniciales };
+    let id = entryNode(flujo.nodes, flujo.edges);
+    const visitados = [id];
+    const dichos = [];
+    let intentos = 0;
+
+    for (let vuelta = 0; vuelta < 40 && id; vuelta++) {
+      const nodo = flujo.nodes.find((n) => n.id === id);
+      const modo = stepMode(nodo, flujo.edges);
+      const mensaje = nodeMessage({ ...nodo, data: { ...nodo.data, props: conVariables(nodo.data.props, vars) } });
+      if (mensaje?.text) dichos.push(mensaje.text);
+      if (modo === "end") break;
+
+      let salida = "next";
+      if (modo === "captura") {
+        const r = resolver(nodo.data.card, nodo.data.props, { vars, texto: cola.shift(), intentos });
+        if (r.reintentar) {
+          intentos += 1;
+          dichos.push(r.mensaje);
+          continue; // el paso se repite: no se avanza
+        }
+        intentos = 0;
+        vars = { ...vars, ...r.vars };
+        salida = r.salida;
+      } else if (modo === "decide") {
+        const r = resolver(nodo.data.card, nodo.data.props, { vars });
+        vars = { ...vars, ...(r.vars || {}) };
+        salida = r.salida;
+      }
+
+      const arista = flujo.edges.find((e) => e.source === id && (e.sourceHandle || "next") === salida);
+      if (!arista) break;
+      id = arista.target;
+      visitados.push(id);
+    }
+    return { visitados, dichos, vars };
+  };
+
+  const escalado = caminar(["hola", "no sé"]);
+  if (!escalado.visitados.includes("asesor")) fail(`recorrido: dos respuestas malas deberían acabar en el asesor (${escalado.visitados.join(" → ")})`);
+  if (escalado.dichos.filter((t) => t === "Solo números, entre 5 y 12 dígitos.").length !== 1) {
+    fail("recorrido: el aviso de error debería salir una vez antes de escalar");
+  }
+
+  const vip = caminar(["1.020.304.050"], { plan: "oro", nombre: "Ana" });
+  if (!vip.visitados.includes("saludo")) fail(`recorrido VIP: debería pasar por el saludo (${vip.visitados.join(" → ")})`);
+  if (vip.vars.documento !== "1020304050") fail("recorrido VIP: el documento no se guarda normalizado");
+  if (!vip.dichos.includes("Hola Ana 👑")) fail(`recorrido VIP: no interpola el nombre (${JSON.stringify(vip.dichos)})`);
+
+  const comun = caminar(["1020304050"], { plan: "plata" });
+  if (!comun.visitados.includes("normal")) fail("recorrido normal: sin plan oro debería irse por «Si no»");
+
+  console.log(`Recorrido con automatizaciones: escala tras 2 fallos · VIP ${vip.visitados.length} pasos · variables vivas`);
 }
 
 const { nodes, edges } = buildInitialFlow();

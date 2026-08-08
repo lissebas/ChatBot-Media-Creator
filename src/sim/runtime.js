@@ -12,6 +12,7 @@
  */
 
 import { cardOutputs, getCard } from "../flow/cardTypes";
+import { interpolar } from "../flow/validadores";
 
 /** Normaliza para comparar: minúsculas, sin tildes, sin espacios sobrantes. */
 export function normalize(s) {
@@ -28,14 +29,33 @@ export function outgoing(edges, nodeId) {
   return edges.filter((e) => e.source === nodeId);
 }
 
-/** Nodo de entrada: 'start' si existe; si no, el primero sin aristas entrantes. */
+/**
+ * Nodo de entrada: 'start', o un disparador externo, o el primero sin aristas
+ * entrantes. Los comandos globales se descartan: no tienen entrada porque
+ * interceptan desde cualquier punto, no porque sean el principio.
+ */
 export function entryNode(nodes, edges) {
   if (!nodes.length) return null;
-  const inicio = nodes.find((n) => n.data?.card === "start");
+  const inicio =
+    nodes.find((n) => n.data?.card === "start") || nodes.find((n) => n.data?.card === "trigger");
   if (inicio) return inicio.id;
   const targets = new Set(edges.map((e) => e.target));
-  const root = nodes.find((n) => !targets.has(n.id));
+  const root = nodes.find((n) => !targets.has(n.id) && n.data?.card !== "commands");
   return (root || nodes[0]).id;
+}
+
+/** Sustituye `{{variable}}` en todos los textos de unos props. */
+export function conVariables(props, vars) {
+  if (!props || !vars || !Object.keys(vars).length) return props;
+  const mapear = (v) => {
+    if (typeof v === "string") return interpolar(v, vars);
+    if (Array.isArray(v)) return v.map(mapear);
+    if (v && typeof v === "object") {
+      return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, mapear(x)]));
+    }
+    return v;
+  };
+  return mapear(props);
 }
 
 /** Etiqueta legible de una arista (su label, o el título del nodo destino). */
@@ -65,12 +85,13 @@ export function describeCard(cardKey, props = {}) {
     ? { type: p.header_type, link: p.header_link, icon: card.icon }
     : undefined;
 
+  // Inicio y Fin no emiten nada; las automatizaciones tampoco son un mensaje
+  // (se pintan como nota técnica, no como burbuja).
+  if (card.chat === false || card.tecnica) return null;
+
   switch (cardKey) {
-    case "start":
-      return null; // el inicio no emite mensaje
-    case "end":
-      return null; // el fin tampoco emite mensaje
     case "text":
+    case "ask":
       return { kind: "text", text: p.body };
     case "image":
     case "video":
@@ -165,19 +186,27 @@ export function nextEdge(edges, nodeId) {
 
 /**
  * Qué hace el simulador al llegar a un nodo:
+ *  "captura" → esperar a que escriba y VALIDAR lo que escriba (el motor decide).
+ *  "decide"  → el motor elige la salida solo, sin preguntar nada.
  *  "options" → esperar a que el usuario toque un botón / fila.
  *  "action"  → esperar a que el usuario complete una acción nativa (ubicación,
  *              Flow, dirección): se muestra un botón para continuar.
  *  "text"    → esperar a que el usuario escriba (pregunta abierta).
  *  "auto"    → el mensaje se envía y la conversación sigue sola.
  *  "end"     → no hay a dónde ir.
+ *
+ * El orden importa: una tarjeta que espera texto puede tener varias salidas
+ * (válido / no válido), y esas salidas NO son botones que se puedan tocar.
  */
 export function stepMode(node, edges) {
   if (!node) return "end";
+  const card = getCard(node.data?.card);
   if (node.data?.card === "end") return "end";
+  if (card.espera === "texto") return "captura";
+  if (card.decide) return "decide";
   if (nodeOptions(node, edges).length) return "options";
   if (!nextEdge(edges, node.id)) return "end";
-  if (getCard(node.data?.card).wait === "action") return "action";
+  if (card.wait === "action") return "action";
   if (node.data?.card === "text" && node.data?.props?.wait_reply) return "text";
   return "auto";
 }

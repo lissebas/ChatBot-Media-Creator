@@ -1,10 +1,12 @@
 /*
- * Catálogo de TARJETAS (tipos de mensaje) de la WhatsApp Cloud API de Meta.
+ * Catálogo de TARJETAS del editor: los mensajes de la WhatsApp Cloud API de Meta
+ * y las automatizaciones que los rodean (validar, decidir, llamar a una API,
+ * esperar, avisar a una persona).
  *
  * Este archivo es la única fuente de verdad del editor: de aquí salen la paleta,
  * el formulario del inspector, el dibujo de la tarjeta en el lienzo, las salidas
  * (handles) de cada nodo, la validación de límites y el JSON que Meta espera.
- * Añadir un tipo de mensaje nuevo = añadir una entrada aquí.
+ * Añadir un tipo de paso nuevo = añadir una entrada aquí.
  *
  * Cada tarjeta declara:
  *   nombre, cat, icon, desc  → cómo se presenta en la paleta y en el lienzo.
@@ -12,12 +14,26 @@
  *   fields                   → formulario (el inspector lo dibuja solo).
  *   outputs(props)           → salidas del nodo; cada una es un handle del lienzo.
  *   summary(props)           → resumen corto bajo el título de la tarjeta.
- *   payload(props)           → objeto `message` tal como lo pide la Cloud API.
+ *   payload(props)           → objeto `message` tal como lo pide la Cloud API,
+ *                              o `null` si el paso no envía nada.
  *   extraErrors(props)       → validaciones que no son de campo (p. ej. 10 filas).
+ *
+ * Y, opcionalmente, cómo se comporta el paso (lo leen el simulador y el análisis):
+ *   chat: false     → no aparece en el chat (Inicio y Fin).
+ *   tecnica: true   → no es un mensaje: en el chat sale como nota técnica.
+ *   espera: "texto" → espera a que el usuario escriba y decide con lo que escribe.
+ *   decide: true    → el motor elige la salida solo, sin preguntar nada.
+ *   entrada: true   → puede empezar un flujo (no es un paso inalcanzable).
+ *   termina: true   → puede no tener salida (no es un callejón).
+ *
+ * REGLA de geometría que hay que respetar: si una tarjeta tiene UNA sola salida,
+ * su id tiene que ser `next`. Con cualquier otro id el lienzo la dibuja como fila
+ * de opción y las aristas guardadas como `next` se quedan sin dibujar.
  *
  * Referencia general:
  * https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/
  */
+import { OPCIONES_REGLA, reglaUsa } from "./validadores";
 
 const DOCS = "https://developers.facebook.com/docs/whatsapp/cloud-api";
 
@@ -30,14 +46,23 @@ export const FAMILIAS = {
   meta: {
     nombre: "Meta Cards",
     sigla: "META",
+    tab: "Meta",
     desc: "Tipos de mensaje reales de la WhatsApp Cloud API.",
     color: "#25d366",
   },
   flujo: {
     nombre: "Control de flujo",
     sigla: "FLUJO",
+    tab: "Flujo",
     desc: "Marcan el recorrido del bot; no envían ningún mensaje.",
     color: "#12b76a",
+  },
+  automatizacion: {
+    nombre: "Automatizaciones",
+    sigla: "AUTO",
+    tab: "Auto",
+    desc: "Lo que pasa alrededor del mensaje: validar, decidir, llamar a una API, esperar y avisar.",
+    color: "#818cf8",
   },
 };
 
@@ -49,6 +74,11 @@ export const CATEGORIAS = {
   interactivo: { nombre: "Interactivos", color: "#60a5fa", familia: "meta" },
   comercio: { nombre: "Comercio", color: "#a78bfa", familia: "meta" },
   avanzado: { nombre: "Avanzados", color: "#2dd4bf", familia: "meta" },
+  datos: { nombre: "Datos y respuestas", color: "#fbbf24", familia: "automatizacion" },
+  logica: { nombre: "Lógica", color: "#f472b6", familia: "automatizacion" },
+  integracion: { nombre: "Integraciones", color: "#818cf8", familia: "automatizacion" },
+  tiempo: { nombre: "Tiempo", color: "#94a3b8", familia: "automatizacion" },
+  personas: { nombre: "Personas", color: "#fb7185", familia: "automatizacion" },
 };
 
 /* ── Ayudas para construir el payload ── */
@@ -103,6 +133,73 @@ const FOOTER_FIELD = { key: "footer", label: "Pie de página", type: "text", max
 /** Salida única: el paso continúa al siguiente nodo. */
 const NEXT = [{ id: "next", label: "Siguiente" }];
 
+/* ── Ayudas de las tarjetas de automatización ── */
+
+/** Comparaciones de la tarjeta Condición. */
+const OPERADORES = [
+  { value: "igual", label: "es igual a" },
+  { value: "distinto", label: "no es igual a" },
+  { value: "contiene", label: "contiene" },
+  { value: "empieza", label: "empieza por" },
+  { value: "mayor", label: "es mayor que" },
+  { value: "menor", label: "es menor que" },
+  { value: "vacio", label: "está vacía" },
+  { value: "no_vacio", label: "tiene algún valor" },
+  { value: "regex", label: "coincide con la expresión" },
+];
+
+/** Lista de pares nombre/valor: cabeceras, parámetros, campos de un registro. */
+const claveValor = (key, label, itemLabel) => ({
+  key,
+  label,
+  type: "list",
+  itemLabel,
+  item: [
+    { key: "clave", label: "Nombre", type: "text", required: true },
+    { key: "valor", label: "Valor", type: "text", help: "Admite {{variable}}." },
+  ],
+});
+
+/** De la respuesta de una API a variables del flujo. */
+const MAPEO_FIELD = {
+  key: "mapeo",
+  label: "Guardar en variables",
+  type: "list",
+  itemLabel: "Campo",
+  help: "Qué parte de la respuesta se guarda y con qué nombre.",
+  item: [
+    { key: "ruta", label: "Ruta en la respuesta", type: "text", required: true, placeholder: "data.cliente.id" },
+    { key: "variable", label: "Variable", type: "text", required: true, max: 40 },
+  ],
+};
+
+const DIAS_TEXTO = { lv: "L-V", ls: "L-S", todos: "todos los días", otro: "días propios" };
+
+/** Resumen corto de una lista escrita a mano ("120 opciones"). */
+const listaCorta = (bruto) => {
+  const n = String(bruto ?? "").split(/[\n,;]+/).filter((s) => s.trim()).length;
+  return n ? `${n} opciones` : "un catálogo vacío";
+};
+
+/** Una URL vale si empieza por http(s) o si la compone una variable. */
+const urlValida = (valor) => {
+  const v = txt(valor);
+  if (!v || v.includes("{{") || /^https?:\/\//i.test(v)) return [];
+  return ["La URL debe empezar por http:// o https:// (o venir de una {{variable}})."];
+};
+
+/** Avisa si un campo que debería ser JSON no lo es. */
+const jsonValido = (valor, quien) => {
+  const v = txt(valor);
+  if (!v || v.includes("{{")) return [];
+  try {
+    JSON.parse(v);
+    return [];
+  } catch (e) {
+    return [`${quien} no es JSON válido: ${e.message}`];
+  }
+};
+
 /* ══════════════════════════════ Catálogo ══════════════════════════════ */
 
 export const CARDS = {
@@ -115,6 +212,8 @@ export const CARDS = {
     pill: true,
     solid: true,
     unique: true,
+    chat: false,
+    entrada: true,
     fields: [],
     outputs: () => NEXT,
     summary: () => "",
@@ -127,6 +226,8 @@ export const CARDS = {
     icon: "■",
     desc: "Cierra la conversación.",
     pill: true,
+    chat: false,
+    termina: true,
     fields: [],
     outputs: () => [],
     summary: () => "",
@@ -755,6 +856,736 @@ export const CARDS = {
         },
       }),
     }),
+  },
+
+  /* ═══════════ Automatizaciones: lo que pasa alrededor del mensaje ═══════════
+   *
+   * Ninguna de estas tarjetas envía nada a Meta (salvo «Pregunta y valida», que
+   * manda la pregunta): describen lo que hace el bot entre mensaje y mensaje.
+   * Por eso casi todas devuelven `payload: () => null`.
+   */
+
+  /* ─────────────── Datos y respuestas ─────────────── */
+  ask: {
+    nombre: "Pregunta y valida",
+    cat: "datos",
+    icon: "✅",
+    desc: "Pregunta algo, comprueba que la respuesta tenga el formato correcto y la guarda en una variable.",
+    espera: "texto",
+    fields: [
+      { key: "body", label: "Pregunta", type: "textarea", max: 1024, rows: 3, required: true },
+      {
+        key: "variable",
+        label: "Guardar la respuesta en",
+        type: "text",
+        max: 40,
+        required: true,
+        placeholder: "correo",
+        help: "Luego se usa como {{correo}} en cualquier texto del flujo.",
+      },
+      { key: "regla", label: "La respuesta tiene que ser", type: "select", options: OPCIONES_REGLA, default: "texto" },
+      {
+        key: "min",
+        label: "Mínimo",
+        type: "text",
+        showIf: (p) => reglaUsa(p.regla || "texto", "min"),
+        help: "Admite {{variable}} y expresiones: «año actual - 18», «hoy - 30».",
+      },
+      { key: "max", label: "Máximo", type: "text", showIf: (p) => reglaUsa(p.regla || "texto", "max") },
+      {
+        key: "orden",
+        label: "Cuando la fecha es ambigua",
+        type: "select",
+        options: [
+          { value: "dmy", label: "03/04 es 3 de abril (día/mes)" },
+          { value: "mdy", label: "03/04 es 4 de marzo (mes/día)" },
+        ],
+        default: "dmy",
+        showIf: (p) => reglaUsa(p.regla, "orden"),
+      },
+      {
+        key: "opciones",
+        label: "Opciones válidas",
+        type: "textarea",
+        rows: 4,
+        showIf: (p) => reglaUsa(p.regla, "opciones"),
+        help: "Una por línea. El usuario también puede responder con el número.",
+      },
+      {
+        key: "patron",
+        label: "Expresión regular",
+        type: "text",
+        showIf: (p) => reglaUsa(p.regla, "patron"),
+        placeholder: "^[A-Z]{3}\\d{3}$",
+        help: "Admite {{variable}}: así el formato puede depender de algo capturado antes.",
+      },
+      {
+        key: "error",
+        label: "Qué responder si no vale",
+        type: "textarea",
+        rows: 2,
+        max: 1024,
+        help: "Si lo dejas vacío se usa el aviso propio de la regla.",
+      },
+      { key: "intentos", label: "Intentos antes de rendirse", type: "number", default: "2" },
+      {
+        key: "espera_min",
+        label: "Minutos de espera (0 = sin límite)",
+        type: "number",
+        default: "0",
+        help: "Con más de 0 aparece una salida para cuando el usuario no contesta.",
+      },
+    ],
+    outputs: (p) => [
+      { id: "ok", label: "Válido" },
+      { id: "fail", label: "No válido" },
+      ...(Number(p.espera_min) > 0 ? [{ id: "timeout", label: "Sin respuesta" }] : []),
+    ],
+    summary: (p) => txt(p.body),
+    // Sí es un mensaje real: la pregunta se envía como texto.
+    payload: (p) => (txt(p.body) ? { type: "text", text: { body: txt(p.body) } } : null),
+  },
+
+  vars: {
+    nombre: "Asignar variables",
+    cat: "datos",
+    icon: "🏷",
+    desc: "Guarda, copia o borra valores para usarlos más adelante.",
+    tecnica: true,
+    decide: true,
+    fields: [
+      {
+        key: "asignaciones",
+        label: "Asignaciones",
+        type: "list",
+        min: 1,
+        max: 20,
+        itemLabel: "Variable",
+        item: [
+          { key: "variable", label: "Variable", type: "text", required: true, max: 40 },
+          {
+            key: "origen",
+            label: "Toma el valor de",
+            type: "select",
+            options: [
+              { value: "fijo", label: "un valor fijo" },
+              { value: "respuesta", label: "la última respuesta del usuario" },
+              { value: "borrar", label: "(borrarla)" },
+            ],
+            default: "fijo",
+          },
+          {
+            key: "valor",
+            label: "Valor",
+            type: "text",
+            showIf: (i) => (i.origen || "fijo") === "fijo",
+            help: "Admite {{otra_variable}}.",
+          },
+        ],
+      },
+    ],
+    outputs: () => NEXT,
+    summary: (p) =>
+      (p.asignaciones || []).map((a) => a.variable).filter(Boolean).join(", ") || "Sin asignaciones",
+    payload: () => null,
+  },
+
+  lookup: {
+    nombre: "Buscar en catálogo",
+    cat: "datos",
+    icon: "🔎",
+    desc: "Busca lo que escribió el usuario en una lista larga y distingue si acertó, si hay varios parecidos o si no hay nada.",
+    tecnica: true,
+    decide: true,
+    fields: [
+      { key: "entrada", label: "Texto a buscar", type: "text", required: true, default: "{{respuesta}}" },
+      {
+        key: "items",
+        label: "Catálogo",
+        type: "textarea",
+        rows: 6,
+        required: true,
+        help: "Una opción por línea. Admite {{variable}} si la lista viene de una petición anterior.",
+      },
+      { key: "variable", label: "Guardar lo encontrado en", type: "text", required: true, max: 40 },
+      { key: "candidatos", label: "Guardar los candidatos en", type: "text", max: 40, default: "candidatos" },
+      { key: "umbral", label: "Parecido mínimo (0-100)", type: "number", default: "72" },
+      { key: "max", label: "Máximo de candidatos", type: "number", default: "10" },
+    ],
+    outputs: () => [
+      { id: "unico", label: "Encontrado" },
+      { id: "varios", label: "Varios candidatos" },
+      { id: "ninguno", label: "Sin coincidencia" },
+    ],
+    summary: (p) => `Busca «${txt(p.entrada) || "…"}» en ${listaCorta(p.items)}`,
+    payload: () => null,
+  },
+
+  record: {
+    nombre: "Guardar o leer datos",
+    cat: "datos",
+    icon: "🗄",
+    desc: "Escribe o recupera un registro (un lead, una conversación, un pedido) en tu almacén.",
+    tecnica: true,
+    fields: [
+      {
+        key: "operacion",
+        label: "Operación",
+        type: "select",
+        options: [
+          { value: "guardar", label: "Guardar / actualizar" },
+          { value: "leer", label: "Leer" },
+          { value: "borrar", label: "Borrar" },
+        ],
+        default: "guardar",
+      },
+      { key: "coleccion", label: "Colección", type: "text", required: true, placeholder: "clientes" },
+      { key: "clave", label: "Clave del registro", type: "text", required: true, default: "{{telefono}}" },
+      {
+        key: "campos",
+        label: "Campos",
+        type: "list",
+        itemLabel: "Campo",
+        showIf: (p) => (p.operacion || "guardar") === "guardar",
+        item: [
+          { key: "clave", label: "Campo", type: "text", required: true },
+          { key: "valor", label: "Valor", type: "text", help: "Admite {{variable}}." },
+        ],
+      },
+      {
+        key: "variable",
+        label: "Guardar el registro en",
+        type: "text",
+        max: 40,
+        showIf: (p) => p.operacion === "leer",
+      },
+    ],
+    outputs: (p) =>
+      p.operacion === "leer"
+        ? [
+            { id: "ok", label: "Encontrado" },
+            { id: "vacio", label: "No existe" },
+            { id: "error", label: "Error" },
+          ]
+        : [
+            { id: "ok", label: "Listo" },
+            { id: "error", label: "Error" },
+          ],
+    summary: (p) => `${p.operacion || "guardar"} · ${txt(p.coleccion) || "colección"} · ${txt(p.clave)}`,
+    payload: () => null,
+  },
+
+  /* ─────────────── Lógica ─────────────── */
+  condition: {
+    nombre: "Condición",
+    cat: "logica",
+    icon: "🔀",
+    desc: "Reparte el flujo según el valor de las variables. Cada ruta es una salida.",
+    tecnica: true,
+    decide: true,
+    fields: [
+      {
+        key: "rutas",
+        label: "Rutas",
+        type: "list",
+        min: 1,
+        max: 8,
+        itemLabel: "Ruta",
+        help: "Se evalúan en orden: gana la primera que se cumpla.",
+        item: [
+          { key: "id", label: "ID", type: "text", max: 64, auto: "ruta" },
+          { key: "etiqueta", label: "Nombre de la ruta", type: "text", max: 40, required: true },
+          {
+            key: "modo",
+            label: "Se cumple cuando",
+            type: "select",
+            options: [
+              { value: "todas", label: "se cumplen todas" },
+              { value: "alguna", label: "se cumple alguna" },
+            ],
+            default: "todas",
+          },
+          {
+            key: "condiciones",
+            label: "Condiciones",
+            type: "list",
+            min: 1,
+            max: 6,
+            itemLabel: "Condición",
+            item: [
+              { key: "variable", label: "Variable", type: "text", required: true, placeholder: "tipo_vehiculo" },
+              { key: "operador", label: "Operador", type: "select", options: OPERADORES, default: "igual" },
+              {
+                key: "valor",
+                label: "Valor",
+                type: "text",
+                showIf: (c) => !["vacio", "no_vacio"].includes(c.operador || "igual"),
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    outputs: (p) => [
+      ...(p.rutas || []).map((r, i) => ({ id: r.id || `ruta_${i + 1}`, label: r.etiqueta || `Ruta ${i + 1}` })),
+      { id: "else", label: "Si no" },
+    ],
+    summary: (p) =>
+      (p.rutas || []).map((r) => r.etiqueta).filter(Boolean).join(" · ") || "Sin rutas",
+    payload: () => null,
+  },
+
+  intent: {
+    nombre: "Intención por palabras",
+    cat: "logica",
+    icon: "🧭",
+    desc: "Escucha lo que escribe el usuario y lo manda por la intención que reconozca.",
+    tecnica: true,
+    espera: "texto",
+    fields: [
+      {
+        key: "intenciones",
+        label: "Intenciones",
+        type: "list",
+        min: 1,
+        max: 12,
+        itemLabel: "Intención",
+        item: [
+          { key: "id", label: "ID", type: "text", max: 64, auto: "int" },
+          { key: "etiqueta", label: "Nombre", type: "text", max: 40, required: true, placeholder: "Cotizar" },
+          {
+            key: "palabras",
+            label: "Palabras clave",
+            type: "text",
+            required: true,
+            placeholder: "cotizar, precio, cuánto vale",
+            help: "Separadas por comas. Basta con que aparezca una.",
+          },
+        ],
+      },
+      { key: "variable", label: "Guardar la intención en", type: "text", max: 40, default: "intencion" },
+    ],
+    outputs: (p) => [
+      ...(p.intenciones || []).map((x, i) => ({ id: x.id || `int_${i + 1}`, label: x.etiqueta || `Intención ${i + 1}` })),
+      { id: "sin_coincidencia", label: "No entendí" },
+    ],
+    summary: (p) => (p.intenciones || []).map((x) => x.etiqueta).filter(Boolean).join(" · ") || "Sin intenciones",
+    payload: () => null,
+  },
+
+  commands: {
+    nombre: "Comandos globales",
+    cat: "logica",
+    icon: "⌘",
+    desc: "Palabras que funcionan en cualquier punto de la conversación: menú, reiniciar, hablar con un asesor.",
+    tecnica: true,
+    entrada: true,
+    fields: [
+      {
+        key: "comandos",
+        label: "Comandos",
+        type: "list",
+        min: 1,
+        max: 8,
+        itemLabel: "Comando",
+        help: "Se revisan ANTES que las opciones del paso en el que esté el usuario.",
+        item: [
+          { key: "id", label: "ID", type: "text", max: 64, auto: "cmd" },
+          { key: "etiqueta", label: "Nombre", type: "text", max: 40, required: true, placeholder: "Menú" },
+          {
+            key: "palabras",
+            label: "Palabras clave",
+            type: "text",
+            required: true,
+            placeholder: "menu, inicio, volver",
+          },
+        ],
+      },
+    ],
+    outputs: (p) =>
+      (p.comandos || []).map((c, i) => ({ id: c.id || `cmd_${i + 1}`, label: c.etiqueta || `Comando ${i + 1}` })),
+    summary: (p) => (p.comandos || []).map((c) => c.etiqueta).filter(Boolean).join(" · ") || "Sin comandos",
+    payload: () => null,
+  },
+
+  goto: {
+    nombre: "Ir a un paso",
+    cat: "logica",
+    icon: "↪",
+    desc: "Salta a otro paso del flujo sin dibujar una conexión que cruce todo el lienzo.",
+    tecnica: true,
+    decide: true,
+    termina: true,
+    fields: [
+      {
+        key: "paso",
+        label: "Paso destino",
+        type: "text",
+        required: true,
+        placeholder: "Menú principal",
+        help: "El título del paso (o su id, que aparece al final de este panel).",
+      },
+    ],
+    outputs: () => [],
+    summary: (p) => (txt(p.paso) ? `→ ${txt(p.paso)}` : "Sin destino"),
+    payload: () => null,
+  },
+
+  /* ─────────────── Integraciones ─────────────── */
+  http: {
+    nombre: "Petición HTTP",
+    cat: "integracion",
+    icon: "🌐",
+    desc: "Llama a una API: manda datos, recoge la respuesta y la guarda en variables.",
+    tecnica: true,
+    fields: [
+      {
+        key: "metodo",
+        label: "Método",
+        type: "select",
+        options: ["GET", "POST", "PUT", "PATCH", "DELETE"].map((m) => ({ value: m, label: m })),
+        default: "GET",
+      },
+      {
+        key: "url",
+        label: "URL",
+        type: "text",
+        required: true,
+        placeholder: "https://api.ejemplo.com/clientes/{{documento}}",
+        help: "Admite {{variable}} en cualquier parte.",
+      },
+      claveValor("headers", "Cabeceras", "Cabecera"),
+      claveValor("query", "Parámetros de la URL", "Parámetro"),
+      {
+        key: "cuerpo",
+        label: "Cuerpo (JSON)",
+        type: "textarea",
+        rows: 5,
+        showIf: (p) => (p.metodo || "GET") !== "GET",
+        placeholder: '{ "nombre": "{{nombre}}" }',
+      },
+      {
+        key: "auth",
+        label: "Autenticación",
+        type: "select",
+        options: [
+          { value: "ninguna", label: "Ninguna" },
+          { value: "bearer", label: "Token Bearer" },
+          { value: "basica", label: "Usuario y contraseña" },
+          { value: "apikey", label: "Clave en una cabecera" },
+        ],
+        default: "ninguna",
+      },
+      {
+        key: "auth_valor",
+        label: "Credencial",
+        type: "text",
+        showIf: (p) => p.auth && p.auth !== "ninguna",
+        help: "Guárdala en una variable de entorno y ponla aquí como {{variable}}: este JSON se exporta.",
+      },
+      {
+        key: "auth_header",
+        label: "Nombre de la cabecera",
+        type: "text",
+        default: "X-API-Key",
+        showIf: (p) => p.auth === "apikey",
+      },
+      { key: "timeout", label: "Tiempo máximo (segundos)", type: "number", default: "10" },
+      { key: "reintentos", label: "Reintentos si falla la red", type: "number", default: "0" },
+      MAPEO_FIELD,
+      {
+        key: "ejemplo",
+        label: "Respuesta de ejemplo",
+        type: "textarea",
+        rows: 5,
+        help: "Solo para el simulador: con esto puedes probar el flujo sin llamar de verdad a la API.",
+      },
+    ],
+    outputs: () => [
+      { id: "ok", label: "Éxito" },
+      { id: "error", label: "Error" },
+    ],
+    summary: (p) => `${p.metodo || "GET"} ${txt(p.url) || "sin URL"}`,
+    extraErrors: (p) => [
+      ...urlValida(p.url),
+      ...jsonValido(p.cuerpo, "El cuerpo"),
+      ...jsonValido(p.ejemplo, "La respuesta de ejemplo"),
+    ],
+    payload: () => null,
+  },
+
+  webhook: {
+    nombre: "Esperar webhook",
+    cat: "integracion",
+    icon: "📥",
+    desc: "Deja el flujo en pausa hasta que un sistema externo avise de que ya terminó.",
+    tecnica: true,
+    fields: [
+      { key: "evento", label: "Nombre del evento", type: "text", required: true, placeholder: "cotizacion_lista" },
+      {
+        key: "correlacion",
+        label: "Cómo se reconoce la conversación",
+        type: "text",
+        required: true,
+        default: "{{telefono}}",
+        help: "El sistema externo tiene que devolver este mismo valor para saber a quién responderle.",
+      },
+      MAPEO_FIELD,
+      { key: "espera_min", label: "Minutos de espera", type: "number", default: "15" },
+      { key: "ejemplo", label: "Carga de ejemplo", type: "textarea", rows: 4 },
+    ],
+    outputs: () => [
+      { id: "recibido", label: "Recibido" },
+      { id: "timeout", label: "Se agotó la espera" },
+    ],
+    summary: (p) => `Espera «${txt(p.evento) || "evento"}» ${p.espera_min || 15} min`,
+    extraErrors: (p) => jsonValido(p.ejemplo, "La carga de ejemplo"),
+    payload: () => null,
+  },
+
+  trigger: {
+    nombre: "Disparador externo",
+    cat: "integracion",
+    icon: "⚡",
+    desc: "Empieza el flujo cuando otro sistema llama a un endpoint tuyo, en vez de cuando escribe el usuario.",
+    tecnica: true,
+    entrada: true,
+    fields: [
+      { key: "evento", label: "Nombre del evento", type: "text", required: true, placeholder: "lead_nuevo" },
+      {
+        key: "metodo",
+        label: "Método",
+        type: "select",
+        options: ["POST", "GET"].map((m) => ({ value: m, label: m })),
+        default: "POST",
+      },
+      { key: "ruta", label: "Ruta sugerida", type: "text", default: "/hooks/lead_nuevo" },
+      {
+        key: "verificacion",
+        label: "Cómo se comprueba quién llama",
+        type: "select",
+        options: [
+          { value: "ninguna", label: "Nada (solo para pruebas)" },
+          { value: "token", label: "Token secreto en la URL" },
+          { value: "firma", label: "Firma HMAC del cuerpo" },
+        ],
+        default: "token",
+      },
+      MAPEO_FIELD,
+    ],
+    outputs: () => NEXT,
+    summary: (p) => `${p.metodo || "POST"} ${txt(p.ruta) || "/hook"}`,
+    payload: () => null,
+  },
+
+  poll: {
+    nombre: "Sondear resultado",
+    cat: "integracion",
+    icon: "🔁",
+    desc: "Pregunta cada cierto tiempo hasta que el resultado esté listo. Para cuando el aviso por webhook no es de fiar.",
+    tecnica: true,
+    fields: [
+      { key: "url", label: "Qué se consulta", type: "text", required: true, placeholder: "https://api.ejemplo.com/tareas/{{id}}" },
+      { key: "intervalo", label: "Cada cuántos segundos", type: "number", default: "60" },
+      { key: "intentos", label: "Cuántas veces como máximo", type: "number", default: "5" },
+      {
+        key: "hasta",
+        label: "Se considera listo cuando",
+        type: "select",
+        options: [
+          { value: "respuesta", label: "haya respuesta" },
+          { value: "estable", label: "el resultado deje de cambiar" },
+          { value: "condicion", label: "se cumpla una condición" },
+        ],
+        default: "respuesta",
+      },
+      {
+        key: "condicion",
+        label: "Condición",
+        type: "text",
+        showIf: (p) => p.hasta === "condicion",
+        placeholder: "estado == listo",
+      },
+      MAPEO_FIELD,
+    ],
+    outputs: () => [
+      { id: "listo", label: "Listo" },
+      { id: "agotado", label: "Se agotaron los intentos" },
+    ],
+    summary: (p) => `Cada ${p.intervalo || 60}s · hasta ${p.intentos || 5} veces`,
+    extraErrors: (p) => urlValida(p.url),
+    payload: () => null,
+  },
+
+  /* ─────────────── Tiempo ─────────────── */
+  delay: {
+    nombre: "Esperar",
+    cat: "tiempo",
+    icon: "⏳",
+    desc: "Una pausa antes del siguiente paso, para que el bot no conteste de golpe.",
+    tecnica: true,
+    fields: [
+      { key: "cantidad", label: "Cuánto", type: "number", default: "3" },
+      {
+        key: "unidad",
+        label: "Unidad",
+        type: "select",
+        options: [
+          { value: "segundos", label: "segundos" },
+          { value: "minutos", label: "minutos" },
+          { value: "horas", label: "horas" },
+        ],
+        default: "segundos",
+      },
+      { key: "motivo", label: "Motivo (nota para ti)", type: "text", max: 80 },
+    ],
+    outputs: () => NEXT,
+    summary: (p) => `${p.cantidad || 3} ${p.unidad || "segundos"}`,
+    payload: () => null,
+  },
+
+  schedule: {
+    nombre: "Programar recordatorio",
+    cat: "tiempo",
+    icon: "🔔",
+    desc: "Deja programados uno o varios mensajes de seguimiento y sigue con la conversación.",
+    tecnica: true,
+    fields: [
+      {
+        key: "envios",
+        label: "Recordatorios",
+        type: "list",
+        min: 1,
+        max: 5,
+        itemLabel: "Recordatorio",
+        item: [
+          { key: "cantidad", label: "Dentro de", type: "number", default: "2" },
+          {
+            key: "unidad",
+            label: "Unidad",
+            type: "select",
+            options: [
+              { value: "minutos", label: "minutos" },
+              { value: "horas", label: "horas" },
+              { value: "dias", label: "días" },
+            ],
+            default: "horas",
+          },
+          {
+            key: "plantilla",
+            label: "Plantilla de Meta",
+            type: "text",
+            help: "Fuera de las 24 h desde el último mensaje del usuario, Meta SOLO deja enviar plantillas aprobadas.",
+          },
+          { key: "texto", label: "Texto (dentro de las 24 h)", type: "textarea", rows: 2, max: 1024 },
+        ],
+      },
+      { key: "horario", label: "Enviar solo en horario de atención", type: "boolean", default: true },
+      { key: "zona", label: "Zona horaria", type: "text", default: "America/Bogota", showIf: (p) => p.horario },
+      { key: "apertura", label: "Desde", type: "text", default: "08:00", showIf: (p) => p.horario },
+      { key: "cierre", label: "Hasta", type: "text", default: "17:00", showIf: (p) => p.horario },
+      {
+        key: "cancelar",
+        label: "Cancelar si",
+        type: "text",
+        placeholder: "el usuario responde",
+        help: "Sin esto, los recordatorios siguen saliendo aunque la conversación haya avanzado.",
+      },
+    ],
+    outputs: () => [
+      { id: "sigue", label: "Sigue el flujo" },
+      { id: "al_vencer", label: "Al vencer el plazo" },
+    ],
+    summary: (p) => `${(p.envios || []).length} recordatorio(s)${p.horario ? " · en horario" : ""}`,
+    payload: () => null,
+  },
+
+  hours: {
+    nombre: "Horario de atención",
+    cat: "tiempo",
+    icon: "🕗",
+    desc: "Separa lo que pasa dentro del horario de lo que pasa fuera.",
+    tecnica: true,
+    decide: true,
+    fields: [
+      { key: "zona", label: "Zona horaria", type: "text", default: "America/Bogota" },
+      {
+        key: "dias",
+        label: "Días",
+        type: "select",
+        options: [
+          { value: "lv", label: "De lunes a viernes" },
+          { value: "ls", label: "De lunes a sábado" },
+          { value: "todos", label: "Todos los días" },
+          { value: "otro", label: "Otros…" },
+        ],
+        default: "lv",
+      },
+      {
+        key: "dias_otros",
+        label: "Qué días",
+        type: "text",
+        default: "L,M,X,J,V",
+        showIf: (p) => p.dias === "otro",
+        help: "Iniciales separadas por comas: L,M,X,J,V,S,D.",
+      },
+      { key: "apertura", label: "Abre a las", type: "text", default: "08:00" },
+      { key: "cierre", label: "Cierra a las", type: "text", default: "17:00" },
+      { key: "festivos", label: "Festivos", type: "textarea", rows: 3, help: "Una fecha por línea (AAAA-MM-DD)." },
+    ],
+    outputs: () => [
+      { id: "abierto", label: "Abierto" },
+      { id: "cerrado", label: "Cerrado" },
+    ],
+    summary: (p) => `${p.apertura || "08:00"}–${p.cierre || "17:00"} · ${DIAS_TEXTO[p.dias || "lv"] || "otros"}`,
+    payload: () => null,
+  },
+
+  /* ─────────────── Personas ─────────────── */
+  handoff: {
+    nombre: "Pasar a un asesor",
+    cat: "personas",
+    icon: "🙋",
+    desc: "Saca la conversación del bot y se la entrega a una persona, con el contexto ya recogido.",
+    tecnica: true,
+    fields: [
+      { key: "equipo", label: "Equipo o especialidad", type: "text", placeholder: "cotizaciones" },
+      {
+        key: "prioridad",
+        label: "Prioridad",
+        type: "select",
+        options: [
+          { value: "normal", label: "Normal" },
+          { value: "alta", label: "Alta" },
+          { value: "baja", label: "Baja" },
+        ],
+        default: "normal",
+      },
+      {
+        key: "modo",
+        label: "Cómo se entrega",
+        type: "select",
+        options: [
+          { value: "enlace", label: "El cliente escribe al asesor (enlace wa.me)" },
+          { value: "notificar", label: "Se avisa al equipo" },
+          { value: "asignar", label: "Se asigna en el CRM" },
+        ],
+        default: "enlace",
+      },
+      { key: "destino", label: "Número o destino", type: "text", placeholder: "573001234567" },
+      {
+        key: "contexto",
+        label: "Contexto para el asesor",
+        type: "textarea",
+        rows: 4,
+        default: "Cliente: {{nombre}}\nTeléfono: {{telefono}}\nMotivo: {{motivo}}",
+        help: "Admite {{variable}}: es el mensaje que llega precargado.",
+      },
+      { key: "referencia", label: "Referencia", type: "text", default: "{{conversacion}}" },
+    ],
+    outputs: () => NEXT,
+    summary: (p) => `${txt(p.equipo) || "asesor"} · ${p.prioridad || "normal"}`,
+    payload: () => null,
   },
 };
 

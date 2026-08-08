@@ -1,6 +1,6 @@
 import { memo, useContext } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { GRUPOS } from "../flow/willyFlow";
+import { GRUPOS } from "../flow/seedFlow";
 import { SimContext } from "../sim/SimContext";
 
 /**
@@ -16,21 +16,21 @@ function FlowNode({ id, data, selected }) {
 
   return (
     <div
-      className={`wnode ${selected ? "wnode--selected" : ""} ${active ? "wnode--active" : ""}`}
+      className={`fnode ${selected ? "fnode--selected" : ""} ${active ? "fnode--active" : ""}`}
       style={{ "--accent": color }}
     >
-      <Handle type="target" position={Position.Top} className="wnode__handle" />
+      <Handle type="target" position={Position.Top} className="fnode__handle" />
 
-      <div className="wnode__bar" style={{ background: color }}>
-        <span className="wnode__group">{grupo.nombre}</span>
+      <div className="fnode__bar" style={{ background: color }}>
+        <span className="fnode__group">{grupo.nombre}</span>
       </div>
 
-      <div className="wnode__body">
-        <div className="wnode__title">{data.title}</div>
-        {data.text ? <div className="wnode__text">{data.text}</div> : null}
+      <div className="fnode__body">
+        <div className="fnode__title">{data.title}</div>
+        {data.text ? <div className="fnode__text">{data.text}</div> : null}
       </div>
 
-      <Handle type="source" position={Position.Bottom} className="wnode__handle" />
+      <Handle type="source" position={Position.Bottom} className="fnode__handle" />
     </div>
   );
 }

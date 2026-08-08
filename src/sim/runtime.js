@@ -1,5 +1,5 @@
 /*
- * Runtime de Willy Studio: interpreta el flujo (nodes + edges de React Flow) como
+ * Runtime de ChatBot Creator: interpreta el flujo (nodes + edges de React Flow) como
  * una máquina de estados y lo "camina" según lo que responde el usuario.
  *
  * Reglas de interpretación (genéricas, sin metadatos extra en los nodos):

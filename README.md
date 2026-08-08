@@ -8,8 +8,9 @@ flujo que diseñaste.
 Stack: **React + React Flow** (Vite). **Todo corre en Docker** — no se instala nada
 (Node, npm, dependencias) en tu Mac.
 
-> Nace del chatbot **Willy** (WGT Seguros): su flujo viene cargado como ejemplo semilla
-> (`src/flow/willyFlow.js`), pero la plataforma es genérica y sirve para cualquier bot.
+> La plataforma es **genérica**: sirve para cualquier bot. Trae un flujo de ejemplo
+> (`src/flow/seedFlow.js`) para que el lienzo no arranque vacío; puedes borrarlo o
+> reemplazarlo por el tuyo.
 
 ## Cómo correrlo (localhost)
 
@@ -51,7 +52,7 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
 | `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
 | `src/components/Simulator.jsx` | Panel de chat que ejecuta el flujo. |
 | `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
-| `src/flow/willyFlow.js` | Flujo **semilla** de ejemplo (mapa del bot Willy). |
+| `src/flow/seedFlow.js` | Flujo **semilla** de ejemplo + tipos de paso (`GRUPOS`). |
 | `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |
 
 ## Roadmap

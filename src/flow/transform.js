@@ -1,5 +1,5 @@
 import dagre from "dagre";
-import { flujoData } from "./willyFlow";
+import { flujoData } from "./seedFlow";
 
 export const NODE_W = 250;
 export const NODE_H = 108;
@@ -38,13 +38,13 @@ function edgeStyle(dashes) {
   };
 }
 
-/** Convierte el flujo-semilla (willyFlow) al formato de React Flow, ya organizado. */
+/** Convierte el flujo-semilla (seedFlow) al formato de React Flow, ya organizado. */
 export function buildInitialFlow(dir = "TB") {
   const nodes = flujoData.nodes.map((n) => {
     const [title, ...rest] = n.label.split("\n");
     return {
       id: n.id,
-      type: "willy",
+      type: "card",
       position: { x: 0, y: 0 },
       data: { title, text: rest.join("\n"), group: n.group },
     };

@@ -17,12 +17,12 @@ import Inspector from "./components/Inspector";
 import Toolbar from "./components/Toolbar";
 import Simulator from "./components/Simulator";
 import { SimContext } from "./sim/SimContext";
-import { GRUPOS } from "./flow/willyFlow";
+import { GRUPOS } from "./flow/seedFlow";
 import { autoLayout, buildInitialFlow, makeEdge, NODE_H, NODE_W } from "./flow/transform";
 import "./App.css";
 
-const STORAGE_KEY = "willy-studio-flow-v1";
-const nodeTypes = { willy: FlowNode };
+const STORAGE_KEY = "chatbot-creator-flow-v1";
+const nodeTypes = { card: FlowNode };
 
 function loadFromStorage() {
   try {
@@ -89,14 +89,14 @@ function Studio() {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-      const group = event.dataTransfer.getData("application/willy-node");
+      const group = event.dataTransfer.getData("application/chatbot-node");
       if (!group || !GRUPOS[group]) return;
       const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const id = `n_${Date.now()}`;
       setNodes((nds) =>
         nds.concat({
           id,
-          type: "willy",
+          type: "card",
           position,
           data: { title: "Nuevo paso", text: "", group },
         }),
@@ -154,7 +154,7 @@ function Studio() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "willy-flujo.json";
+    a.download = "flujo.json";
     a.click();
     URL.revokeObjectURL(url);
   }, [nodes, edges]);
@@ -185,7 +185,7 @@ function Studio() {
   );
 
   const handleReset = useCallback(() => {
-    if (!confirm("¿Volver al flujo original de Willy? Se perderán tus cambios.")) return;
+    if (!confirm("¿Volver al flujo de ejemplo? Se perderán tus cambios.")) return;
     const fresh = buildInitialFlow();
     setNodes(fresh.nodes);
     setEdges(fresh.edges);

@@ -1,4 +1,4 @@
-# Willy Studio — imagen de desarrollo. Todo (Node, npm, dependencias) vive dentro
+# ChatBot Creator — imagen de desarrollo. Todo (Node, npm, dependencias) vive dentro
 # del contenedor; nada se instala en la máquina del usuario.
 FROM node:20-alpine
 

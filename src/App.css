@@ -74,7 +74,7 @@
 .react-flow__attribution { display: none; }
 
 /* ── Nodo (tarjeta tipo Botpress) ── */
-.wnode {
+.fnode {
   width: 250px;
   background: #fff;
   border: 1px solid var(--border);
@@ -83,34 +83,34 @@
   overflow: hidden;
   transition: box-shadow .12s, border-color .12s;
 }
-.wnode--selected {
+.fnode--selected {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent), 0 6px 18px rgba(15,23,42,.12);
 }
-.wnode--active {
+.fnode--active {
   border-color: #16a34a;
-  animation: wnode-pulse 1.3s ease-in-out infinite;
+  animation: fnode-pulse 1.3s ease-in-out infinite;
 }
-@keyframes wnode-pulse {
+@keyframes fnode-pulse {
   0%, 100% { box-shadow: 0 0 0 3px rgba(22,163,74,.55), 0 6px 18px rgba(15,23,42,.14); }
   50% { box-shadow: 0 0 0 7px rgba(22,163,74,.12), 0 6px 18px rgba(15,23,42,.14); }
 }
-.wnode__bar {
+.fnode__bar {
   height: 26px; display: flex; align-items: center; padding: 0 10px;
 }
-.wnode__group {
+.fnode__group {
   font-size: 10.5px; font-weight: 700; color: #fff;
   text-transform: uppercase; letter-spacing: .04em;
   text-shadow: 0 1px 1px rgba(0,0,0,.15);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.wnode__body { padding: 10px 12px 12px; }
-.wnode__title { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.25; }
-.wnode__text {
+.fnode__body { padding: 10px 12px 12px; }
+.fnode__title { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.25; }
+.fnode__text {
   margin-top: 6px; font-size: 11.5px; color: var(--muted); line-height: 1.45;
   white-space: pre-line;
 }
-.wnode__handle {
+.fnode__handle {
   width: 10px; height: 10px; background: #fff;
   border: 2px solid var(--accent);
 }

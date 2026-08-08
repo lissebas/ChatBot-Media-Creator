@@ -1,4 +1,4 @@
-import { GRUPOS } from "../flow/willyFlow";
+import { GRUPOS } from "../flow/seedFlow";
 
 /**
  * Panel derecho: edita el nodo o la arista seleccionada.

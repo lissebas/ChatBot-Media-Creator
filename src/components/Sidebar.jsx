@@ -1,4 +1,4 @@
-import { GRUPOS } from "../flow/willyFlow";
+import { GRUPOS } from "../flow/seedFlow";
 
 /**
  * Paleta lateral: cada "tipo" (grupo) se puede arrastrar al lienzo para crear un
@@ -7,7 +7,7 @@ import { GRUPOS } from "../flow/willyFlow";
  */
 export default function Sidebar() {
   const onDragStart = (event, group) => {
-    event.dataTransfer.setData("application/willy-node", group);
+    event.dataTransfer.setData("application/chatbot-node", group);
     event.dataTransfer.effectAllowed = "move";
   };
 

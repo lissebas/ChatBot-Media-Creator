@@ -7,10 +7,10 @@ export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, 
   return (
     <header className="toolbar">
       <div className="toolbar__brand">
-        <span className="toolbar__logo">W</span>
+        <span className="toolbar__logo">C</span>
         <div>
-          <div className="toolbar__name">Willy Studio</div>
-          <div className="toolbar__sub">Constructor de flujos · WGT Seguros</div>
+          <div className="toolbar__name">ChatBot Creator</div>
+          <div className="toolbar__sub">Constructor visual de flujos conversacionales</div>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export default function Toolbar({ onSave, onLoad, onAutoLayout, onFit, onReset, 
           />
         </label>
         <span className="toolbar__sep" />
-        <button className="btn btn--ghost" onClick={onReset} title="Volver al flujo original de Willy">
+        <button className="btn btn--ghost" onClick={onReset} title="Volver al flujo de ejemplo">
           Reiniciar
         </button>
         <span className="toolbar__saved">{saved}</span>

@@ -530,7 +530,12 @@ export const CARDS = {
       ...HEADER_FIELDS,
       { key: "body", label: "Cuerpo", type: "textarea", max: 1024, required: true, rows: 4 },
       FOOTER_FIELD,
-      { key: "flow_id", label: "Flow ID", type: "text", help: "Usa Flow ID o Flow name: basta con uno." },
+      {
+        key: "flow_id",
+        label: "Flow ID",
+        type: "text",
+        help: "El que te da Meta al publicar el formulario. Basta con el ID o el name.",
+      },
       { key: "flow_name", label: "Flow name", type: "text" },
       { key: "flow_cta", label: "Texto del botón", type: "text", max: 20, required: true },
       {
@@ -549,13 +554,22 @@ export const CARDS = {
         type: "text",
         showIf: (p) => (p.flow_action || "navigate") === "navigate",
         required: true,
+        help: "Si diseñas el formulario aquí abajo, se rellena con su primera pantalla.",
       },
       { key: "flow_token", label: "Flow token", type: "text", help: "Opcional; por defecto «unused»." },
     ],
     outputs: () => [{ id: "next", label: "Flow completado" }],
     summary: (p) => txt(p.body),
+    /** La tarjeta guarda el diseño del formulario en `flowjson`. */
+    pantallas: (p) => p.flowjson?.pantallas || [],
     extraErrors: (p) =>
-      !txt(p.flow_id) && !txt(p.flow_name) ? ["Indica el Flow ID o el Flow name."] : [],
+      !txt(p.flow_id) && !txt(p.flow_name)
+        ? [
+            (p.flowjson?.pantallas || []).length
+              ? "Publica el formulario en Meta y pega aquí su Flow ID."
+              : "Indica el Flow ID o el Flow name.",
+          ]
+        : [],
     payload: (p) => ({
       type: "interactive",
       interactive: clean({
@@ -572,9 +586,11 @@ export const CARDS = {
             flow_name: txt(p.flow_name) || undefined,
             flow_cta: txt(p.flow_cta),
             flow_action: p.flow_action || "navigate",
+            // Si el formulario se diseñó en la tarjeta, su primera pantalla es la inicial.
             flow_action_payload:
-              (p.flow_action || "navigate") === "navigate" && txt(p.screen)
-                ? { screen: txt(p.screen) }
+              (p.flow_action || "navigate") === "navigate" &&
+              (txt(p.screen) || p.flowjson?.pantallas?.[0]?.id)
+                ? { screen: txt(p.screen) || p.flowjson.pantallas[0].id }
                 : undefined,
           }),
         },

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import WhatsAppMessage from "./WhatsAppMessage";
+import FlowScreen from "./FlowScreen";
 
 /**
  * Vista previa de la tarjeta que se está editando, con el aspecto real de
@@ -8,7 +9,9 @@ import WhatsAppMessage from "./WhatsAppMessage";
  */
 export default function CardPreview({ card, props }) {
   const [verLista, setVerLista] = useState(false);
+  const [verForm, setVerForm] = useState(false);
   const secciones = props?.sections || [];
+  const pantallas = props?.flowjson?.pantallas || [];
 
   return (
     <div className="preview">
@@ -24,6 +27,7 @@ export default function CardPreview({ card, props }) {
           time="10:30"
           onAction={(id) => {
             if (id === "__list__") setVerLista((v) => !v);
+            if (card === "flow" && id === "next" && pantallas.length) setVerForm((v) => !v);
           }}
         />
 
@@ -53,7 +57,26 @@ export default function CardPreview({ card, props }) {
             </div>
           </div>
         ) : null}
+        {card === "flow" && verForm && pantallas.length ? (
+          <div className="preview__form">
+            <FlowScreen
+              pantalla={pantallas[0]}
+              seleccion={null}
+              onSelect={() => {}}
+              onMover={() => {}}
+              onBorrar={() => {}}
+              marca="Gestionado por tu negocio"
+            />
+          </div>
+        ) : null}
       </div>
+
+      {card === "flow" && pantallas.length ? (
+        <p className="preview__formato">
+          Toca «{props.flow_cta || "el botón"}» en la vista previa para ver el formulario
+          ({pantallas.length} pantalla{pantallas.length === 1 ? "" : "s"}).
+        </p>
+      ) : null}
 
       <p className="preview__formato">
         Formato de WhatsApp: <code>*negrita*</code> <code>_cursiva_</code>{" "}

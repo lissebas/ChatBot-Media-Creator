@@ -618,7 +618,28 @@ for (const n of nodes) {
     const { width } = nodeSize(n);
     if (entrada.x < n.position.x || entrada.x > n.position.x + width) fail(`render: ancla fuera de ${n.id}`);
   }
-  console.log(`Render: SVG de ${(svg.length / 1024).toFixed(0)} KB para ${nodes.length} nodos · LOD y omitir funcionan`);
+  // Una conexión que se va MUY lejos de la región no puede dibujarse entera: el
+  // rasterizador aborta con geometría a miles de píxeles de la vista (pasó de
+  // verdad con un flujo de 94 pasos). Los extremos se recortan al área visible.
+  {
+    const lejano = {
+      nodes: [
+        { ...nodes[0], id: "arriba", position: { x: 0, y: 0 } },
+        { ...nodes[1], id: "abajo", position: { x: 40, y: 60000 } },
+      ],
+      edges: [{ id: "larga", source: "arriba", target: "abajo", sourceHandle: "next" }],
+    };
+    const vista = { x: -100, y: -100, w: 600, h: 600 };
+    const trozo = svgDeRegion(lejano, { region: vista, zoom: 1 });
+    const coordenadas = [...trozo.matchAll(/<path d="M ([^"]+)"/g)]
+      .flatMap((m) => m[1].split(/[^\d.-]+/))
+      .map(Number)
+      .filter(Number.isFinite);
+    const tope = vista.y + vista.h + 1000;
+    const fuera = coordenadas.filter((v) => v > tope);
+    if (fuera.length) fail(`render: el trazo llega a ${Math.max(...fuera)} px, muy lejos de la vista (tope ${tope})`);
+  }
+  console.log(`Render: SVG de ${(svg.length / 1024).toFixed(0)} KB para ${nodes.length} nodos · LOD, omitir y recorte de trazos`);
 }
 
 // Aristas ligeras: solo cambia el dibujo, nunca los datos que se guardan.

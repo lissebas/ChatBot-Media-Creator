@@ -13,8 +13,10 @@ function autoId(prefix) {
  * values  → objeto con los valores de este nivel.
  * onChange→ recibe el objeto completo del nivel, ya actualizado.
  * errors  → { "ruta.campo": "mensaje" }; `path` es el prefijo de este nivel.
+ * ctx     → contexto para los campos cuyas opciones dependen del documento
+ *           (p. ej. la lista de pantallas de un Flow).
  */
-export default function FieldForm({ fields, values, onChange, errors = {}, path = "" }) {
+export default function FieldForm({ fields, values, onChange, errors = {}, path = "", ctx }) {
   const set = (key, value) => onChange({ ...values, [key]: value });
 
   return (
@@ -88,6 +90,7 @@ export default function FieldForm({ fields, values, onChange, errors = {}, path 
                     fields={f.item}
                     values={item}
                     errors={errors}
+                    ctx={ctx}
                     path={`${id}[${i}].`}
                     onChange={(next) => set(f.key, items.map((it, j) => (j === i ? next : it)))}
                   />
@@ -119,11 +122,16 @@ export default function FieldForm({ fields, values, onChange, errors = {}, path 
         }
 
         if (f.type === "select") {
+          // Las opciones pueden depender del documento (p. ej. las pantallas de un Flow).
+          const opciones = typeof f.options === "function" ? f.options(ctx) : f.options;
           return (
             <label className="field" key={f.key}>
               <span className="field__label">{f.label}</span>
               <select value={value ?? f.default ?? ""} onChange={(e) => set(f.key, e.target.value)}>
-                {f.options.map((o) => (
+                {opciones.some((o) => o.value === (value ?? f.default ?? "")) ? null : (
+                  <option value="">{opciones.length ? "— elegir —" : "— sin opciones —"}</option>
+                )}
+                {opciones.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>

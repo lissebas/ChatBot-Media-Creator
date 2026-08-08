@@ -126,6 +126,29 @@ así que el simulador sabe exactamente a qué paso lleva cada opción.
 
 Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/).
 
+## Formularios nativos: editor de Flow JSON
+
+Un **WhatsApp Flow** es el formulario que se abre *dentro* del chat (el que lleva
+el pie «Managed by …»). No viaja en el mensaje: se publica aparte en Meta y la
+tarjeta **Flow** solo lo invoca por `flow_id`. Por eso tiene su propio editor.
+
+- **Pantallas** con su `id`, título y marca de pantalla final (`terminal`).
+- **14 componentes**: título, subtítulo, párrafo, nota, enlace, imagen; campo de
+  texto y campo largo; opción única, opción múltiple, desplegable, fecha y
+  casilla de aceptación; y el botón de pie.
+- **Vista previa** con el aspecto de la hoja nativa: seleccionas un componente
+  tocándolo y lo reordenas ahí mismo.
+- **Encadenado de datos automático**: lo que se captura en una pantalla viaja en
+  el `payload` del `navigate`, se declara en el `data` de la siguiente y vuelve
+  entero en el `complete` — que es lo que Meta exige para que el Flow compile.
+- **Validación local** de lo que Meta rechazaría: ids en MAYÚSCULAS, nombres de
+  campo repetidos, pie ausente o que no va al final, destinos de navegación
+  inexistentes, `complete` en una pantalla no terminal, límites de caracteres y
+  topes por pantalla (50 componentes, 3 imágenes, 2 enlaces).
+- **Exportar / copiar** el Flow JSON listo para pegar en el Flow Builder de Meta.
+
+Versión de Flow JSON por defecto: **7.3** (editable por formulario).
+
 ## Flujos de ejemplo
 
 `examples/` **no se versiona** (está en `.gitignore`): los flujos se generan en
@@ -147,7 +170,10 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/App.jsx` | Portada + editor: lienzo, drag&drop, edición, guardar/cargar, simulador. |
 | `src/components/Home.jsx` | Portada: tus flujos y lo que viene. |
 | `src/components/Modal.jsx` | Diálogos de la app (confirmar, renombrar). |
-| `src/flow/workspace.js` | Los flujos guardados en el navegador. |
+| `src/flow/workspace.js` | Los flujos y formularios guardados en el navegador. |
+| `src/flow/flowJson.js` | **Catálogo de componentes de Flows**: campos, límites y Flow JSON. |
+| `src/components/FlowEditor.jsx` | Editor de formularios nativos (pantallas + componentes). |
+| `src/components/FlowScreen.jsx` | Vista previa de una pantalla de Flow. |
 | `src/components/FlowNode.jsx` | Nodo del lienzo: tarjeta o cápsula (Inicio / Fin). |
 | `src/components/{Sidebar,Inspector,Toolbar}.jsx` | Paleta, editor de selección, barra. |
 | `src/components/ContextMenu.jsx` | Menú de clic derecho (lienzo, nodo, conexión). |

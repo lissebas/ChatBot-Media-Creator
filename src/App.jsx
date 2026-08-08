@@ -30,14 +30,17 @@ import {
   NODE_W,
 } from "./flow/transform";
 import {
-  borrarFlujo,
+  borrarDoc,
   cargarEspacio,
   crearFlujo,
-  duplicarFlujo,
+  crearFormulario,
+  duplicarDoc,
+  guardarDoc,
   guardarEspacio,
-  guardarFlujo,
-  renombrarFlujo,
+  renombrarDoc,
 } from "./flow/workspace";
+import FlowEditor from "./components/FlowEditor";
+import { flujoNuevo } from "./flow/flowJson";
 import "./App.css";
 
 const nodeTypes = { card: FlowNode };
@@ -423,14 +426,13 @@ function Studio({ flujo, onChange, onRename, onHome }) {
 
 export default function App() {
   const [espacio, setEspacio] = useState(cargarEspacio);
-  const [abiertoId, setAbiertoId] = useState(null);
+  const [abierto, setAbierto] = useState(null); // { tipo, id }
 
   useEffect(() => guardarEspacio(espacio), [espacio]);
 
-  const abrirNuevo = useCallback((nombre, contenido) => {
-    const nuevo = crearFlujo(nombre, contenido);
-    setEspacio((e) => ({ ...e, ultimo: nuevo.id, flujos: [nuevo, ...e.flujos] }));
-    setAbiertoId(nuevo.id);
+  const abrirNuevo = useCallback((tipo, doc) => {
+    setEspacio((e) => ({ ...e, ultimo: doc.id, [tipo]: [doc, ...(e[tipo] || [])] }));
+    setAbierto({ tipo, id: doc.id });
   }, []);
 
   const importar = useCallback(
@@ -445,7 +447,7 @@ export default function App() {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
             return;
           }
-          abrirNuevo(file.name.replace(/\.json$/i, ""), migrateFlow(data));
+          abrirNuevo("flujos", crearFlujo(file.name.replace(/\.json$/i, ""), migrateFlow(data)));
         } catch {
           alert("No se pudo leer el JSON.");
         }
@@ -456,29 +458,63 @@ export default function App() {
     [abrirNuevo],
   );
 
-  const flujo = espacio.flujos.find((f) => f.id === abiertoId) || null;
+  const doc = abierto ? (espacio[abierto.tipo] || []).find((d) => d.id === abierto.id) : null;
 
   const guardarContenido = useCallback(
-    (nodes, edges) =>
+    (patch) => {
+      if (!abierto) return;
       setEspacio((e) => {
-        const actual = e.flujos.find((f) => f.id === abiertoId);
+        const actual = (e[abierto.tipo] || []).find((d) => d.id === abierto.id);
         if (!actual) return e;
-        return guardarFlujo(e, { ...actual, nodes, edges });
-      }),
-    [abiertoId],
+        return guardarDoc(e, abierto.tipo, { ...actual, ...patch });
+      });
+    },
+    [abierto],
   );
 
-  if (!flujo) {
+  // Identidades estables: los editores autoguardan en un efecto que depende de
+  // ellas; si cambiaran en cada render, el guardado se repetiría sin parar.
+  const guardarLienzo = useCallback(
+    (nodes, edges) => guardarContenido({ nodes, edges }),
+    [guardarContenido],
+  );
+  const guardarPantallas = useCallback(
+    (flow) => guardarContenido({ version: flow.version, pantallas: flow.pantallas }),
+    [guardarContenido],
+  );
+  const renombrar = useCallback(
+    (nombre) => abierto && setEspacio((e) => renombrarDoc(e, abierto.tipo, abierto.id, nombre)),
+    [abierto],
+  );
+
+  if (!doc) {
     return (
       <Home
         flujos={espacio.flujos}
-        onAbrir={setAbiertoId}
-        onNuevo={() => abrirNuevo("Flujo sin título", { nodes: [], edges: [] })}
-        onEjemplo={() => abrirNuevo("Flujo de ejemplo", buildInitialFlow())}
+        formularios={espacio.formularios}
+        onAbrir={(id) => setAbierto({ tipo: "flujos", id })}
+        onAbrirFormulario={(id) => setAbierto({ tipo: "formularios", id })}
+        onNuevo={() => abrirNuevo("flujos", crearFlujo("Flujo sin título"))}
+        onNuevoFormulario={() =>
+          abrirNuevo("formularios", crearFormulario("Formulario sin título", flujoNuevo()))
+        }
+        onEjemplo={() => abrirNuevo("flujos", crearFlujo("Flujo de ejemplo", buildInitialFlow()))}
         onImportar={importar}
-        onDuplicar={(id) => setEspacio((e) => duplicarFlujo(e, id))}
-        onBorrar={(id) => setEspacio((e) => borrarFlujo(e, id))}
-        onRenombrar={(id, nombre) => setEspacio((e) => renombrarFlujo(e, id, nombre))}
+        onDuplicar={(tipo, id) => setEspacio((e) => duplicarDoc(e, tipo, id))}
+        onBorrar={(tipo, id) => setEspacio((e) => borrarDoc(e, tipo, id))}
+        onRenombrar={(tipo, id, nombre) => setEspacio((e) => renombrarDoc(e, tipo, id, nombre))}
+      />
+    );
+  }
+
+  if (abierto.tipo === "formularios") {
+    return (
+      <FlowEditor
+        key={doc.id}
+        formulario={doc}
+        onChange={guardarPantallas}
+        onRename={renombrar}
+        onHome={() => setAbierto(null)}
       />
     );
   }
@@ -486,11 +522,11 @@ export default function App() {
   return (
     <ReactFlowProvider>
       <Studio
-        key={flujo.id}
-        flujo={flujo}
-        onChange={guardarContenido}
-        onRename={(nombre) => setEspacio((e) => renombrarFlujo(e, flujo.id, nombre))}
-        onHome={() => setAbiertoId(null)}
+        key={doc.id}
+        flujo={doc}
+        onChange={guardarLienzo}
+        onRename={renombrar}
+        onHome={() => setAbierto(null)}
       />
     </ReactFlowProvider>
   );

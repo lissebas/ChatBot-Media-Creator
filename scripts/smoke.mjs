@@ -14,6 +14,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { buildInitialFlow } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
+import {
+  COMPONENTES,
+  VERSION_FLOW,
+  construirFlowJson,
+  flujoNuevo,
+  componenteCon,
+  validarFlow,
+} from "../src/flow/flowJson.js";
 
 let fallos = 0;
 const fail = (m) => { console.log("  ✗", m); fallos++; };
@@ -72,6 +80,63 @@ for (const [entrada, esperado, debe] of casos) {
 }
 if (sinFormato("*a* _b_ ~c~") !== "a b c") fail("sinFormato no limpia los marcadores");
 console.log(`Formato: ${casos.length} casos`);
+
+// ── WhatsApp Flows: el Flow JSON que se exporta debe ser publicable ──
+{
+  const uno = flujoNuevo();
+  const j1 = construirFlowJson(uno);
+  if (j1.version !== VERSION_FLOW) fail(`flow: versión ${j1.version}`);
+  if (j1.screens[0].layout?.type !== "SingleColumnLayout") fail("flow: falta SingleColumnLayout");
+  const pie1 = j1.screens[0].layout.children.at(-1);
+  if (pie1.type !== "Footer" || pie1["on-click-action"]?.name !== "complete") {
+    fail("flow: el pie de la pantalla final debería ser complete");
+  }
+  if (pie1["on-click-action"].payload?.nombre !== "${form.nombre}") {
+    fail("flow: complete no devuelve los campos de la pantalla");
+  }
+  if (validarFlow(uno).length) fail(`flow nuevo con avisos: ${validarFlow(uno).join(" | ")}`);
+
+  // Dos pantallas encadenadas: el dato de la primera debe llegar a la segunda.
+  const p1 = { id: "UNO", title: "Uno", terminal: false, children: [
+    componenteCon("TextInput", { label: "Nombre", name: "nombre", required: true }),
+    componenteCon("Footer", { label: "Seguir", accion: "navigate", next: "DOS" }),
+  ] };
+  const p2 = { id: "DOS", title: "Dos", terminal: true, children: [
+    componenteCon("TextInput", { label: "Correo", name: "correo" }, 1),
+    componenteCon("Footer", { label: "Enviar", accion: "complete" }),
+  ] };
+  const dos = { version: VERSION_FLOW, pantallas: [p1, p2] };
+  const j2 = construirFlowJson(dos);
+  const nav = j2.screens[0].layout.children.at(-1)["on-click-action"];
+  if (nav.next?.name !== "DOS") fail("flow: navigate sin destino");
+  if (nav.payload?.nombre !== "${form.nombre}") fail("flow: navigate no arrastra el campo");
+  if (!j2.screens[1].data?.nombre) fail("flow: la 2ª pantalla no declara el dato recibido");
+  const fin = j2.screens[1].layout.children.at(-1)["on-click-action"];
+  if (fin.payload?.nombre !== "${data.nombre}" || fin.payload?.correo !== "${form.correo}") {
+    fail("flow: complete no combina data + form");
+  }
+  if (j2.routing_model?.UNO?.[0] !== "DOS") fail("flow: routing_model incorrecto");
+  if (validarFlow(dos).length) fail(`flow de 2 pantallas con avisos: ${validarFlow(dos).join(" | ")}`);
+
+  // La validación debe cazar los errores que Meta rechazaría.
+  const roto = {
+    version: VERSION_FLOW,
+    pantallas: [
+      { id: "minusculas", title: "x", terminal: false, children: [
+        componenteCon("TextInput", { label: "A", name: "dup" }),
+        componenteCon("TextInput", { label: "B", name: "dup" }, 1),
+        componenteCon("Footer", { label: "Ir", accion: "navigate", next: "NO_EXISTE" }),
+      ] },
+      { id: "SIN_PIE", title: "y", terminal: false, children: [] },
+    ],
+  };
+  const av = validarFlow(roto);
+  const debe = ["MAYÚSCULAS", "repetido", "no existe", "botón de pie", "vacía", "final"];
+  for (const frag of debe) {
+    if (!av.some((a) => a.includes(frag))) fail(`validación: no detecta "${frag}" (${av.join(" | ")})`);
+  }
+  console.log(`Flows: ${Object.keys(COMPONENTES).length} componentes · validación con ${av.length} avisos`);
+}
 
 const { nodes, edges } = buildInitialFlow();
 console.log(`Semilla: ${nodes.length} nodos, ${edges.length} conexiones`);

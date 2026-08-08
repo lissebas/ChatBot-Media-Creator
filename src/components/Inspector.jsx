@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CardPreview from "./CardPreview";
 import FieldForm from "./FieldForm";
 import {
   CARDS_POR_CATEGORIA,
@@ -44,6 +45,8 @@ export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDe
     return (
       <aside className="inspector">
         <div className="inspector__title">Editar paso</div>
+
+        <CardPreview card={node.data.card} props={props} />
 
         <label className="field">
           <span className="field__label">Nombre del paso</span>

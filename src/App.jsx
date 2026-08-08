@@ -20,6 +20,7 @@ import ContextMenu from "./components/ContextMenu";
 import ZoomControls from "./components/ZoomControls";
 import Modal from "./components/Modal";
 import Home from "./components/Home";
+import { MINIMO_REMOTO, analizarRemoto, layoutRemoto, motorActivo, precalentar } from "./flow/remoto";
 import { SimContext } from "./sim/SimContext";
 import { CARDS, CARDS_POR_FAMILIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
 import {
@@ -86,6 +87,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
+  const [informe, setInforme] = useState(null); // revisión del flujo en la nube
   // El minimapa redibuja TODOS los nodos en cada movimiento de la vista: en
   // flujos grandes arranca apagado, y la preferencia se recuerda.
   const [mapa, setMapa] = useState(() => {
@@ -268,10 +270,43 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
   );
 
   // ── Toolbar ──
-  const handleAutoLayout = useCallback(() => {
+  const organizarEnLocal = useCallback(() => {
     setNodes((nds) => autoLayout(nds, edges, "TB"));
     setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
   }, [edges, setNodes, fitView]);
+
+  const handleAutoLayout = useCallback(async () => {
+    // Solo se delega cuando compensa: en flujos pequeños la red tarda más que dagre.
+    if (motorActivo && nodes.length >= MINIMO_REMOTO) {
+      try {
+        const posiciones = await layoutRemoto(nodes, edges, "TB");
+        setNodes((nds) =>
+          nds.map((n) => (posiciones[n.id] ? { ...n, position: posiciones[n.id] } : n)),
+        );
+        setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
+        return;
+      } catch (e) {
+        console.warn("[motor] no disponible, se organiza en local:", e.message);
+      }
+    }
+    organizarEnLocal();
+  }, [nodes, edges, setNodes, fitView, organizarEnLocal]);
+
+  const handleAnalizar = useCallback(async () => {
+    setInforme({ cargando: true });
+    try {
+      setInforme(await analizarRemoto(nodes, edges));
+    } catch (e) {
+      setInforme({ error: e.message });
+    }
+  }, [nodes, edges]);
+
+  // Despierta la Lambda al abrir un flujo grande: así el primer uso no paga el
+  // arranque en frío.
+  useEffect(() => {
+    if (nodes.length >= MINIMO_REMOTO) precalentar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFit = useCallback(() => fitView({ padding: 0.18, duration: 400 }), [fitView]);
 
@@ -408,6 +443,7 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
         onAutoLayout={handleAutoLayout}
         onFit={handleFit}
         onReset={() => setReset(true)}
+        onAnalizar={motorActivo ? handleAnalizar : null}
         onToggleSim={toggleSim}
         simOpen={simOpen}
         saved={saved}
@@ -504,6 +540,38 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
         )}
       </div>
 
+      {informe ? (
+        <Modal
+          icon="🔍"
+          title="Revisión del flujo"
+          onClose={() => setInforme(null)}
+          acciones={[{ label: "Cerrar", onClick: () => setInforme(null), variant: "primary" }]}
+        >
+          {informe.cargando ? (
+            "Analizando en la nube…"
+          ) : informe.error ? (
+            `No se pudo analizar: ${informe.error}`
+          ) : (
+            <>
+              <p style={{ margin: "0 0 10px" }}>
+                <b>{informe.pasos}</b> pasos y <b>{informe.conexiones}</b> conexiones ·
+                empieza en <b>{informe.inicio || "—"}</b> · calculado en AWS en {informe.ms} ms.
+              </p>
+              <ListaInforme titulo="Pasos inalcanzables" items={informe.inalcanzables} />
+              <ListaInforme titulo="Sin salida (callejones)" items={informe.callejones} />
+              <ListaInforme titulo="Salidas sin conectar" items={informe.sueltas} />
+              <ListaInforme titulo="Tarjetas que Meta rechazaría" items={informe.invalidas} />
+              {!informe.inalcanzables.length &&
+              !informe.callejones.length &&
+              !informe.sueltas.length &&
+              !informe.invalidas.length
+                ? "✅ Sin problemas: todo alcanzable, conectado y válido."
+                : null}
+            </>
+          )}
+        </Modal>
+      ) : null}
+
       {reset ? (
         <Modal
           icon="🔄"
@@ -523,6 +591,24 @@ function Studio({ nombre, doc, onChange, onRename, onHome }) {
           </ul>
         </Modal>
       ) : null}
+    </div>
+  );
+}
+
+/** Bloque del informe: solo aparece si hay algo que contar. */
+function ListaInforme({ titulo, items }) {
+  if (!items?.length) return null;
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <b>
+        {titulo} ({items.length})
+      </b>
+      <ul className="modal__list">
+        {items.slice(0, 8).map((t, i) => (
+          <li key={i}>{t}</li>
+        ))}
+        {items.length > 8 ? <li>…y {items.length - 8} más</li> : null}
+      </ul>
     </div>
   );
 }

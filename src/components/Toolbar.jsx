@@ -12,6 +12,7 @@ export default function Toolbar({
   onAutoLayout,
   onFit,
   onReset,
+  onAnalizar,
   onToggleSim,
   simOpen,
   saved,
@@ -37,6 +38,11 @@ export default function Toolbar({
           Auto-organizar
         </button>
         <button className="btn" onClick={onFit} title="Encuadrar todo">Ajustar</button>
+        {onAnalizar ? (
+          <button className="btn" onClick={onAnalizar} title="Revisar el flujo (se calcula en AWS)">
+            Analizar
+          </button>
+        ) : null}
         <span className="toolbar__sep" />
         <button className="btn" onClick={onSave} title="Descargar el flujo como JSON">
           Exportar

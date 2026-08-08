@@ -20,7 +20,6 @@ import ContextMenu from "./components/ContextMenu";
 import ZoomControls from "./components/ZoomControls";
 import Modal from "./components/Modal";
 import Home from "./components/Home";
-import Diagnostico from "./components/Diagnostico";
 import { SimContext } from "./sim/SimContext";
 import { CARDS, CARDS_POR_FAMILIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
 import {

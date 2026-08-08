@@ -86,14 +86,22 @@ function edgeDecor(dashes) {
 
 /** Convierte el flujo-semilla (seedFlow) al formato de React Flow, ya organizado. */
 export function buildInitialFlow(dir = "TB") {
-  const nodes = flujoData.nodes.map((n) => ({
+  return buildFlowFrom(flujoData, dir);
+}
+
+/**
+ * Convierte cualquier flujo en formato semilla ({ nodes, edges }) al formato de
+ * React Flow, con auto-layout. Lo usan el flujo de ejemplo y los presets.
+ */
+export function buildFlowFrom(data, dir = "TB") {
+  const nodes = data.nodes.map((n) => ({
     id: n.id,
     type: "card",
     position: { x: 0, y: 0 },
     data: { card: n.card, title: n.title, props: { ...defaultProps(n.card), ...n.props } },
   }));
 
-  const edges = flujoData.edges.map((e, i) => ({
+  const edges = data.edges.map((e, i) => ({
     id: `e${i}`,
     source: e.from,
     target: e.to,

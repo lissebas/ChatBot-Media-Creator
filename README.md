@@ -106,6 +106,17 @@ así que el simulador sabe exactamente a qué paso lleva cada opción.
 
 Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/).
 
+## Flujos de ejemplo
+
+En `examples/` hay flujos listos para cargar con el botón **Importar** del editor.
+
+| Archivo | Qué trae |
+|---|---|
+| `examples/gys-legal.json` | Bot de campo de **G&S Legal** («Amaranta»): wizard del informe de asistencia jurídica — 103 pasos, 182 conexiones, con sus bifurcaciones por resultado del servicio, tercero y titular de la póliza. |
+
+Se regeneran con `npm run presets` desde `src/flow/presets/` (ahí vive el flujo
+como datos: catálogos, textos y salidas).
+
 ## Estructura
 
 | Archivo | Qué es |
@@ -122,7 +133,9 @@ Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsap
 | `src/components/Simulator.jsx` | Emulador de WhatsApp que ejecuta el flujo. |
 | `src/flow/cardTypes.js` | **Catálogo de tarjetas de Meta**: campos, límites, salidas y JSON. |
 | `src/index.css` | Tokens del tema oscuro (colores, radios, sombras). |
+| `src/flow/presets/` | Flujos reales reconstruidos como tarjetas (G&S Legal). |
 | `scripts/smoke.mjs` | Chequeo rápido: payloads, flujo semilla y runtime (`npm run smoke`). |
+| `scripts/gen-preset.mjs` | Genera los JSON de `examples/` (`npm run presets`). |
 | `src/sim/runtime.js` | Motor que interpreta el grafo como máquina de estados. |
 | `src/flow/seedFlow.js` | Flujo **semilla** de ejemplo + tipos de paso (`GRUPOS`). |
 | `src/flow/transform.js` | Conversión a React Flow + auto-layout (dagre). |

@@ -4,7 +4,7 @@ import "@xyflow/react/dist/style.css";
 import "./index.css";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { resolverSesion } from "./auth";
+import { entrar, resolverSesion } from "./auth";
 
 const raiz = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -47,8 +47,8 @@ function FalloLogin({ mensaje }) {
         <h1 className="crash__title">No se pudo iniciar sesión</h1>
         <p className="crash__text">{mensaje}</p>
         <div className="crash__actions">
-          <button className="btn btn--primary" onClick={() => window.location.replace("/")}>
-            Reintentar
+          <button className="btn btn--primary" onClick={() => { sessionStorage.clear(); entrar(); }}>
+            Entrar de nuevo
           </button>
         </div>
       </div>

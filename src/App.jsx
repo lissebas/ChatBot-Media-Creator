@@ -18,7 +18,7 @@ import Simulator from "./components/Simulator";
 import ContextMenu from "./components/ContextMenu";
 import ZoomControls from "./components/ZoomControls";
 import { SimContext } from "./sim/SimContext";
-import { CARDS, CARDS_POR_CATEGORIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
+import { CARDS, CARDS_POR_FAMILIA, cardColor, defaultProps, getCard } from "./flow/cardTypes";
 import {
   autoLayout,
   buildInitialFlow,
@@ -266,14 +266,17 @@ function Studio() {
     if (!menu) return [];
     if (menu.kind === "pane") {
       return [
-        ...CARDS_POR_CATEGORIA.flatMap((g) => [
-          { header: g.nombre },
-          ...g.cards.map((c) => ({
-            label: c.nombre,
-            dot: g.color,
-            hint: c.icon,
-            onSelect: () => addNode(c.key, menu.flowPos),
-          })),
+        ...CARDS_POR_FAMILIA.flatMap((f) => [
+          { header: f.nombre, strong: true, color: f.color },
+          ...f.grupos.flatMap((g) => [
+            { header: g.nombre },
+            ...g.cards.map((c) => ({
+              label: c.nombre,
+              dot: g.color,
+              hint: c.icon,
+              onSelect: () => addNode(c.key, menu.flowPos),
+            })),
+          ]),
         ]),
         { sep: true },
         { label: "Auto-organizar", onSelect: handleAutoLayout },

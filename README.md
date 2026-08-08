@@ -52,9 +52,13 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
 - **Borrar**: selecciona y pulsa `Supr`/`Backspace`, o el botón del inspector.
 - **Auto-organizar** (layout jerárquico automático), **Ajustar**, controles de zoom
   flotantes con porcentaje y paleta plegable.
-- **Minimapa conmutable** (botón ▣ en los controles): redibuja todos los nodos en
-  cada movimiento de la vista, así que en flujos de más de 60 pasos arranca
-  apagado. La preferencia se recuerda.
+- Dos **interruptores de rendimiento** en los controles del lienzo, ambos con la
+  preferencia recordada:
+  - **▣ Minimapa** — redibuja todos los nodos en cada movimiento de la vista;
+    arranca apagado por encima de 60 pasos.
+  - **⤳ Aristas ligeras** — oculta las etiquetas y usa trazado en escalones;
+    arranca activo por encima de 80 conexiones. Solo cambia el dibujo: las
+    etiquetas siguen ahí al guardar, exportar y simular.
 - **Reiniciar** abre un diálogo con dos salidas: **vaciar el lienzo** o volver al
   **flujo de ejemplo**.
 - **Exportar / Importar** el flujo como JSON. Además se **autoguarda** en el navegador.

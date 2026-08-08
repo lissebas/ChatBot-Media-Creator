@@ -11,7 +11,9 @@ export default function ZoomControls({ mapa, onToggleMapa, simples, onToggleSimp
   const zoom = useStore((s) => s.transform[2]);
   const [pct, setPct] = useState(100);
 
-  useEffect(() => setPct(Math.round(zoom * 100)), [zoom]);
+  useEffect(() => {
+    setPct(Math.round(zoom * 100));
+  }, [zoom]);
 
   return (
     <div className="zoomctl">

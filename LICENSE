@@ -1,0 +1,124 @@
+ChatBot Creator — Licencia Propietaria / Proprietary License
+Copyright (c) 2026 Johan Sebastián Gómez Rubio. Todos los derechos reservados. All rights reserved.
+
+Contacto para licencias comerciales / Commercial licensing contact:
+gomezrubiosebas@gmail.com
+
+--------------------------------------------------------------------------------
+ESPAÑOL
+--------------------------------------------------------------------------------
+
+1. TITULARIDAD
+   Este software, su código fuente, documentación, diseños, recursos gráficos y
+   cualquier material asociado (en adelante, "el Software") son propiedad
+   exclusiva de Johan Sebastián Gómez Rubio (en adelante, "el Titular") y
+   están protegidos por las leyes de derechos de autor y por los tratados
+   internacionales aplicables.
+
+2. NINGUNA LICENCIA POR DEFECTO
+   Este NO es software libre ni de código abierto. El hecho de que el Software
+   sea visible o descargable (por ejemplo, en un repositorio público) NO otorga
+   ningún derecho de uso. No se concede ninguna licencia, expresa o implícita,
+   salvo mediante un contrato escrito y firmado por el Titular.
+
+3. USOS PROHIBIDOS SIN LICENCIA PAGADA
+   Sin una licencia comercial previa, por escrito y pagada al Titular, queda
+   expresamente prohibido:
+   a) usar, ejecutar o desplegar el Software, total o parcialmente, en
+      cualquier entorno (personal, académico, interno o de producción);
+   b) copiar, reproducir, publicar o redistribuir el Software;
+   c) modificar, adaptar, traducir o crear obras derivadas;
+   d) sublicenciar, vender, alquilar, arrendar o prestar el Software;
+   e) incorporar el Software, o cualquier porción de su código, en otro
+      producto, servicio, plataforma o modelo;
+   f) descompilar, desensamblar o realizar ingeniería inversa;
+   g) eliminar, ocultar o alterar los avisos de copyright o de licencia;
+   h) utilizar el Software para entrenar, ajustar o evaluar sistemas de
+      inteligencia artificial o aprendizaje automático.
+
+4. ÚNICA EXCEPCIÓN PERMITIDA
+   Se permite exclusivamente la visualización del código con fines de
+   evaluación personal y no comercial, sin ejecutarlo, sin copiarlo y sin
+   reutilizar ninguna parte de él.
+
+5. OBLIGACIÓN DE PAGO
+   Cualquier uso distinto al descrito en la cláusula 4 requiere la obtención
+   previa de una licencia comercial y el pago de la contraprestación económica
+   acordada con el Titular. Las condiciones, el alcance y el precio de dicha
+   licencia se pactan caso por caso escribiendo a gomezrubiosebas@gmail.com.
+
+6. TERMINACIÓN
+   El incumplimiento de cualquier cláusula extingue automáticamente y de forma
+   inmediata cualquier permiso o licencia concedidos, sin perjuicio de las
+   acciones civiles y penales que el Titular pueda ejercer, incluida la
+   reclamación de daños, perjuicios y beneficios obtenidos indebidamente.
+
+7. AUSENCIA DE GARANTÍA
+   EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA
+   O IMPLÍCITA, INCLUIDAS, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD,
+   IDONEIDAD PARA UN FIN DETERMINADO Y NO INFRACCIÓN. EN NINGÚN CASO EL TITULAR
+   SERÁ RESPONSABLE POR RECLAMACIONES, DAÑOS U OTRAS RESPONSABILIDADES
+   DERIVADAS DEL SOFTWARE O DE SU USO.
+
+8. COMPONENTES DE TERCEROS
+   Las dependencias de terceros utilizadas por el Software (por ejemplo, las
+   declaradas en package.json) se rigen por sus propias licencias y no quedan
+   cubiertas por este documento.
+
+--------------------------------------------------------------------------------
+ENGLISH
+--------------------------------------------------------------------------------
+
+1. OWNERSHIP
+   This software, its source code, documentation, designs, assets and any
+   associated material (the "Software") are the exclusive property of
+   Johan Sebastián Gómez Rubio (the "Owner") and are protected by copyright
+   law and applicable international treaties.
+
+2. NO LICENSE BY DEFAULT
+   This is NOT free or open source software. The Software being visible or
+   downloadable (for example, in a public repository) grants NO right of use.
+   No license, express or implied, is granted except through a written
+   agreement signed by the Owner.
+
+3. USES PROHIBITED WITHOUT A PAID LICENSE
+   Without a prior, written, paid commercial license from the Owner, the
+   following are expressly prohibited:
+   a) using, running or deploying the Software, in whole or in part, in any
+      environment (personal, academic, internal or production);
+   b) copying, reproducing, publishing or redistributing the Software;
+   c) modifying, adapting, translating or creating derivative works;
+   d) sublicensing, selling, renting, leasing or lending the Software;
+   e) incorporating the Software, or any portion of its code, into another
+      product, service, platform or model;
+   f) decompiling, disassembling or reverse engineering;
+   g) removing, obscuring or altering copyright or license notices;
+   h) using the Software to train, fine-tune or evaluate artificial
+      intelligence or machine learning systems.
+
+4. SOLE PERMITTED EXCEPTION
+   Viewing the code for personal, non-commercial evaluation only is permitted,
+   without executing it, without copying it and without reusing any part of it.
+
+5. PAYMENT OBLIGATION
+   Any use other than the one described in clause 4 requires obtaining a
+   commercial license in advance and paying the fee agreed with the Owner.
+   Terms, scope and price of such license are negotiated case by case by
+   writing to gomezrubiosebas@gmail.com.
+
+6. TERMINATION
+   Breach of any clause immediately and automatically terminates any permission
+   or license granted, without prejudice to the civil and criminal actions the
+   Owner may pursue, including claims for damages and disgorgement of profits.
+
+7. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   OWNER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+   SOFTWARE OR ITS USE.
+
+8. THIRD-PARTY COMPONENTS
+   Third-party dependencies used by the Software (for example, those declared
+   in package.json) are governed by their own licenses and are not covered by
+   this document.

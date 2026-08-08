@@ -59,3 +59,19 @@ Si cambias `package.json` (nuevas dependencias): `docker compose up --build`.
 - ✅ **Fase 1** — Editor visual de flujos.
 - ✅ **Fase 2** — Runtime + simulador de chat.
 - ⏳ **Fase 3** — Conectar el runtime a un canal real (WhatsApp).
+
+## Licencia
+
+**Software propietario. Copyright © 2026 Johan Sebastián Gómez Rubio. Todos los derechos reservados.**
+
+Este repositorio **no es open source**. Que el código esté visible en GitHub **no
+otorga ningún derecho de uso**. Queda prohibido usar, ejecutar, desplegar, copiar,
+modificar, redistribuir o integrar este código —total o parcialmente— sin una
+**licencia comercial previa, por escrito y pagada** al titular.
+
+Única excepción: leer el código para evaluación personal y no comercial, sin
+ejecutarlo ni reutilizar ninguna parte de él.
+
+¿Quieres usarlo? Escribe para cotizar una licencia: **gomezrubiosebas@gmail.com**
+
+Detalle completo de las condiciones en [`LICENSE`](./LICENSE).

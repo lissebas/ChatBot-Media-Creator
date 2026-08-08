@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "ChatBot Creator — plataforma propia (tipo Botpress) para diseñar y simular flujos conversacionales",
+  "author": "Johan Sebastián Gómez Rubio <gomezrubiosebas@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

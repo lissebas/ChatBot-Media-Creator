@@ -161,9 +161,11 @@ function analizar({ nodes = [], edges = [] }) {
     nodes.find((n) => n.data?.card === "start")?.id ||
     nodes.find((n) => !entrantes.get(n.id))?.id;
 
-  // Alcanzables desde el inicio (BFS).
+  // Alcanzables desde el inicio (BFS). Los disparadores externos y los comandos
+  // globales también son raíces: se entra por ellos aunque nadie los apunte.
+  const raices = nodes.filter((n) => getCard(n.data?.card).entrada).map((n) => n.id);
   const vistos = new Set();
-  const cola = inicio ? [inicio] : [];
+  const cola = [...new Set([inicio, ...raices].filter(Boolean))];
   while (cola.length) {
     const id = cola.shift();
     if (vistos.has(id)) continue;
@@ -173,7 +175,7 @@ function analizar({ nodes = [], edges = [] }) {
 
   const inalcanzables = nodes.filter((n) => !vistos.has(n.id)).map((n) => etiqueta(n));
   const callejones = nodes
-    .filter((n) => n.data?.card !== "end" && !(salientes.get(n.id) || []).length)
+    .filter((n) => !getCard(n.data?.card).termina && !(salientes.get(n.id) || []).length)
     .map((n) => etiqueta(n));
 
   const sueltas = [];

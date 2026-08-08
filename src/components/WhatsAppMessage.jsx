@@ -24,6 +24,14 @@ const ICONO_ACCION = {
 export function accionesDe(cardKey, props) {
   const outs = cardOutputs({ card: cardKey, props });
 
+  // Un paso técnico no tiene botones de WhatsApp: sus salidas se ofrecen como
+  // ramas para probar («Éxito» / «Error»), y solo si nadie las decide por ti.
+  const card = getCard(cardKey);
+  if (card.tecnica) {
+    if (card.decide || card.espera) return [];
+    return outs.filter((o) => o.id !== "next").map((o) => ({ id: o.id, label: o.label, rama: true }));
+  }
+
   if (cardKey === "buttons" || cardKey === "call_permission_request") {
     return outs.map((o) => ({ id: o.id, label: o.label }));
   }
@@ -37,15 +45,45 @@ export function accionesDe(cardKey, props) {
   return [];
 }
 
-export default function WhatsAppMessage({ card, props = {}, time = "10:30", onAction, muted }) {
+export default function WhatsAppMessage({ card, props = {}, time = "10:30", onAction, muted, nota }) {
+  const meta = getCard(card);
   const desc = describeCard(card, props);
+
+  // Los pasos de automatización no son un mensaje: el cliente no vería nada.
+  // En el simulador se enseñan como una nota técnica, para poder seguir el
+  // recorrido sin ensuciar el chat con burbujas que no existen.
+  if (meta.tecnica) {
+    const ramas = accionesDe(card, props);
+    return (
+      <div className="wa-tech">
+        <div className="wa-tech__line">
+          <span className="wa-tech__icon">{meta.icon}</span>
+          <span className="wa-tech__text">{nota || `${meta.nombre} · ${meta.summary(props) || ""}`}</span>
+        </div>
+        {ramas.length ? (
+          <div className="wa-tech__ramas">
+            {ramas.map((r) => (
+              <button
+                key={r.id}
+                className="wa-tech__rama"
+                onClick={() => onAction?.(r.id, r.label)}
+                disabled={!onAction}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   if (!desc) {
     return (
       <div className="wa-note">Este paso no envía ningún mensaje: solo marca el flujo.</div>
     );
   }
 
-  const meta = getCard(card);
   const acciones = accionesDe(card, props);
   const soloSticker = desc.kind === "media" && desc.media === "sticker";
 

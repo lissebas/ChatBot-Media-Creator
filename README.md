@@ -110,8 +110,9 @@ ella la **categoría**.
 |---|---|---|
 | **Meta Cards** | Tipos de mensaje reales de la WhatsApp Cloud API. | 20 (Mensajes, Multimedia, Interactivos, Comercio, Avanzados) |
 | **Control de flujo** | Piezas del editor que marcan el recorrido; no envían nada. | 2 (Inicio, Fin) |
+| **Automatizaciones** | Lo que pasa alrededor del mensaje: validar, decidir, llamar a una API, esperar, avisar. | 16 (Datos, Lógica, Integraciones, Tiempo, Personas) |
 
-La paleta lateral filtra por familia (**Todas · Meta · Flujo**), tiene buscador y
+La paleta lateral filtra por familia (**Todas · Meta · Flujo · Auto**), tiene buscador y
 grupos plegables; el menú de clic derecho usa la misma segmentación; y el
 inspector muestra la familia, la categoría y el `type` exacto de la API de cada
 tarjeta.
@@ -153,6 +154,64 @@ salida por cada botón o fila, con su propio conector a la derecha de la tarjeta
 así que el simulador sabe exactamente a qué paso lleva cada opción.
 
 Referencia: [Cloud API · Messages](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/).
+
+## Automatizaciones: lo que pasa entre mensaje y mensaje
+
+Un bot real no es una lista de mensajes. Es comprobar que el correo sea un correo,
+mirar si el cliente existe en el CRM, decidir por dónde seguir, esperar a que
+otro sistema conteste, programar un recordatorio y, cuando toca, pasarle la
+conversación a una persona. Esas 16 tarjetas hacen justo eso, y ninguna es de
+Meta: no envían nada (salvo *Pregunta y valida*, que manda la pregunta).
+
+| Categoría | Tarjeta | Qué hace | Salidas |
+|---|---|---|---|
+| Datos | **Pregunta y valida** | Pregunta, comprueba el formato y guarda la respuesta en una variable. | Válido · No válido · Sin respuesta |
+| Datos | Asignar variables | Guarda, copia o borra valores. | una |
+| Datos | Buscar en catálogo | Busca texto libre en una lista larga y distingue si acertó, si duda o si no hay nada. | Encontrado · Varios · Ninguno |
+| Datos | Guardar o leer datos | Escribe o recupera un registro de tu almacén. | Listo · No existe · Error |
+| Lógica | Condición | Reparte el flujo por reglas sobre las variables. | una por ruta · Si no |
+| Lógica | Intención por palabras | Clasifica lo que escribe el usuario por palabras clave. | una por intención · No entendí |
+| Lógica | Comandos globales | «menú», «asesor», «reiniciar»: funcionan en cualquier punto. | una por comando |
+| Lógica | Ir a un paso | Salta a otro paso sin cruzar el lienzo con una conexión. | — |
+| Integraciones | Petición HTTP | Llama a una API y mapea la respuesta a variables. | Éxito · Error |
+| Integraciones | Esperar webhook | Deja el flujo en pausa hasta que un sistema externo avise. | Recibido · Se agotó |
+| Integraciones | Disparador externo | Empieza el flujo cuando otro sistema llama a un endpoint tuyo. | una |
+| Integraciones | Sondear resultado | Pregunta cada X segundos hasta que el resultado esté listo. | Listo · Agotado |
+| Tiempo | Esperar | Una pausa antes del siguiente paso. | una |
+| Tiempo | Programar recordatorio | Seguimientos a 2 h / 48 h / 7 días, en horario laboral y con plantillas. | Sigue · Al vencer |
+| Tiempo | Horario de atención | Separa lo que pasa dentro del horario de lo que pasa fuera. | Abierto · Cerrado |
+| Personas | Pasar a un asesor | Entrega la conversación a alguien, con el contexto ya recogido. | una |
+
+### Validar la respuesta del usuario
+
+*Pregunta y valida* es la tarjeta central. Elige una regla —texto, número, número
+en rango, entero, correo, teléfono, documento, fecha, hora, enlace, sí/no, una de
+una lista, o tu propia expresión regular— y la tarjeta:
+
+- guarda el valor **normalizado** (el correo en minúsculas, la fecha en ISO, el
+  documento sin puntos), no lo que se tecleó;
+- **reintenta** con tu mensaje de error las veces que digas, y cuando se agotan
+  sale por «No válido», que normalmente lleva a un asesor;
+- admite **límites dinámicos**: `mínimo: año actual - 18` o `máximo: {{tope}}`;
+- admite **formatos que dependen de lo capturado antes**: el patrón acepta
+  `{{variable}}`, así que la placa puede validarse distinto para un carro y para
+  una moto.
+
+### Variables
+
+Todo lo que se captura vive en variables, y **`{{variable}}` se sustituye en
+cualquier texto**: el cuerpo de un mensaje, una URL, el contexto que le llega al
+asesor. El simulador lleva un panel con su valor actual, así que se ve en vivo
+qué sabe el bot en cada momento.
+
+### El simulador las ejecuta de verdad
+
+No son adornos del lienzo: al probar el flujo, las validaciones validan, las
+condiciones comparan, las intenciones clasifican y los comandos globales
+interceptan. Los pasos que no se pueden ejecutar en el navegador —una petición
+HTTP, un webhook, un recordatorio— salen como una **nota técnica** con lo que
+harían y te dejan elegir la rama (**Éxito** / **Error**) para probar los dos
+caminos.
 
 ## El formulario nativo vive en la tarjeta Flow
 
@@ -232,7 +291,10 @@ versiona: `npm run presets` reconstruye el JSON cuando lo necesites.
 | `src/components/WaText.jsx` | Formato de WhatsApp (negrita, cursiva, listas, citas…). |
 | `src/components/CardPreview.jsx` | Vista previa en vivo dentro del inspector. |
 | `src/components/Simulator.jsx` | Emulador de WhatsApp que ejecuta el flujo. |
-| `src/flow/cardTypes.js` | **Catálogo de tarjetas de Meta**: campos, límites, salidas y JSON. |
+| `src/flow/cardTypes.js` | **Catálogo de tarjetas**: campos, límites, salidas y JSON. |
+| `src/flow/validadores.js` | Reglas de validación de las respuestas (puras, sin navegador). |
+| `src/flow/coincidencias.js` | Emparejado de texto libre con un catálogo: único / varios / ninguno. |
+| `src/sim/motores.js` | Qué decide cada automatización cuando el flujo pasa por ella. |
 | `src/index.css` | Tokens del tema oscuro (colores, radios, sombras). |
 | `src/flow/presets/` | Flujos reales reconstruidos como tarjetas (G&S Legal). |
 | `scripts/smoke.mjs` | Chequeo rápido: payloads, flujo semilla y runtime (`npm run smoke`). |

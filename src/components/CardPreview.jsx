@@ -54,6 +54,12 @@ export default function CardPreview({ card, props }) {
           </div>
         ) : null}
       </div>
+
+      <p className="preview__formato">
+        Formato de WhatsApp: <code>*negrita*</code> <code>_cursiva_</code>{" "}
+        <code>~tachado~</code> <code>```mono```</code>, listas con <code>-</code> o{" "}
+        <code>1.</code> y citas con <code>&gt;</code>.
+      </p>
     </div>
   );
 }

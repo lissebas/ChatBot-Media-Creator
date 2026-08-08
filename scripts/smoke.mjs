@@ -9,8 +9,11 @@ import {
   defaultProps,
   validateCard,
 } from "../src/flow/cardTypes.js";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { buildInitialFlow } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
+import WaText, { sinFormato } from "../src/components/WaText.jsx";
 
 let fallos = 0;
 const fail = (m) => { console.log("  ✗", m); fallos++; };
@@ -45,6 +48,30 @@ console.log(
   "Familias:",
   CARDS_POR_FAMILIA.map((f) => `${f.nombre} (${f.total})`).join(", "),
 );
+
+// Formato de WhatsApp: lo que se ve en la vista previa y en el simulador.
+const html = (t) => renderToStaticMarkup(createElement(WaText, { text: t }));
+const casos = [
+  ["*hola*", "<strong>hola</strong>", true],
+  ["_hola_", "<em>hola</em>", true],
+  ["~hola~", "<s>hola</s>", true],
+  ["```cod```", "<code", true],
+  ["`cod`", "<code", true],
+  ["2 * 3 * 4", "<strong>", false], // marcador con espacios: no es negrita
+  ["a *b* y *c*", "<strong>c</strong>", true], // no se pierde el segundo par
+  ["- uno\n- dos", "<ul", true],
+  ["1. uno\n2. dos", "<ol", true],
+  ["> cita", "<blockquote", true],
+  ["*_mixto_*", "<strong><em>mixto</em></strong>", true],
+];
+for (const [entrada, esperado, debe] of casos) {
+  const salida = html(entrada);
+  if (salida.includes(esperado) !== debe) {
+    fail(`formato ${JSON.stringify(entrada)}: se esperaba ${debe ? "" : "NO "}"${esperado}" en ${salida}`);
+  }
+}
+if (sinFormato("*a* _b_ ~c~") !== "a b c") fail("sinFormato no limpia los marcadores");
+console.log(`Formato: ${casos.length} casos`);
 
 const { nodes, edges } = buildInitialFlow();
 console.log(`Semilla: ${nodes.length} nodos, ${edges.length} conexiones`);

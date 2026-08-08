@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import WhatsAppMessage from "./WhatsAppMessage";
+import WaText from "./WaText";
 import {
   matchEdge,
   entryNode,
@@ -203,7 +204,7 @@ export default function Simulator({ nodes, edges, onActive, onClose }) {
           m.role === "user" ? (
             <div className="wa-msg wa-msg--out" key={i}>
               <div className="wa-bubble wa-bubble--out">
-                <div className="wa-body">{m.text}</div>
+                <WaText className="wa-body" text={m.text} />
                 <span className="wa-time">{m.time} ✓✓</span>
               </div>
             </div>

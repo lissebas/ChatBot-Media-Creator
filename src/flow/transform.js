@@ -113,6 +113,26 @@ export function buildFlowFrom(data, dir = "TB") {
   return { nodes: autoLayout(nodes, edges, dir), edges };
 }
 
+/**
+ * Versión ligera de las aristas para flujos grandes: sin etiquetas (el texto SVG
+ * es lo más caro de rasterizar en cada frame de pan/zoom) y con trazado en
+ * escalones, más barato de calcular que la curva. No toca los datos guardados:
+ * es solo lo que se dibuja.
+ */
+export function simplificarAristas(edges) {
+  return edges.map((e) => ({
+    ...e,
+    label: undefined,
+    labelBgStyle: undefined,
+    labelStyle: undefined,
+    labelBgPadding: undefined,
+    labelBgBorderRadius: undefined,
+    type: "step",
+    pathOptions: undefined,
+    style: { ...e.style, strokeWidth: 1.2 },
+  }));
+}
+
 /** Estilo estándar para una arista nueva creada por el usuario en el lienzo. */
 export function makeEdge(params) {
   return { ...params, ...edgeDecor(false) };

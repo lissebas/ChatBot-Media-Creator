@@ -11,7 +11,7 @@ import {
 } from "../src/flow/cardTypes.js";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { buildInitialFlow } from "../src/flow/transform.js";
+import { buildInitialFlow, simplificarAristas } from "../src/flow/transform.js";
 import { entryNode, nodeOptions, nextEdge, nodeMessage, stepMode } from "../src/sim/runtime.js";
 import WaText, { sinFormato } from "../src/components/WaText.jsx";
 import { cargarDocumento, cargarIndice, conResumen } from "../src/flow/workspace.js";
@@ -211,6 +211,20 @@ for (const n of nodes) {
       fail(`${n.id}: la salida "${o.id}" no está conectada`);
     }
   }
+}
+
+// Aristas ligeras: solo cambia el dibujo, nunca los datos que se guardan.
+{
+  const ligeras = simplificarAristas(edges);
+  const conEtiqueta = edges.filter((e) => e.label).length;
+  if (ligeras.length !== edges.length) fail("aristas ligeras: cambia el número de conexiones");
+  if (ligeras.some((e) => e.label)) fail("aristas ligeras: quedan etiquetas");
+  if (ligeras.some((e, i) => e.id !== edges[i].id || e.source !== edges[i].source
+      || e.target !== edges[i].target || e.sourceHandle !== edges[i].sourceHandle)) {
+    fail("aristas ligeras: se pierde la conexión (id/origen/destino/salida)");
+  }
+  if (edges.filter((e) => e.label).length !== conEtiqueta) fail("aristas ligeras: mutan el original");
+  console.log(`Aristas ligeras: ${edges.length} conexiones, ${conEtiqueta} etiquetas ocultas sin tocar los datos`);
 }
 
 // Recorrido del runtime: desde el inicio, tomando siempre la primera opción.

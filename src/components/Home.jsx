@@ -54,11 +54,8 @@ function resumen(flujo) {
 
 export default function Home({
   flujos,
-  formularios,
   onAbrir,
-  onAbrirFormulario,
   onNuevo,
-  onNuevoFormulario,
   onEjemplo,
   onImportar,
   onDuplicar,
@@ -69,7 +66,7 @@ export default function Home({
   const [renombrando, setRenombrando] = useState(null);
   const [nombre, setNombre] = useState("");
 
-  /** Acciones de una tarjeta: sirven para flujos y para formularios. */
+  /** Acciones de la tarjeta de un flujo: renombrar, duplicar y borrar. */
   const tools = (f, tipo) => (
     <div className="flowcard__tools">
       <button
@@ -115,7 +112,6 @@ export default function Home({
               onChange={onImportar}
             />
           </label>
-          <button className="btn" onClick={onNuevoFormulario}>+ Formulario</button>
           <button className="btn btn--primary" onClick={onNuevo}>+ Nuevo flujo</button>
         </div>
       </header>
@@ -166,53 +162,6 @@ export default function Home({
                   </article>
                 );
               })}
-            </div>
-          )}
-        </section>
-
-        <section className="home__section">
-          <div className="home__sectionhead">
-            <h2 className="home__h2">Formularios nativos (Flows)</h2>
-            <span className="home__count">{formularios.length}</span>
-          </div>
-          <p className="home__lead">
-            Las pantallas que se abren dentro del chat. Se diseñan aquí y se publican
-            en Meta; luego una tarjeta <b>Flow</b> de tus flujos las invoca.
-          </p>
-
-          {formularios.length === 0 ? (
-            <div className="empty">
-              <div className="empty__icon">🧾</div>
-              <div className="empty__title">Sin formularios todavía</div>
-              <p className="empty__text">
-                Un Flow es el formulario nativo de WhatsApp: títulos, campos, selectores
-                y un botón de pie. Al terminar exportas su Flow JSON.
-              </p>
-              <div className="empty__actions">
-                <button className="btn btn--primary" onClick={onNuevoFormulario}>
-                  + Crear formulario
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid">
-              {formularios.map((f) => (
-                <article className="flowcard" key={f.id}>
-                  <button className="flowcard__open" onClick={() => onAbrirFormulario(f.id)}>
-                    <div className="flowcard__dots">
-                      <span style={{ background: "#25d366" }} />
-                    </div>
-                    <h3 className="flowcard__name">{f.nombre}</h3>
-                    <div className="flowcard__meta">
-                      {(f.pantallas || []).length} pantallas ·{" "}
-                      {(f.pantallas || []).reduce((n, p) => n + (p.children || []).length, 0)} componentes
-                    </div>
-                    <div className="flowcard__tipos">Flow JSON {f.version || "—"}</div>
-                    <div className="flowcard__time">Editado {haceCuanto(f.actualizado)}</div>
-                  </button>
-                  {tools(f, "formularios")}
-                </article>
-              ))}
             </div>
           )}
         </section>

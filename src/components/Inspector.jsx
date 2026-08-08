@@ -1,6 +1,8 @@
 import { useState } from "react";
 import CardPreview from "./CardPreview";
 import FieldForm from "./FieldForm";
+import FlowDesigner from "./FlowDesigner";
+import { VERSION_FLOW, flujoNuevo, validarFlow } from "../flow/flowJson";
 import {
   CARDS_POR_FAMILIA,
   buildMessage,
@@ -30,6 +32,7 @@ function remapProps(oldProps = {}, newKey) {
 export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDeleteNode, onDeleteEdge }) {
   const [verJson, setVerJson] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  const [disenando, setDisenando] = useState(false);
 
   if (node) {
     const card = getCard(node.data.card);
@@ -129,6 +132,32 @@ export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDe
           </div>
         ) : null}
 
+        {node.data.card === "flow" ? (
+          <FlowBlock
+            node={node}
+            onUpdateNode={onUpdateNode}
+            abrir={() => setDisenando(true)}
+          />
+        ) : null}
+
+        {disenando ? (
+          <FlowDesigner
+            nombre={node.data.title || "Flow"}
+            valor={props.flowjson}
+            onClose={() => setDisenando(false)}
+            onChange={(flowjson) =>
+              onUpdateNode(node.id, {
+                props: {
+                  ...props,
+                  flowjson,
+                  // La pantalla inicial sigue a la primera del diseño.
+                  screen: props.screen || flowjson.pantallas?.[0]?.id || "",
+                },
+              })
+            }
+          />
+        ) : null}
+
         {json ? (
           <div className="jsonbox">
             <button className="jsonbox__toggle" onClick={() => setVerJson((v) => !v)}>
@@ -199,5 +228,59 @@ export default function Inspector({ node, edge, onUpdateNode, onUpdateEdge, onDe
         <li><kbd>Supr</kbd> / <kbd>Backspace</kbd> borra lo seleccionado.</li>
       </ul>
     </aside>
+  );
+}
+
+/**
+ * Bloque del formulario nativo dentro de la tarjeta Flow: resumen del diseño,
+ * botón para abrir el diseñador y avisos de validación del Flow JSON.
+ */
+function FlowBlock({ node, onUpdateNode, abrir }) {
+  const props = node.data.props || {};
+  const diseno = props.flowjson;
+  const pantallas = diseno?.pantallas || [];
+  const componentes = pantallas.reduce((n, p) => n + (p.children || []).length, 0);
+  const avisos = pantallas.length ? validarFlow(diseno) : [];
+
+  const crear = () => {
+    const nuevo = flujoNuevo();
+    onUpdateNode(node.id, {
+      props: { ...props, flowjson: nuevo, screen: props.screen || nuevo.pantallas[0].id },
+    });
+    abrir();
+  };
+
+  return (
+    <div className="flowblock">
+      <div className="flowblock__head">
+        <span className="flowblock__title">Formulario nativo</span>
+        <span className="flowblock__badge">Flow JSON {diseno?.version || VERSION_FLOW}</span>
+      </div>
+
+      {pantallas.length ? (
+        <>
+          <div className="flowblock__meta">
+            {pantallas.length} pantalla{pantallas.length === 1 ? "" : "s"} · {componentes} componentes
+            {avisos.length ? ` · ${avisos.length} aviso${avisos.length === 1 ? "" : "s"}` : " · sin avisos"}
+          </div>
+          <div className="flowblock__screens">
+            {pantallas.map((p) => (
+              <span className="flowblock__chip" key={p.id}>{p.id}</span>
+            ))}
+          </div>
+          <button className="btn btn--wide" onClick={abrir}>Diseñar las pantallas</button>
+        </>
+      ) : (
+        <>
+          <p className="flowblock__hint">
+            Diseña aquí las pantallas que se abren al pulsar el botón. Al terminar,
+            exportas su Flow JSON y lo publicas en Meta.
+          </p>
+          <button className="btn btn--wide btn--primary" onClick={crear}>
+            + Diseñar el formulario
+          </button>
+        </>
+      )}
+    </div>
   );
 }

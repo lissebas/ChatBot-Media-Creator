@@ -33,14 +33,11 @@ import {
   borrarDoc,
   cargarEspacio,
   crearFlujo,
-  crearFormulario,
   duplicarDoc,
   guardarDoc,
   guardarEspacio,
   renombrarDoc,
 } from "./flow/workspace";
-import FlowEditor from "./components/FlowEditor";
-import { flujoNuevo } from "./flow/flowJson";
 import "./App.css";
 
 const nodeTypes = { card: FlowNode };
@@ -478,10 +475,6 @@ export default function App() {
     (nodes, edges) => guardarContenido({ nodes, edges }),
     [guardarContenido],
   );
-  const guardarPantallas = useCallback(
-    (flow) => guardarContenido({ version: flow.version, pantallas: flow.pantallas }),
-    [guardarContenido],
-  );
   const renombrar = useCallback(
     (nombre) => abierto && setEspacio((e) => renombrarDoc(e, abierto.tipo, abierto.id, nombre)),
     [abierto],
@@ -491,30 +484,13 @@ export default function App() {
     return (
       <Home
         flujos={espacio.flujos}
-        formularios={espacio.formularios}
         onAbrir={(id) => setAbierto({ tipo: "flujos", id })}
-        onAbrirFormulario={(id) => setAbierto({ tipo: "formularios", id })}
         onNuevo={() => abrirNuevo("flujos", crearFlujo("Flujo sin título"))}
-        onNuevoFormulario={() =>
-          abrirNuevo("formularios", crearFormulario("Formulario sin título", flujoNuevo()))
-        }
         onEjemplo={() => abrirNuevo("flujos", crearFlujo("Flujo de ejemplo", buildInitialFlow()))}
         onImportar={importar}
         onDuplicar={(tipo, id) => setEspacio((e) => duplicarDoc(e, tipo, id))}
         onBorrar={(tipo, id) => setEspacio((e) => borrarDoc(e, tipo, id))}
         onRenombrar={(tipo, id, nombre) => setEspacio((e) => renombrarDoc(e, tipo, id, nombre))}
-      />
-    );
-  }
-
-  if (abierto.tipo === "formularios") {
-    return (
-      <FlowEditor
-        key={doc.id}
-        formulario={doc}
-        onChange={guardarPantallas}
-        onRename={renombrar}
-        onHome={() => setAbierto(null)}
       />
     );
   }

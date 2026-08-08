@@ -135,7 +135,22 @@ console.log(`Formato: ${casos.length} casos`);
   for (const frag of debe) {
     if (!av.some((a) => a.includes(frag))) fail(`validación: no detecta "${frag}" (${av.join(" | ")})`);
   }
-  console.log(`Flows: ${Object.keys(COMPONENTES).length} componentes · validación con ${av.length} avisos`);
+  // El formulario vive DENTRO de la tarjeta Flow: su diseño alimenta el payload.
+  const tarjeta = { card: "flow", props: {
+    body: "Déjanos tus datos", flow_cta: "Dejar mis datos", flow_action: "navigate",
+    flow_id: "123", flowjson: flujoNuevo(),
+  } };
+  const msg = buildMessage(tarjeta);
+  const params = msg.interactive.action.parameters;
+  if (params.flow_action_payload?.screen !== "PANTALLA_1") {
+    fail(`tarjeta flow: pantalla inicial ${JSON.stringify(params.flow_action_payload)}`);
+  }
+  if (JSON.stringify(msg).includes("flowjson")) fail("tarjeta flow: el diseño se cuela en el payload");
+  const sinId = validateCard("flow", { ...tarjeta.props, flow_id: "" });
+  if (!sinId.list.some((m) => m.includes("Publica el formulario"))) {
+    fail(`tarjeta flow: falta el aviso de publicar (${sinId.list.join(" | ")})`);
+  }
+  console.log(`Flows: ${Object.keys(COMPONENTES).length} componentes · validación con ${av.length} avisos · tarjeta OK`);
 }
 
 const { nodes, edges } = buildInitialFlow();

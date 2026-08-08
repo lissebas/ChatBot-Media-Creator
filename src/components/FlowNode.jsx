@@ -1,5 +1,6 @@
 import { memo, useContext } from "react";
 import { Handle, Position } from "@xyflow/react";
+import { sinFormato } from "./WaText";
 import { cardColor, cardOutputs, getCard, validateCard } from "../flow/cardTypes";
 import { hasOptionRows } from "../flow/transform";
 import { SimContext } from "../sim/SimContext";
@@ -38,7 +39,8 @@ function FlowNode({ id, data, selected }) {
     );
   }
 
-  const resumen = card.summary(props);
+  // En el lienzo se lee mejor sin los marcadores (*negrita*, _cursiva_…).
+  const resumen = sinFormato(card.summary(props));
 
   return (
     <div className={`fnode${state}`} style={{ "--accent": color }}>

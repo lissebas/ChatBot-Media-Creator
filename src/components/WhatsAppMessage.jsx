@@ -1,3 +1,4 @@
+import WaText from "./WaText";
 import { cardOutputs, getCard } from "../flow/cardTypes";
 import { describeCard } from "../sim/runtime";
 
@@ -113,9 +114,12 @@ export default function WhatsAppMessage({ card, props = {}, time = "10:30", onAc
 
       {desc.kind === "reaction" ? <div className="wa-reaction">{desc.text || "👍"}</div> : null}
 
+      {/* El encabezado va sin formato: Meta solo admite emojis ahí. */}
       {desc.header ? <div className="wa-header">{desc.header}</div> : null}
-      {desc.kind !== "reaction" && desc.text ? <div className="wa-body">{desc.text}</div> : null}
-      {desc.footer ? <div className="wa-footer">{desc.footer}</div> : null}
+      {desc.kind !== "reaction" && desc.text ? (
+        <WaText className="wa-body" text={desc.text} />
+      ) : null}
+      {desc.footer ? <WaText className="wa-footer" text={desc.footer} /> : null}
     </>
   );
 

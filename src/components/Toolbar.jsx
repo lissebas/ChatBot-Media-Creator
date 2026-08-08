@@ -50,6 +50,9 @@ export default function Toolbar({
             onChange={onLoad}
           />
         </label>
+        <button className="btn btn--ghost" onClick={onDiagnostico} title="Medir el rendimiento en este equipo">
+          Diagnóstico
+        </button>
         <button className="btn btn--ghost" onClick={onReset} title="Vaciar el lienzo o volver al ejemplo">
           Reiniciar
         </button>

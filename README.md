@@ -71,6 +71,13 @@ Inicio/Fin, al estilo de los constructores de flujos modernos.
   encuadrar todo** y **▶ ir al primer paso**, que centra la vista en el Inicio
   del flujo (o en el disparador externo, si el flujo empieza por ahí) y lo deja
   seleccionado. En un lienzo de miles de píxeles es la forma rápida de volver.
+- **Apertura enfocada.** Un flujo de cientos de pasos no se encuadra entero al
+  abrirlo: encuadrar mete todos los pasos dentro de la vista y el navegador los
+  monta de golpe (370 pasos de golpe congelan un portátil). Se abre por el
+  **primer paso** y solo se monta lo que se ve — 3 pasos en vez de 370. El botón
+  ⤢ sigue encuadrando todo cuando tú lo pides.
+- **Barra de apertura** con el porcentaje real de la descarga desde S3, y las
+  etapas: bajando → preparando → dibujando.
 - **Minimapa siempre visible** y **modo ligero siempre activo**: se monta solo lo
   que se ve (en un flujo de 103 pasos, ~25 nodos en vez de 103: 76 % menos DOM),
   las aristas van sin etiqueta y, al alejar el zoom, las tarjetas pierden el

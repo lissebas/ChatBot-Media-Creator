@@ -203,6 +203,15 @@ console.log(`Formato: ${casos.length} casos`);
   }
   if (!appSrc.includes("onlyRenderVisibleElements")) fail("la virtualización dejó de aplicarse");
   if (!zoomSrcActual.includes("onInicio")) fail("falta el botón para ir al primer paso");
+
+  // Encuadrar un flujo de cientos de pasos mete TODOS dentro de la vista, y
+  // React Flow los monta de golpe: es exactamente lo que congelaba el equipo.
+  // Solo puede quedar donde lo pide el usuario a propósito (el botón ⤢ y el
+  // reencuadre de los flujos pequeños); ninguna ruta automática debe hacerlo.
+  if (!appSrc.includes("reencuadrar")) fail("no existe el reencuadre cuidadoso de flujos grandes");
+  const encuadres = (appSrc.match(/fitView\(\{/g) || []).length;
+  if (encuadres > 2) fail(`hay ${encuadres} llamadas a fitView; solo deberían quedar las que pide el usuario`);
+  if (/fitView\s*$/m.test(appSrc)) fail("el lienzo encuadra todo al montar, sin mirar el tamaño del flujo");
 }
 
 // ── Almacenamiento: índice pequeño + un documento por flujo ──

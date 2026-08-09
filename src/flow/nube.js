@@ -40,7 +40,7 @@ const limpio = (indice) =>
 /* ── Operaciones sueltas ── */
 
 export const indiceNube = async () => (await invocar("indice", {})).indice || [];
-export const leerNube = async (id) => (await invocar("leer", { id })).doc || null;
+export const leerNube = async (id, onProgreso) => (await invocar("leer", { id }, onProgreso)).doc || null;
 const guardarEnNube = (id, doc, indice) => invocar("guardar", { id, doc, indice: limpio(indice) });
 const borrarEnNube = (id, indice) => invocar("borrar", { id, indice: limpio(indice) });
 const subirIndice = (indice) => invocar("indice-guardar", { indice: limpio(indice) });
@@ -106,15 +106,29 @@ export async function sincronizarIndice() {
 /**
  * Devuelve el cuerpo de un flujo, bajándolo de la nube si esta copia es la
  * buena. Si la descarga falla, se abre lo que haya en local.
+ *
+ * `avisar(etapa, pct)` va contando lo que pasa: bajar cientos de KB y luego
+ * preparar cientos de pasos lleva su tiempo, y sin señal parece que se colgó.
  */
-export async function documento(id) {
-  if (!porDescargar.has(id)) return cargarDocumento(id);
+export async function documento(id, avisar = () => {}) {
+  if (!porDescargar.has(id)) {
+    avisar("abriendo", 0);
+    const doc = cargarDocumento(id);
+    avisar("listo", 100);
+    return doc;
+  }
   try {
-    const doc = await leerNube(id);
+    avisar("bajando", 0);
+    const doc = await leerNube(id, (leidos, total) => {
+      avisar("bajando", total ? Math.round((leidos / total) * 100) : 0);
+    });
+    avisar("preparando", 100);
     porDescargar.delete(id);
     if (!doc || !Array.isArray(doc.nodes)) return cargarDocumento(id);
     guardarDocumento(id, doc);
-    return cargarDocumento(id); // pasa por la carga normal: rellena dimensiones
+    const listo = cargarDocumento(id); // pasa por la carga normal: rellena dimensiones
+    avisar("listo", 100);
+    return listo;
   } catch (e) {
     console.warn("[nube] no se pudo descargar el flujo:", e);
     return cargarDocumento(id);

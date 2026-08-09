@@ -27,8 +27,13 @@ export const motorActivo = Boolean(URL_MOTOR) && firmaDisponible;
 /** Por debajo de esto, la ida y vuelta cuesta más que calcularlo en el navegador. */
 export const MINIMO_REMOTO = 40;
 
-/** Invoca la Lambda. Compartido con `nube.js`, que usa las mismas credenciales. */
-export async function invocar(op, datos) {
+/**
+ * Invoca la Lambda. Compartido con `nube.js`, que usa las mismas credenciales.
+ *
+ * `onProgreso(bytes, total)` recibe el avance de la descarga: un flujo grande
+ * pesa cientos de KB y bajarlo sin dar señal parece que la app se quedó colgada.
+ */
+export async function invocar(op, datos, onProgreso) {
   const s = sesion();
   if (!s?.idToken) throw new Error("sin sesión");
 
@@ -38,10 +43,34 @@ export async function invocar(op, datos) {
   if (!r.ok) throw new Error(`El motor devolvió ${r.status}`);
 
   // `Invoke` devuelve lo que retorna el handler: {statusCode, headers, body}.
-  const sobre = await r.json();
+  const sobre = onProgreso ? await leerConProgreso(r, onProgreso) : await r.json();
   const cuerpo = JSON.parse(sobre.body || "{}");
   if (sobre.statusCode >= 400) throw new Error(cuerpo.error || `El motor devolvió ${sobre.statusCode}`);
   return { ...cuerpo, red: Math.round(performance.now() - t0) };
+}
+
+/** Lee la respuesta en trozos para poder informar del avance. */
+async function leerConProgreso(respuesta, onProgreso) {
+  const total = Number(respuesta.headers.get("content-length")) || 0;
+  if (!respuesta.body?.getReader) return respuesta.json();
+
+  const lector = respuesta.body.getReader();
+  const trozos = [];
+  let leidos = 0;
+  for (;;) {
+    const { done, value } = await lector.read();
+    if (done) break;
+    trozos.push(value);
+    leidos += value.length;
+    onProgreso(leidos, total);
+  }
+  const todo = new Uint8Array(leidos);
+  let i = 0;
+  for (const t of trozos) {
+    todo.set(t, i);
+    i += t.length;
+  }
+  return JSON.parse(new TextDecoder().decode(todo));
 }
 
 /**

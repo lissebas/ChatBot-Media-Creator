@@ -107,6 +107,8 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
   const [menu, setMenu] = useState(null); // { kind, x, y, id?, flowPos? }
   const [informe, setInforme] = useState(null); // revisión del flujo en la nube
   const [reset, setReset] = useState(false);
+  // Con muchos pasos, encuadrar todo al abrir monta el flujo entero de una vez.
+  const grande = (initial.nodes?.length || 0) > 120;
   const wrapperRef = useRef(null);
   const { screenToFlowPosition, fitView, setCenter, getZoom } = useReactFlow();
 
@@ -273,11 +275,35 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
     [setNodes],
   );
 
+  /**
+   * Reencuadre AUTOMÁTICO (tras auto-organizar, importar o reiniciar).
+   *
+   * En un flujo grande, encuadrarlo entero mete los cientos de pasos dentro de
+   * la vista y React Flow los monta todos: es justo lo que congela el equipo.
+   * Cuando el flujo es grande se vuelve al principio en vez de encuadrar todo.
+   * El botón ⤢ sí encuadra de verdad: ahí lo pide el usuario a propósito.
+   */
+  const reencuadrar = useCallback(
+    (lista) => {
+      const ns = lista || nodes;
+      if (ns.length <= 120) {
+        fitView({ padding: 0.18, duration: 400 });
+        return;
+      }
+      const id = entryNode(ns, edges);
+      const node = id && ns.find((n) => n.id === id);
+      if (!node) return;
+      const { width, height } = nodeSize(node);
+      setCenter(node.position.x + width / 2, node.position.y + height / 2, { zoom: 0.8, duration: 400 });
+    },
+    [nodes, edges, fitView, setCenter],
+  );
+
   // ── Toolbar ──
   const organizarEnLocal = useCallback(() => {
     setNodes((nds) => autoLayout(nds, edges, "TB"));
-    setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
-  }, [edges, setNodes, fitView]);
+    setTimeout(() => reencuadrar(), 60);
+  }, [edges, setNodes, reencuadrar]);
 
   const handleAutoLayout = useCallback(async () => {
     // Solo se delega cuando compensa: en flujos pequeños la red tarda más que dagre.
@@ -287,14 +313,14 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
         setNodes((nds) =>
           nds.map((n) => (posiciones[n.id] ? { ...n, position: posiciones[n.id] } : n)),
         );
-        setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
+        setTimeout(() => reencuadrar(), 60);
         return;
       } catch (e) {
         console.warn("[motor] no disponible, se organiza en local:", e.message);
       }
     }
     organizarEnLocal();
-  }, [nodes, edges, setNodes, fitView, organizarEnLocal]);
+  }, [nodes, edges, setNodes, reencuadrar, organizarEnLocal]);
 
   const handleAnalizar = useCallback(async () => {
     setInforme({ cargando: true });
@@ -338,7 +364,7 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
             const cargado = migrateFlow(data);
             setNodes(cargado.nodes);
             setEdges(cargado.edges);
-            setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
+            setTimeout(() => reencuadrar(cargado.nodes), 60);
           } else {
             alert("El archivo no tiene el formato esperado (nodes / edges).");
           }
@@ -349,7 +375,7 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
       reader.readAsText(file);
       event.target.value = "";
     },
-    [setNodes, setEdges, fitView],
+    [setNodes, setEdges, reencuadrar],
   );
 
   /** Reinicia el lienzo: vacío o con el flujo de ejemplo. */
@@ -361,9 +387,24 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
       setSelNodeId(null);
       setSelEdgeId(null);
       setReset(false);
-      if (fresh.nodes.length) setTimeout(() => fitView({ padding: 0.18, duration: 400 }), 60);
+      if (fresh.nodes.length) setTimeout(() => reencuadrar(fresh.nodes), 60);
     },
-    [setNodes, setEdges, fitView],
+    [setNodes, setEdges, reencuadrar],
+  );
+
+  /** Al montar el lienzo grande, centrar en el primer paso sin encuadrar todo. */
+  const alIniciar = useCallback(
+    (instancia) => {
+      if (!grande) return;
+      const id = entryNode(nodes, edges);
+      const node = id && nodes.find((n) => n.id === id);
+      if (!node) return;
+      const { width, height } = nodeSize(node);
+      instancia.setCenter(node.position.x + width / 2, node.position.y + height / 2, { zoom: 0.8 });
+    },
+    // Solo importa el estado inicial: después manda el usuario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [grande],
   );
 
   /** Lleva la vista al primer paso del flujo (el Inicio, o el disparador). */
@@ -482,8 +523,14 @@ function Studio({ nombre, doc, nube, onChange, onRename, onHome }) {
               onEdgeContextMenu={openEdgeMenu}
               onPaneClick={closeMenu}
               onMoveStart={closeMenu}
-              fitView
-              fitViewOptions={{ padding: 0.18 }}
+              {...(grande
+                ? // Encuadrar todo pondría los CIENTOS de pasos dentro de la vista
+                  // y React Flow los montaría todos de golpe — eso es lo que
+                  // congela el equipo. En un flujo grande se abre por el
+                  // principio, y la virtualización solo monta lo que se ve.
+                  { defaultViewport: { x: 60, y: 60, zoom: 0.8 } }
+                : { fitView: true, fitViewOptions: { padding: 0.18 } })}
+              onInit={alIniciar}
               minZoom={0.15}
               onlyRenderVisibleElements
               proOptions={{ hideAttribution: true }}
@@ -610,6 +657,45 @@ function ListaInforme({ titulo, items }) {
   );
 }
 
+/** Qué se está haciendo mientras se abre un flujo. */
+const ETAPAS = {
+  abriendo: "Abriendo el flujo…",
+  bajando: "Bajando de la nube…",
+  preparando: "Preparando los pasos…",
+  dibujando: "Dibujando el lienzo…",
+  listo: "Listo",
+};
+
+/**
+ * Pantalla de apertura con avance real.
+ *
+ * Un flujo de cientos de pasos pesa cientos de KB: bajarlo, guardarlo y montarlo
+ * lleva su tiempo, y sin señal parece que la aplicación se colgó. La barra usa
+ * el porcentaje real de la descarga, que es la parte larga.
+ */
+function Cargando({ nombre, pasos, carga }) {
+  const etapa = carga?.etapa || "abriendo";
+  const pct = etapa === "bajando" ? carga.pct : etapa === "abriendo" ? 5 : 100;
+  return (
+    <div className="cargando">
+      <div className="cargando__caja">
+        <div className="cargando__nombre">{nombre}</div>
+        {pasos ? <div className="cargando__pasos">{pasos} pasos</div> : null}
+        <div className="cargando__barra">
+          <div
+            className={`cargando__avance${etapa === "bajando" ? "" : " is-indeterminado"}`}
+            style={{ width: `${Math.max(5, pct)}%` }}
+          />
+        </div>
+        <div className="cargando__etapa">
+          {ETAPAS[etapa]}
+          {etapa === "bajando" && carga.pct ? ` ${carga.pct}%` : ""}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════ App: portada + editor ══════════════════════════ */
 
 export default function App({ sesion }) {
@@ -623,6 +709,7 @@ export default function App({ sesion }) {
   const indiceRef = useRef(indice);
   // Cuerpo del flujo abierto: `null` mientras se busca (puede venir de S3).
   const [doc, setDoc] = useState(null);
+  const [carga, setCarga] = useState(null); // { etapa, pct }
   const [estadoNube, setEstadoNube] = useState(null);
 
   // El índice es estado PURO; persistirlo es un efecto (y pesa ~1 KB).
@@ -666,8 +753,15 @@ export default function App({ sesion }) {
     }
     let vivo = true;
     setDoc(null);
-    documento(abiertoId).then((d) => {
-      if (vivo) setDoc(d);
+    setCarga({ etapa: "abriendo", pct: 0 });
+    documento(abiertoId, (etapa, pct) => {
+      if (vivo) setCarga({ etapa, pct });
+    }).then((d) => {
+      if (!vivo) return;
+      setCarga({ etapa: "dibujando", pct: 100 });
+      // Un respiro antes de montar el lienzo: así el navegador alcanza a pintar
+      // el 100 % de la barra en vez de saltar de golpe a un lienzo a medio hacer.
+      setTimeout(() => vivo && setDoc(d), 60);
     });
     return () => {
       vivo = false;
@@ -756,12 +850,7 @@ export default function App({ sesion }) {
 
   // Con `meta` pero sin `doc`, el cuerpo se está bajando de S3.
   if (meta && !doc) {
-    return (
-      <div className="cargando">
-        <div className="cargando__spinner" />
-        Abriendo «{meta.nombre}»…
-      </div>
-    );
+    return <Cargando nombre={meta.nombre} pasos={meta.pasos} carga={carga} />;
   }
 
   if (!meta) {
